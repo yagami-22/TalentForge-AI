@@ -128,6 +128,9 @@ export default async function ResumePage() {
                         <CardDescription className="mt-1 text-zinc-400">
                           Uploaded {resume.createdAt.toLocaleDateString()}
                         </CardDescription>
+                        <p className="mt-2 text-xs font-medium uppercase text-cyan-200">
+                          {resume.extractionSource ?? "Source pending"}
+                        </p>
                       </div>
                       <div className="shrink-0 text-right">
                         <p className="text-xs font-medium uppercase text-zinc-500">

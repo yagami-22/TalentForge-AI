@@ -14,6 +14,7 @@ import { prisma } from "@/lib/prisma";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "resumes");
+const isDevelopment = process.env.NODE_ENV !== "production";
 
 function sanitizeFileName(fileName: string) {
   return fileName
@@ -21,6 +22,10 @@ function sanitizeFileName(fileName: string) {
     .replace(/[^a-zA-Z0-9-_]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .toLowerCase();
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Unknown PDF extraction error";
 }
 
 export async function uploadResume(
@@ -75,21 +80,42 @@ export async function uploadResume(
   const fileUrl = `/uploads/resumes/${user.id}/${storedFileName}`;
   const buffer = Buffer.from(await file.arrayBuffer());
   let extractedText = "";
+  let extractionSource = "";
 
   try {
-    extractedText = await extractPdfText(buffer);
-  } catch {
+    const extraction = await extractPdfText(buffer);
+    extractedText = extraction.text;
+    extractionSource = extraction.source;
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+
+    if (isDevelopment) {
+      console.error("[resume-upload] PDF extraction failed", {
+        fileSize: buffer.length,
+        error: errorMessage,
+      });
+    }
+
     return {
-      message:
-        "We could not read text from this PDF. Try exporting it as a text-based PDF and upload again.",
+      message: isDevelopment
+        ? `We could not read this PDF: ${errorMessage}`
+        : "We could not read this PDF. Try uploading a clearer PDF or exporting it again.",
       status: "error",
     };
+  }
+
+  if (isDevelopment) {
+    console.log("[resume-upload] PDF extraction result", {
+      fileSize: buffer.length,
+      extractedTextLength: extractedText.length,
+      extractionSource,
+    });
   }
 
   if (!extractedText) {
     return {
       message:
-        "We could not find readable text in this PDF. Scanned image PDFs are not supported yet.",
+        "We could not find readable text in this PDF. Try exporting it as a text-based PDF and upload again.",
       status: "error",
     };
   }
@@ -104,6 +130,7 @@ export async function uploadResume(
       title,
       fileUrl,
       extractedText,
+      extractionSource,
       atsScore: atsAnalysis.score,
       atsIssues: atsAnalysis.issues,
       atsSuggestions: atsAnalysis.suggestions,
@@ -114,7 +141,7 @@ export async function uploadResume(
   revalidatePath("/dashboard/resume");
 
   return {
-    message: `Resume uploaded and analyzed. ATS score: ${atsAnalysis.score}.`,
+    message: `Resume uploaded and analyzed from ${extractionSource}. ATS score: ${atsAnalysis.score}.`,
     status: "success",
   };
 }

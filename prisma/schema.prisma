@@ -5,52 +5,54 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 enum UserRole {
   CANDIDATE
   RECRUITER
 }
 
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  name      String?
-  imageUrl  String?
-  role      UserRole?
+  id       String    @id @default(cuid())
+  clerkId  String    @unique
+  email    String    @unique
+  name     String?
+  imageUrl String?
+  role     UserRole?
 
-  resumes   Resume[]
-  jobs      Job[]
+  resumes Resume[]
+  jobs    Job[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Resume {
-  id             String   @id @default(cuid())
-  title          String
-  fileUrl        String?
-  extractedText  String?  @db.Text
-  atsScore       Int?
-  atsIssues      Json?
-  atsSuggestions Json?
-  matchScore     Int?
+  id               String  @id @default(cuid())
+  title            String
+  fileUrl          String?
+  extractedText    String? @db.Text
+  extractionSource String?
+  atsScore         Int?
+  atsIssues        Json?
+  atsSuggestions   Json?
+  matchScore       Int?
 
-  userId         String
-  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Job {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   title       String
   company     String
-  description String   @db.Text
+  description String @db.Text
 
   recruiterId String
-  recruiter   User @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  recruiter   User   @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
