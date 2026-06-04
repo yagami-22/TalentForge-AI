@@ -1,7 +1,7 @@
 "use server";
 
 import { createHash, randomUUID } from "crypto";
-import { mkdir, unlink, writeFile } from "fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import path from "path";
 
 import { revalidatePath } from "next/cache";
@@ -34,6 +34,10 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Unknown PDF extraction error";
 }
 
+function hashBuffer(buffer: Buffer) {
+  return createHash("sha256").update(buffer).digest("hex");
+}
+
 function getSafeStoredResumePath(fileUrl: string | null, userId: string) {
   if (!fileUrl || !fileUrl.startsWith(`/uploads/resumes/${userId}/`)) {
     return null;
@@ -51,6 +55,69 @@ function getSafeStoredResumePath(fileUrl: string | null, userId: string) {
   }
 
   return storedPath;
+}
+
+async function findDuplicateResumeForUser(userId: string, fileHash: string) {
+  const existingHashedResume = await prisma.resume.findFirst({
+    where: {
+      userId,
+      fileHash,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingHashedResume) {
+    return existingHashedResume;
+  }
+
+  const legacyResumes = await prisma.resume.findMany({
+    where: {
+      userId,
+      fileHash: null,
+      fileUrl: {
+        not: null,
+      },
+    },
+    select: {
+      id: true,
+      fileUrl: true,
+    },
+  });
+
+  for (const resume of legacyResumes) {
+    const storedPath = getSafeStoredResumePath(resume.fileUrl, userId);
+
+    if (!storedPath) continue;
+
+    try {
+      const existingBuffer = await readFile(storedPath);
+      const existingHash = hashBuffer(existingBuffer);
+
+      await prisma.resume.update({
+        where: {
+          id: resume.id,
+        },
+        data: {
+          fileHash: existingHash,
+        },
+      });
+
+      if (existingHash === fileHash) {
+        return { id: resume.id };
+      }
+    } catch (error) {
+      if (isDevelopment) {
+        console.warn("[resume-upload] Legacy hash backfill skipped", {
+          resumeId: resume.id,
+          error: getErrorMessage(error),
+        });
+      }
+    }
+  }
+
+  return null;
 }
 
 export async function uploadResume(
@@ -96,19 +163,19 @@ export async function uploadResume(
   const storedPath = path.join(userUploadDir, storedFileName);
   const fileUrl = `/uploads/resumes/${user.id}/${storedFileName}`;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const fileHash = createHash("sha256").update(buffer).digest("hex");
+  const fileHash = hashBuffer(buffer);
   let extractedText = "";
   let extractionSource = "";
 
-  const existingResume = await prisma.resume.findFirst({
-    where: {
-      userId: user.id,
+  const existingResume = await findDuplicateResumeForUser(user.id, fileHash);
+
+  if (isDevelopment) {
+    console.log("[resume-upload] Duplicate check", {
       fileHash,
-    },
-    select: {
-      id: true,
-    },
-  });
+      userId: user.id,
+      duplicateFound: Boolean(existingResume),
+    });
+  }
 
   if (existingResume) {
     return {
