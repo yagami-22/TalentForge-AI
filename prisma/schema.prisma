@@ -33,6 +33,7 @@ model Resume {
   extractedText    String? @db.Text
   extractionSource String?
   atsScore         Int?
+  atsAnalysis      Json?
   atsIssues        Json?
   atsSuggestions   Json?
   matchScore       Int?

@@ -7,10 +7,10 @@ import path from "path";
 import { revalidatePath } from "next/cache";
 
 import type { UploadResumeState } from "@/app/dashboard/resume/state";
-import { analyzeResumeForAts } from "@/lib/ats-analysis";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { extractPdfText } from "@/lib/pdf-text";
 import { prisma } from "@/lib/prisma";
+import { analyzeResume } from "@/lib/resume-analyzer";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "resumes");
@@ -120,7 +120,25 @@ export async function uploadResume(
     };
   }
 
-  const atsAnalysis = analyzeResumeForAts(extractedText);
+  const atsAnalysis = analyzeResume(extractedText);
+
+  if (isDevelopment) {
+    console.log("[resume-upload] Resume Analyzer v3 result", {
+      overallScore: atsAnalysis.overallScore,
+      grade: atsAnalysis.grade,
+      hiringReadiness: atsAnalysis.hiringReadiness,
+      detectedProfileType: atsAnalysis.detectedProfileType,
+      detectedSeniority: atsAnalysis.detectedSeniority,
+      categoryScores: atsAnalysis.categoryScores.map((category) => ({
+        name: category.name,
+        score: category.score,
+        maxScore: category.maxScore,
+        evidenceFound: category.evidenceFound,
+        missingEvidence: category.missingEvidence,
+      })),
+      redFlags: atsAnalysis.redFlags,
+    });
+  }
 
   await mkdir(userUploadDir, { recursive: true });
   await writeFile(storedPath, buffer);
@@ -131,9 +149,10 @@ export async function uploadResume(
       fileUrl,
       extractedText,
       extractionSource,
-      atsScore: atsAnalysis.score,
-      atsIssues: atsAnalysis.issues,
-      atsSuggestions: atsAnalysis.suggestions,
+      atsScore: atsAnalysis.overallScore,
+      atsAnalysis,
+      atsIssues: atsAnalysis.topIssues,
+      atsSuggestions: atsAnalysis.quickWins,
       userId: user.id,
     },
   });
@@ -141,7 +160,7 @@ export async function uploadResume(
   revalidatePath("/dashboard/resume");
 
   return {
-    message: `Resume uploaded and analyzed from ${extractionSource}. ATS score: ${atsAnalysis.score}.`,
+    message: `Resume uploaded and analyzed from ${extractionSource}. ATS score: ${atsAnalysis.overallScore}.`,
     status: "success",
   };
 }
