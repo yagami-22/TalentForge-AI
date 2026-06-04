@@ -52,6 +52,13 @@ export default async function ATSOptimizerPage() {
             variant="outline"
             className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
           >
+            <Link href="/dashboard/resume/rewrite">AI Rewriter</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
+          >
             <Link href="/dashboard/resume">Resume Dashboard</Link>
           </Button>
         </div>

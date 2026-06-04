@@ -313,6 +313,13 @@ export default async function ResumePage() {
               >
                 <Link href="/dashboard/resume/ats">Optimize Resume for ATS</Link>
               </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="border-cyan-200/25 bg-cyan-300/10 text-cyan-50 shadow-sm hover:border-cyan-100/40 hover:bg-cyan-300/15 hover:text-white"
+              >
+                <Link href="/dashboard/resume/rewrite">AI Resume Rewriter</Link>
+              </Button>
             </div>
             <div className="mt-7 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
               {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
