@@ -1,3 +1,6 @@
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -48,9 +51,9 @@ export default function Home() {
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
 
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
-          <a href="#" className="text-lg font-semibold tracking-tight">
+          <Link href="/" className="text-lg font-semibold tracking-tight">
             TalentForge AI
-          </a>
+          </Link>
           <div className="hidden items-center gap-8 text-sm text-zinc-300 md:flex">
             <a href="#features" className="transition hover:text-white">
               Features
@@ -59,12 +62,35 @@ export default function Home() {
               Pricing
             </a>
           </div>
-          <Button
-            variant="outline"
-            className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-          >
-            Login
-          </Button>
+          <div className="flex items-center gap-3">
+            <Show when="signed-out">
+              <SignInButton fallbackRedirectUrl="/dashboard">
+                <Button
+                  variant="outline"
+                  className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton fallbackRedirectUrl="/dashboard">
+                <Button className="hidden bg-cyan-300 text-slate-950 hover:bg-cyan-200 sm:inline-flex">
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <Button
+                asChild
+                variant="outline"
+                className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+              >
+                <Link href="/dashboard" prefetch={false}>
+                  Dashboard
+                </Link>
+              </Button>
+              <UserButton />
+            </Show>
+          </div>
         </nav>
 
         <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 pb-24 pt-16 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:pb-32 lg:pt-24">
@@ -81,12 +107,27 @@ export default function Home() {
               career roadmaps.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                className="h-12 bg-cyan-300 px-6 text-base font-semibold text-slate-950 hover:bg-cyan-200"
-              >
-                Start Free Analysis
-              </Button>
+              <Show when="signed-out">
+                <SignUpButton fallbackRedirectUrl="/dashboard">
+                  <Button
+                    size="lg"
+                    className="h-12 bg-cyan-300 px-6 text-base font-semibold text-slate-950 hover:bg-cyan-200"
+                  >
+                    Start Free Analysis
+                  </Button>
+                </SignUpButton>
+              </Show>
+              <Show when="signed-in">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 bg-cyan-300 px-6 text-base font-semibold text-slate-950 hover:bg-cyan-200"
+                >
+                  <Link href="/dashboard" prefetch={false}>
+                    Open Dashboard
+                  </Link>
+                </Button>
+              </Show>
               <Button
                 size="lg"
                 variant="outline"
@@ -208,12 +249,27 @@ export default function Home() {
                 Build the proof, practice the pitch, and walk in prepared.
               </h2>
             </div>
-            <Button
-              size="lg"
-              className="h-12 bg-white px-6 text-base font-semibold text-slate-950 hover:bg-cyan-100"
-            >
-              Get Started
-            </Button>
+            <Show when="signed-out">
+              <SignUpButton fallbackRedirectUrl="/dashboard">
+                <Button
+                  size="lg"
+                  className="h-12 bg-white px-6 text-base font-semibold text-slate-950 hover:bg-cyan-100"
+                >
+                  Get Started
+                </Button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <Button
+                asChild
+                size="lg"
+                className="h-12 bg-white px-6 text-base font-semibold text-slate-950 hover:bg-cyan-100"
+              >
+                <Link href="/dashboard" prefetch={false}>
+                  Go to Dashboard
+                </Link>
+              </Button>
+            </Show>
           </CardContent>
         </Card>
       </section>
