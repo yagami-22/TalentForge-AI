@@ -16,7 +16,7 @@ model User {
   email     String   @unique
   name      String?
   imageUrl  String?
-  role      UserRole @default(CANDIDATE)
+  role      UserRole?
 
   resumes   Resume[]
   jobs      Job[]
@@ -26,17 +26,20 @@ model User {
 }
 
 model Resume {
-  id          String   @id @default(cuid())
-  title       String
-  fileUrl     String?
-  atsScore    Int?
-  matchScore  Int?
+  id             String   @id @default(cuid())
+  title          String
+  fileUrl        String?
+  extractedText  String?  @db.Text
+  atsScore       Int?
+  atsIssues      Json?
+  atsSuggestions Json?
+  matchScore     Int?
 
-  userId      String
-  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Job {

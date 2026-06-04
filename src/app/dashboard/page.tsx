@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,24 +9,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getCurrentDbUser } from "@/lib/current-user";
 
 const dashboardItems = [
   {
-    title: "Resume ATS Analysis",
-    description: "Upload a resume and find the highest-impact fixes first.",
+    title: "Upload Resume",
+    description: "Add a PDF resume to your workspace for future ATS analysis.",
+    href: "/dashboard/resume",
   },
   {
     title: "Job Match Analysis",
     description: "Paste a role and compare it against your current profile.",
+    href: "/dashboard",
   },
   {
     title: "AI Mock Interviews",
     description: "Practice targeted questions with feedback you can act on.",
+    href: "/dashboard",
   },
 ];
 
 export default async function DashboardPage() {
-  const { userId } = await auth.protect();
+  const user = await getCurrentDbUser();
+
+  if (!user.role) {
+    redirect("/onboarding");
+  }
 
   return (
     <main className="min-h-screen bg-[#05070d] px-6 py-8 text-white lg:px-8">
@@ -51,8 +59,8 @@ export default async function DashboardPage() {
           Your career command center is ready.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-300">
-          Signed in as session owner {userId}. Start with a resume scan, match a
-          role, or run a mock interview.
+          Signed in as {user.email}. Your {user.role.toLowerCase()} workspace is
+          ready for resume scans, job matching, and interview practice.
         </p>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -68,8 +76,11 @@ export default async function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="bg-cyan-300 text-slate-950 hover:bg-cyan-200">
-                  Open
+                <Button
+                  asChild
+                  className="bg-cyan-300 text-slate-950 hover:bg-cyan-200"
+                >
+                  <Link href={item.href}>Open</Link>
                 </Button>
               </CardContent>
             </Card>
