@@ -1,6 +1,6 @@
 "use server";
 
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 
@@ -14,8 +14,11 @@ import { getCurrentDbUser } from "@/lib/current-user";
 import { extractPdfText } from "@/lib/pdf-text";
 import { prisma } from "@/lib/prisma";
 import { analyzeResume } from "@/lib/resume-analyzer";
+import {
+  validateResumeFile,
+  validateResumeText,
+} from "@/lib/resume-validation";
 
-const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "resumes");
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -72,19 +75,11 @@ export async function uploadResume(
     };
   }
 
-  const isPdf =
-    file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+  const fileValidation = validateResumeFile(file);
 
-  if (!isPdf) {
+  if (!fileValidation.isValid) {
     return {
-      message: "Only PDF resumes are supported.",
-      status: "error",
-    };
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    return {
-      message: "Resume uploads must be 8 MB or smaller.",
+      message: fileValidation.reason,
       status: "error",
     };
   }
@@ -101,8 +96,26 @@ export async function uploadResume(
   const storedPath = path.join(userUploadDir, storedFileName);
   const fileUrl = `/uploads/resumes/${user.id}/${storedFileName}`;
   const buffer = Buffer.from(await file.arrayBuffer());
+  const fileHash = createHash("sha256").update(buffer).digest("hex");
   let extractedText = "";
   let extractionSource = "";
+
+  const existingResume = await prisma.resume.findFirst({
+    where: {
+      userId: user.id,
+      fileHash,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingResume) {
+    return {
+      message: "This resume has already been uploaded.",
+      status: "error",
+    };
+  }
 
   try {
     const extraction = await extractPdfText(buffer);
@@ -121,7 +134,7 @@ export async function uploadResume(
     return {
       message: isDevelopment
         ? `We could not read this PDF: ${errorMessage}`
-        : "We could not read this PDF. Try uploading a clearer PDF or exporting it again.",
+        : "We could not read this PDF. It may be password-protected or corrupted. Please upload a text-based resume PDF.",
       status: "error",
     };
   }
@@ -137,7 +150,26 @@ export async function uploadResume(
   if (!extractedText) {
     return {
       message:
-        "We could not find readable text in this PDF. Try exporting it as a text-based PDF and upload again.",
+        "This PDF does not contain enough readable text. It may be scanned or image-based. Please upload a text-based PDF resume.",
+      status: "error",
+    };
+  }
+
+  const validation = validateResumeText(extractedText);
+
+  if (isDevelopment) {
+    console.log("[resume-upload] Resume validation", {
+      extractionQuality: validation.extractionQuality,
+      confidence: validation.confidence,
+      signalsFound: validation.signalsFound,
+      warnings: validation.warnings,
+      fileType: validation.fileType,
+    });
+  }
+
+  if (!validation.isValid) {
+    return {
+      message: validation.reason,
       status: "error",
     };
   }
@@ -171,6 +203,7 @@ export async function uploadResume(
       fileUrl,
       extractedText,
       extractionSource,
+      fileHash,
       atsScore: atsAnalysis.overallScore,
       atsAnalysis,
       atsIssues: atsAnalysis.topIssues,
@@ -184,6 +217,7 @@ export async function uploadResume(
   return {
     message: `Resume uploaded and analyzed from ${extractionSource}. ATS score: ${atsAnalysis.overallScore}.`,
     status: "success",
+    warning: validation.warnings[0],
   };
 }
 

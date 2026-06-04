@@ -55,6 +55,15 @@ export function UploadResumeForm() {
         </p>
       ) : null}
 
+      {state.warning ? (
+        <p
+          aria-live="polite"
+          className="rounded-md border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-sm leading-6 text-amber-100"
+        >
+          {state.warning}
+        </p>
+      ) : null}
+
       <Button
         type="submit"
         disabled={pending}

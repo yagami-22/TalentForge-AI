@@ -1,6 +1,7 @@
 export type UploadResumeState = {
   message: string;
   status: "idle" | "success" | "error";
+  warning?: string;
 };
 
 export type DeleteResumeState = UploadResumeState;
