@@ -343,6 +343,60 @@ const PROJECT_SECTION_NAMES = [
 const SECTION_HEADING_REGEX =
   /^(summary|profile|objective|education|skills|technical skills|core skills|projects|personal projects|portfolio|case studies|experience|work experience|professional experience|internship|internships|employment|freelance|client work|volunteer experience|volunteering|open source|hackathon|leadership|positions of responsibility|achievements|awards|certifications|publications|research|coursework|interests|activities)\s*:?$/i;
 
+const RESUME_SECTION_HEADINGS = [
+  "summary",
+  "profile",
+  "objective",
+  "career objective",
+  "professional summary",
+  "education",
+  "academics",
+  "skills",
+  "technical skills",
+  "core skills",
+  "portfolio",
+  "projects",
+  "personal projects",
+  "academic projects",
+  "research projects",
+  "case studies",
+  "experience",
+  "work experience",
+  "professional experience",
+  "internship",
+  "internships",
+  "certifications",
+  "certifications & achievements",
+  "achievements",
+  "awards",
+  "extra curricular activities",
+  "extracurricular activities",
+  "leadership",
+  "positions of responsibility",
+  "publications",
+  "research",
+  "coursework",
+  "interests",
+  "activities",
+];
+
+const EDUCATION_STOP_HEADINGS = [
+  "portfolio",
+  "projects",
+  "skills",
+  "technical skills",
+  "core skills",
+  "experience",
+  "professional experience",
+  "certifications",
+  "certifications & achievements",
+  "extra curricular activities",
+  "extracurricular activities",
+  "achievements",
+  "career objective",
+  "professional summary",
+];
+
 const EMAIL_REGEX = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
 const PHONE_REGEX =
   /(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{3,5}\)?[\s.-]?)\d{3,5}[\s.-]?\d{3,5}/;
@@ -350,6 +404,8 @@ const DATE_REGEX =
   /\b(?:20\d{2}|19\d{2}|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|present|current)\b/i;
 const YEAR_RANGE_REGEX =
   /\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:19|20)\d{2}\b/i;
+const FLEXIBLE_YEAR_RANGE_REGEX =
+  /\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:(?:19|20)\d{2}|present|current|ongoing)\b/i;
 const BULLET_REGEX = /(^|\n)\s*(?:[-*•]|\d+\.)\s+/;
 const OUTCOME_WORD_REGEX =
   /\b(?:achieved|boosted|cut|decreased|delivered|grew|improved|increased|launched|optimized|processed|reduced|saved|served|shipped|supported|won|ranked|published|certified)\b/i;
@@ -360,11 +416,21 @@ function normalize(text: string) {
   return text.replace(/\s+/g, " ").trim();
 }
 
-function getLines(text: string) {
+function normalizeResumeLines(text: string): string[] {
   return text
     .split(/\r?\n/)
-    .map((line) => line.trim())
+    .map((line) =>
+      line
+        .replace(/[–—]/g, "-")
+        .replace(/^[•*]\s*/, "- ")
+        .replace(/\s+/g, " ")
+        .trim()
+    )
     .filter(Boolean);
+}
+
+function getLines(text: string) {
+  return normalizeResumeLines(text);
 }
 
 function unique(items: string[]) {
@@ -381,25 +447,101 @@ function countMatches(text: string, terms: string[]) {
 }
 
 function hasSection(text: string, names: string[]) {
-  return names.some((name) =>
-    new RegExp(`(^|\\n)\\s*${escapeRegExp(name)}\\s*[:\\n]`, "i").test(text)
-  );
+  const lines = normalizeResumeLines(text);
+
+  return lines.some((line) => isSectionHeadingLine(line, names));
 }
 
-function extractSection(text: string, names: string[]) {
-  const lines = getLines(text);
-  const headingRegex = new RegExp(
-    `^(${names.map(escapeRegExp).join("|")})\\s*:?$`,
-    "i"
-  );
-  const start = lines.findIndex((line) => headingRegex.test(line));
+function normalizeHeading(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function matchSectionHeadingLine(line: string, headings: string[]) {
+  const raw = line.replace(/^[\-–—]\s*/, "").trim();
+  const cleaned = normalizeHeading(raw);
+
+  for (const heading of headings) {
+    const normalizedHeading = normalizeHeading(heading);
+
+    if (
+      cleaned === normalizedHeading ||
+      cleaned === `${normalizedHeading} section` ||
+      cleaned === `${normalizedHeading} details`
+    ) {
+      return { matches: true, trailingText: "" };
+    }
+
+    if (cleaned.startsWith(`${normalizedHeading} `)) {
+      const headingPattern = heading
+        .trim()
+        .split(/\s+/)
+        .map(escapeRegExp)
+        .join("\\s+");
+      const trailingText = raw
+        .replace(new RegExp(`^${headingPattern}\\s*(?::|-)?\\s*`, "i"), "")
+        .trim();
+
+      if (trailingText && trailingText !== raw) {
+        return { matches: true, trailingText };
+      }
+    }
+  }
+
+  return { matches: false, trailingText: "" };
+}
+
+function isSectionHeadingLine(line: string, headings: string[]) {
+  return matchSectionHeadingLine(line, headings).matches;
+}
+
+function extractSection(lines: string[], heading: string, stopHeadings: string[]): string[];
+function extractSection(text: string, names: string[]): string;
+function extractSection(
+  source: string | string[],
+  headingOrNames: string | string[],
+  stopHeadings: string[] = RESUME_SECTION_HEADINGS
+) {
+  if (Array.isArray(source)) {
+    const names = Array.isArray(headingOrNames) ? headingOrNames : [headingOrNames];
+    const start = source.findIndex((line) => isSectionHeadingLine(line, names));
+
+    if (start === -1) return [];
+
+    const startMatch = matchSectionHeadingLine(source[start], names);
+    const sectionLines: string[] = [];
+
+    if (startMatch.trailingText) {
+      sectionLines.push(startMatch.trailingText);
+    }
+
+    for (const line of source.slice(start + 1)) {
+      if (isSectionHeadingLine(line, stopHeadings)) break;
+      sectionLines.push(line);
+    }
+
+    return sectionLines;
+  }
+
+  const lines = normalizeResumeLines(source);
+  const names = Array.isArray(headingOrNames) ? headingOrNames : [headingOrNames];
+  const start = lines.findIndex((line) => isSectionHeadingLine(line, names));
 
   if (start === -1) return "";
 
+  const startMatch = matchSectionHeadingLine(lines[start], names);
   const sectionLines: string[] = [];
 
+  if (startMatch.trailingText) {
+    sectionLines.push(startMatch.trailingText);
+  }
+
   for (const line of lines.slice(start + 1)) {
-    if (SECTION_HEADING_REGEX.test(line)) break;
+    if (isSectionHeadingLine(line, stopHeadings)) break;
     sectionLines.push(line);
   }
 
@@ -407,20 +549,26 @@ function extractSection(text: string, names: string[]) {
 }
 
 function extractNearbySection(text: string, names: string[], lineLimit = 10) {
-  const lines = getLines(text);
-  const headingRegex = new RegExp(`\\b(${names.map(escapeRegExp).join("|")})\\b`, "i");
-  const start = lines.findIndex((line) => headingRegex.test(line));
+  const lines = normalizeResumeLines(text);
+  const start = lines.findIndex((line) => isSectionHeadingLine(line, names));
 
   if (start === -1) return "";
 
-  const sectionLines = [lines[start]];
+  const sectionLines: string[] = [];
 
   for (const line of lines.slice(start + 1, start + lineLimit)) {
-    if (SECTION_HEADING_REGEX.test(line) && !headingRegex.test(line)) break;
+    if (isSectionHeadingLine(line, RESUME_SECTION_HEADINGS)) break;
     sectionLines.push(line);
   }
 
   return sectionLines.join("\n");
+}
+
+function extractFlexibleSection(text: string, names: string[], lineLimit = 80) {
+  return (
+    extractSection(text, names) ||
+    extractNearbySection(text, names, lineLimit)
+  );
 }
 
 function escapeRegExp(value: string) {
@@ -432,13 +580,19 @@ function hasDateSignal(text: string) {
 }
 
 const DEGREE_REGEX =
-  /\b(?:b\s*\.?\s*tech|bachelor\s+of\s+technology|b\s*\.?\s*e\s*\.?|bachelor\s+of\s+engineering|b\s*\.?\s*sc|bachelor\s+of\s+science|b\s*\.?\s*s\b|m\s*\.?\s*tech|master\s+of\s+technology|m\s*\.?\s*e\s*\.?|master\s+of\s+engineering|m\s*\.?\s*sc|master\s+of\s+science|mca|mba|bba|b\s*\.?\s*com|m\s*\.?\s*com|ph\s*\.?\s*d|diploma|degree)\b/i;
+  /\b(?:b\s*\.?\s*tech|btech|bachelor\s+of\s+technology|bachelor\s+of\s+engineering|b\s*\.?\s*sc|bsc\b|bachelor\s+of\s+science|b\s*\.?\s*s\b|bs\b|m\s*\.?\s*tech|mtech\b|master\s+of\s+technology|master\s+of\s+engineering|m\s*\.?\s*sc|msc\b|master\s+of\s+science|mca|mba|bba|b\s*\.?\s*com|m\s*\.?\s*com|ph\s*\.?\s*d|diploma|degree)\b/i;
+
+const DEGREE_ABBREVIATION_REGEX =
+  /\b(?:B\s*\.?\s*E\s*\.?|M\s*\.?\s*E\s*\.?|B\s*\.?\s*Tech|BTech|B\s*\.?\s*Sc|BSc|B\s*\.?\s*S\b|BS\b|M\s*\.?\s*Tech|MTech|M\s*\.?\s*Sc|MSc|MCA|MBA)\b/;
 
 const INSTITUTION_REGEX =
-  /\b(?:university|college|engineering college|institute|polytechnic|school|academy|iit|nit|iiit|bits|vit|srm|manipal|amity|business school|vidyalaya|public school)\b/i;
+  /\b(?:university|college|institute|polytechnic|school|academy|campus|engineering|technology|business school|vidyalaya|public school)\b/i;
 
 const EDUCATION_TIMELINE_REGEX =
   /\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:(?:19|20)\d{2}|present|current|ongoing)\b|\b(?:expected|anticipated)\s+(?:graduation|completion)?\s*:?\s*(?:19|20)\d{2}\b|\b(?:graduat(?:e|ion|ing)|passing|passout)\s*(?:year)?\s*:?\s*(?:19|20)\d{2}\b/i;
+
+const EDUCATION_CGPA_REGEX =
+  /\b(?:(?:cgpa|gpa|sgpa|percentage|percent|marks)\s*:?\s*)?(?:\d+(?:\.\d+)?\s*\/\s*10|\d+(?:\.\d+)?\s*%|(?:cgpa|gpa|sgpa)\s*:?\s*\d+(?:\.\d+)?|percentage\s*:?\s*\d+(?:\.\d+)?)\b/i;
 
 const FIELD_REGEX =
   /\b(?:computer science|cse|ai\/?ml|artificial intelligence|machine learning|information technology|\bit\b|engineering|design|marketing|finance|commerce|economics|business|management|data science|statistics|psychology|operations|human resources|research|biology|physics|mathematics|law)\b/i;
@@ -447,16 +601,239 @@ function findEvidenceLine(lines: string[], regex: RegExp) {
   return lines.find((line) => regex.test(line));
 }
 
+function splitEducationSegments(line: string) {
+  return line
+    .split(/\s*\|\s*|\s{2,}/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+}
+
+function findEducationSegment(lines: string[], regex: RegExp) {
+  for (const line of lines) {
+    const segment = splitEducationSegments(line).find((item) => regex.test(item));
+
+    if (segment) return segment;
+  }
+
+  return undefined;
+}
+
+function findEducationSegmentBy(
+  lines: string[],
+  predicate: (segment: string) => boolean
+) {
+  for (const line of lines) {
+    const segment = splitEducationSegments(line).find(predicate);
+
+    if (segment) return segment;
+  }
+
+  return undefined;
+}
+
+function flattenedEducationSegments(lines: string[]) {
+  return lines.flatMap((line) => {
+    const segments = splitEducationSegments(line);
+
+    return segments.length > 1 ? segments : [line];
+  });
+}
+
+function hasDegreeSignal(segment: string) {
+  return DEGREE_REGEX.test(segment) || DEGREE_ABBREVIATION_REGEX.test(segment);
+}
+
+function isDegreeCandidate(segment: string) {
+  return (
+    hasDegreeSignal(segment) ||
+    (FIELD_REGEX.test(segment) &&
+      !/\b(?:university|college|institute|polytechnic|school|academy|campus|business school|vidyalaya|public school)\b/i.test(
+        segment
+      ) &&
+      !EDUCATION_TIMELINE_REGEX.test(segment) &&
+      !EDUCATION_CGPA_REGEX.test(segment))
+  );
+}
+
+function isCgpaOnlyLine(line: string) {
+  return EDUCATION_CGPA_REGEX.test(line) && !lineWithoutEducationSignals(line);
+}
+
+function lineWithoutEducationSignals(line: string) {
+  return line
+    .replace(DEGREE_REGEX, " ")
+    .replace(DEGREE_ABBREVIATION_REGEX, " ")
+    .replace(EDUCATION_TIMELINE_REGEX, " ")
+    .replace(FIELD_REGEX, " ")
+    .replace(/\b(?:cgpa|gpa|sgpa|percentage|percent|marks|grade|aggregate)\b\s*:?\s*\d+(?:\.\d+)?(?:\s*(?:\/\s*10|%|percent))?/gi, " ")
+    .replace(/[,:|/()&-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isTimelineOnlyLine(line: string) {
+  return EDUCATION_TIMELINE_REGEX.test(line) && !lineWithoutEducationSignals(line);
+}
+
+function isEducationInstitutionCandidate(line: string) {
+  const cleaned = line.trim();
+
+  if (
+    !cleaned ||
+    SECTION_HEADING_REGEX.test(cleaned) ||
+    EMAIL_REGEX.test(cleaned) ||
+    PHONE_REGEX.test(cleaned) ||
+    isTimelineOnlyLine(cleaned) ||
+    isCgpaOnlyLine(cleaned) ||
+    isDegreeCandidate(cleaned) ||
+    hasDegreeSignal(cleaned) ||
+    /\b(?:cgpa|gpa|sgpa|percentage|percent|marks|grade|aggregate|class 10|class 12|class x|class xii|10th|12th)\b/i.test(
+      cleaned
+    )
+  ) {
+    return false;
+  }
+
+  return /[a-z]/i.test(cleaned) && cleaned.length >= 3 && cleaned.length <= 120;
+}
+
+function findStructuralInstitutionLine(lines: string[]) {
+  const degreeIndex = lines.findIndex((line) => hasDegreeSignal(line));
+  const timelineIndex = lines.findIndex((line) => EDUCATION_TIMELINE_REGEX.test(line));
+  const hasEducationAnchor = degreeIndex !== -1 || timelineIndex !== -1;
+
+  if (!hasEducationAnchor) {
+    return findEvidenceLine(lines, INSTITUTION_REGEX);
+  }
+
+  const institutionWordLine = lines.find(
+    (line) => INSTITUTION_REGEX.test(line) && isEducationInstitutionCandidate(line)
+  );
+
+  if (institutionWordLine) {
+    return institutionWordLine;
+  }
+
+  const anchorIndexes = [degreeIndex, timelineIndex].filter((index) => index >= 0);
+  const firstAnchor = Math.min(...anchorIndexes);
+  const lastAnchor = Math.max(...anchorIndexes);
+
+  return lines.find((line, index) => {
+    if (!isEducationInstitutionCandidate(line)) {
+      return false;
+    }
+
+    return index >= Math.max(0, firstAnchor - 3) && index <= lastAnchor + 4;
+  });
+}
+
+function findInlineInstitutionSegment(lines: string[]) {
+  for (const line of lines) {
+    const segments = splitEducationSegments(line);
+
+    if (segments.length < 2) continue;
+
+    const institutionSegment =
+      segments.find(
+        (segment) =>
+          INSTITUTION_REGEX.test(segment) &&
+          isEducationInstitutionCandidate(segment)
+      ) ??
+      segments.find(
+        (segment) =>
+          isEducationInstitutionCandidate(segment) &&
+          !isDegreeCandidate(segment) &&
+          !EDUCATION_TIMELINE_REGEX.test(segment) &&
+          !EDUCATION_CGPA_REGEX.test(segment)
+      );
+
+    if (institutionSegment) {
+      return institutionSegment;
+    }
+  }
+
+  return undefined;
+}
+
+function parseInlineEducationSegments(lines: string[]) {
+  for (const line of lines) {
+    const segments = splitEducationSegments(line);
+
+    if (segments.length < 3) continue;
+
+    const degreeLine = segments.find(isDegreeCandidate);
+    const timelineLine = segments.find((segment) =>
+      EDUCATION_TIMELINE_REGEX.test(segment)
+    );
+    const academicPerformanceLine = segments.find((segment) =>
+      EDUCATION_CGPA_REGEX.test(segment)
+    );
+    const institutionLine =
+      segments.find(
+        (segment) =>
+          segment !== degreeLine &&
+          segment !== timelineLine &&
+          segment !== academicPerformanceLine &&
+          INSTITUTION_REGEX.test(segment) &&
+          isEducationInstitutionCandidate(segment)
+      ) ??
+      segments.find(
+        (segment) =>
+          segment !== degreeLine &&
+          segment !== timelineLine &&
+          segment !== academicPerformanceLine &&
+          isEducationInstitutionCandidate(segment)
+      );
+
+    if (degreeLine || institutionLine || timelineLine || academicPerformanceLine) {
+      return {
+        degreeLine,
+        institutionLine,
+        timelineLine,
+        academicPerformanceLine,
+      };
+    }
+  }
+
+  return {};
+}
+
 function extractEducationEvidence(context: ResumeContext) {
-  const education =
-    extractSection(context.text, ["education"]) ||
-    extractNearbySection(context.text, ["education", "academics"], 14);
+  const normalizedLines = normalizeResumeLines(context.text);
+  const educationSectionLines = extractSection(
+    normalizedLines,
+    "education",
+    EDUCATION_STOP_HEADINGS
+  );
+  const educationLines = educationSectionLines.length
+    ? educationSectionLines
+    : extractSection(normalizedLines, "academics", EDUCATION_STOP_HEADINGS);
+  const education = educationLines.length
+    ? educationLines.join("\n")
+    : extractFlexibleSection(context.text, ["education", "academics"], 18);
   const scope = education || context.text;
-  const scopeLines = getLines(scope);
+  const scopeLines = normalizeResumeLines(scope);
   const allLines = education ? scopeLines : context.lines;
-  const degreeLine = findEvidenceLine(allLines, DEGREE_REGEX);
-  const institutionLine = findEvidenceLine(allLines, INSTITUTION_REGEX);
-  const timelineLine = findEvidenceLine(allLines, EDUCATION_TIMELINE_REGEX);
+  const educationSegments = flattenedEducationSegments(allLines);
+  const inlineEducation = parseInlineEducationSegments(allLines);
+  const degreeLine =
+    inlineEducation.degreeLine ??
+    educationSegments.find(isDegreeCandidate) ??
+    findEducationSegmentBy(allLines, hasDegreeSignal) ??
+    findEvidenceLine(allLines, DEGREE_REGEX) ??
+    findEvidenceLine(allLines, DEGREE_ABBREVIATION_REGEX);
+  const timelineLine =
+    inlineEducation.timelineLine ??
+    findEducationSegment(allLines, EDUCATION_TIMELINE_REGEX) ??
+    findEvidenceLine(allLines, EDUCATION_TIMELINE_REGEX);
+  const institutionLine =
+    inlineEducation.institutionLine ??
+    findInlineInstitutionSegment(allLines) ??
+    findStructuralInstitutionLine(allLines);
+  const academicPerformanceLine =
+    inlineEducation.academicPerformanceLine ??
+    findEducationSegment(allLines, EDUCATION_CGPA_REGEX) ??
+    findEvidenceLine(allLines, EDUCATION_CGPA_REGEX);
   const fieldLine = findEvidenceLine(allLines, FIELD_REGEX);
 
   return {
@@ -465,8 +842,118 @@ function extractEducationEvidence(context: ResumeContext) {
     degreeLine,
     institutionLine,
     timelineLine,
+    academicPerformanceLine,
     fieldLine,
   };
+}
+
+type ProjectEntry = {
+  title: string;
+  lines: string[];
+  hasTimeline: boolean;
+  hasProofMarker: boolean;
+};
+
+function isTimelineLine(line: string) {
+  return FLEXIBLE_YEAR_RANGE_REGEX.test(line) || /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)\b.{0,20}\b(?:19|20)\d{2}\b/i.test(line);
+}
+
+function isProjectProofLine(line: string) {
+  return (
+    extractUrlEvidence(line).length > 0 ||
+    hasVisibleLabel(line, [
+      "github",
+      "git hub",
+      "repository",
+      "repo",
+      "source code",
+      "live",
+      "demo",
+      "project link",
+      "app link",
+      "website",
+    ]) ||
+    hasArrowLinkMarker(line)
+  );
+}
+
+function isLikelyProjectTitle(line: string, previousLine = "", nextLine = "") {
+  const cleaned = line.replace(/^[•\-*–]\s*/, "").trim();
+
+  if (
+    !cleaned ||
+    cleaned.length > 95 ||
+    SECTION_HEADING_REGEX.test(cleaned) ||
+    isTimelineLine(cleaned) ||
+    isProjectProofLine(cleaned) ||
+    /[.;]$/.test(cleaned) ||
+    /\b(?:developed|built|created|designed|implemented|integrated|supports|allows|enables|using|with|through|by|for users|responsible)\b/i.test(cleaned)
+  ) {
+    return false;
+  }
+
+  const hasProjectNameSignal =
+    /\b(?:planora|complaint|management system|system|platform|dashboard|app|application|website|portal|tracker|ai|ml|assistant|case study|analysis|model|automation)\b/i.test(
+      cleaned
+    );
+  const hasAdjacentStructure =
+    isTimelineLine(previousLine) ||
+    isTimelineLine(nextLine) ||
+    isProjectProofLine(previousLine) ||
+    isProjectProofLine(nextLine);
+  const titleCaseWords = cleaned
+    .split(/\s+/)
+    .filter((word) => /^[A-Z][A-Za-z0-9&()/-]*$/.test(word)).length;
+
+  return hasProjectNameSignal || hasAdjacentStructure || titleCaseWords >= 2;
+}
+
+function extractProjectEntries(scope: string) {
+  const lines = getLines(scope);
+  const entries: ProjectEntry[] = [];
+  let current: ProjectEntry | null = null;
+
+  lines.forEach((line, index) => {
+    const previousLine = lines[index - 1] ?? "";
+    const nextLine = lines[index + 1] ?? "";
+
+    if (SECTION_HEADING_REGEX.test(line)) {
+      return;
+    }
+
+    if (isLikelyProjectTitle(line, previousLine, nextLine)) {
+      if (current) entries.push(current);
+      current = {
+        title: line.replace(/[↗→➜➡›»]+.*/, "").trim(),
+        lines: [line],
+        hasTimeline: isTimelineLine(previousLine) || isTimelineLine(nextLine),
+        hasProofMarker: isProjectProofLine(previousLine) || isProjectProofLine(nextLine),
+      };
+      return;
+    }
+
+    if (!current) return;
+
+    current.lines.push(line);
+
+    if (isTimelineLine(line)) {
+      current.hasTimeline = true;
+    }
+
+    if (isProjectProofLine(line)) {
+      current.hasProofMarker = true;
+    }
+  });
+
+  if (current) entries.push(current);
+
+  return entries.filter((entry) =>
+    entry.lines.some((line) =>
+      /\b(?:developed|built|created|designed|implemented|integrated|supports|allows|enables|workflow|feature|module|database|testing|documentation|responsive|frontend|full-stack|ai|recommendation|automation|srs|uml|dfd)\b/i.test(
+        line
+      )
+    )
+  );
 }
 
 function stripNonAchievementNumbers(line: string) {
@@ -767,6 +1254,7 @@ function analyzeEducation(context: ResumeContext) {
     degreeLine,
     institutionLine,
     timelineLine,
+    academicPerformanceLine,
     fieldLine,
   } = extractEducationEvidence(context);
   const hasDegree = Boolean(degreeLine);
@@ -774,9 +1262,7 @@ function analyzeEducation(context: ResumeContext) {
   const hasTimeline = Boolean(timelineLine) || hasDateSignal(scope);
   const hasField = Boolean(fieldLine);
   const hasAcademicPerformance =
-    /\b(?:cgpa|gpa|sgpa|percentage|percent|marks|grade|aggregate)\b\s*:?\s*\d+(?:\.\d+)?(?:\s*(?:\/\s*10|%|percent))?/i.test(
-      scope
-    ) || /\b\d+(?:\.\d+)?\s*%\b/.test(scope);
+    Boolean(academicPerformanceLine) || EDUCATION_CGPA_REGEX.test(scope);
   const hasClass12 =
     /\b(?:class|grade|standard|std\.?|xii|12th|senior secondary|higher secondary|intermediate|cbse|isc|hsc)\b/i.test(
       scope
@@ -786,16 +1272,18 @@ function analyzeEducation(context: ResumeContext) {
       scope
     ) && /\b(?:x|10th|10|secondary|matriculation|cbse|icse|ssc)\b/i.test(scope);
   const rawScore =
-    (hasDegree ? 2 : 0) +
+    (hasDegree ? 3 : 0) +
     (hasInstitution ? 2 : 0) +
     (hasTimeline ? 2 : 0) +
-    (hasField ? 1 : 0) +
     (hasAcademicPerformance ? 1 : 0) +
     (hasClass12 ? 1 : 0) +
     (hasClass10 ? 1 : 0);
-  const score = hasDegree && hasInstitution && hasTimeline
-    ? Math.max(7, rawScore)
-    : rawScore;
+  const score =
+    hasDegree && hasInstitution && hasTimeline && hasAcademicPerformance
+      ? Math.max(8, rawScore)
+      : hasDegree && hasInstitution && hasTimeline
+        ? Math.max(7, rawScore)
+        : rawScore;
 
   return makeCategory(
     "Education Strength",
@@ -806,7 +1294,7 @@ function analyzeEducation(context: ResumeContext) {
       hasInstitution ? `Institution found${institutionLine ? `: ${institutionLine}` : ""}` : "",
       hasTimeline ? `Graduation timeline found${timelineLine ? `: ${timelineLine}` : ""}` : "",
       hasField ? `Relevant field or specialization found${fieldLine ? `: ${fieldLine}` : ""}` : "",
-      hasAcademicPerformance ? "Academic performance found" : "",
+      hasAcademicPerformance ? `Academic performance found${academicPerformanceLine ? `: ${academicPerformanceLine}` : ""}` : "",
       hasClass12 ? "Class 12 or equivalent found" : "",
       hasClass10 ? "Class 10 or equivalent found" : "",
     ],
@@ -819,7 +1307,7 @@ function analyzeEducation(context: ResumeContext) {
       !hasClass12 ? "Class 12 or equivalent missing" : "",
       !hasClass10 ? "Class 10 or equivalent missing" : "",
     ],
-    `Awarded ${score}/10 from ${education ? "the education area" : "resume-wide education evidence"}. Degree, institution, and timeline evidence create a 7/10 floor; full marks require academic performance plus school education.`,
+    `Awarded ${score}/10 from ${education ? "the education area" : "resume-wide education evidence"}. Degree, institution, and timeline evidence create a 7/10 floor; adding CGPA or percentage creates an 8/10 floor.`,
     [
       !hasAcademicPerformance ? "Add CGPA, percentage, honors, or another credible academic performance signal." : "",
       !hasClass12 && context.seniority !== "Senior" ? "Add Class 12 or equivalent if it strengthens a student/fresher resume." : "",
@@ -920,9 +1408,10 @@ function analyzeSkills(context: ResumeContext) {
 }
 
 function analyzeProjects(context: ResumeContext) {
-  const projectSection = extractSection(context.text, PROJECT_SECTION_NAMES);
+  const projectSection = extractFlexibleSection(context.text, PROJECT_SECTION_NAMES, 90);
   const scope = projectSection || context.text;
   const lines = getLines(scope);
+  const projectEntries = extractProjectEntries(scope);
   const projectTerms = [
     "project",
     "case study",
@@ -941,21 +1430,25 @@ function analyzeProjects(context: ResumeContext) {
   ];
   const projectSignals = countMatches(scope, projectTerms).length;
   const hasProjectSection = Boolean(projectSection) || hasSection(context.text, PROJECT_SECTION_NAMES);
-  const projectTitleLines = lines.filter(
+  const projectTitleLines = unique([
+    ...projectEntries.map((entry) => entry.title),
+    ...lines.filter(
     (line) =>
       line.length <= 90 &&
       /\b(?:project|system|app|platform|dashboard|case study|portfolio|analysis|model|planora|management)\b/i.test(
         line
       )
-  );
+    ),
+  ]);
   const descriptionLines = lines.filter(
     (line) =>
       line.length > 30 &&
-      /\b(?:built|created|designed|analyzed|researched|implemented|developed|conducted|launched|planned|optimized|managed|allows|enables|provides|tracks|generates|uses|integrates|supports|workflow|feature|module|dashboard|system|application|platform|complaint|management)\b/i.test(
+      /\b(?:built|created|designed|analyzed|researched|implemented|developed|conducted|launched|planned|optimized|managed|allows|enables|provides|tracks|generates|uses|integrates|supports|workflow|feature|module|dashboard|system|application|platform|complaint|management|frontend|full-stack|full stack|database|testing|documentation|recommendation|automation|timer|planning|srs|uml|dfd|responsive|role-based|role based)\b/i.test(
         line
       )
   );
   const estimatedProjectCount = Math.max(
+    projectEntries.length,
     projectTitleLines.length,
     Math.min(3, descriptionLines.length),
     hasProjectSection && descriptionLines.length ? 1 : 0
@@ -969,12 +1462,29 @@ function analyzeProjects(context: ResumeContext) {
     "api",
     "apis",
     "database",
+    "database integration",
     "schema",
     "authentication",
     "authorization",
+    "role-based",
+    "role based",
     "ai",
     "ml",
     "llm",
+    "ui",
+    "frontend",
+    "full-stack",
+    "full stack",
+    "srs",
+    "uml",
+    "dfd",
+    "testing",
+    "documentation",
+    "workflow",
+    "workflows",
+    "automation",
+    "recommendation",
+    "recommendations",
   ]);
   const proofScope = projectSection
     ? scope
@@ -1022,7 +1532,9 @@ function analyzeProjects(context: ResumeContext) {
     "scholar",
   ]);
   const visibleProof =
-    proofLabels.length > 0 || hasArrowLinkMarker(proofScope);
+    proofLabels.length > 0 ||
+    hasArrowLinkMarker(proofScope) ||
+    projectEntries.some((entry) => entry.hasProofMarker);
   const complexitySignals = countMatches(scope, [
     "feature",
     "features",
@@ -1044,6 +1556,10 @@ function analyzeProjects(context: ResumeContext) {
     "valuation",
     "dashboard",
     "dashboards",
+    "ui",
+    "frontend",
+    "full-stack",
+    "full stack",
     "prototype",
     "user research",
     "financial modeling",
@@ -1055,15 +1571,27 @@ function analyzeProjects(context: ResumeContext) {
     "strategy",
     "workflow",
     "workflows",
+    "registration",
+    "tracking",
+    "resolution",
     "testing",
+    "documentation",
+    "srs",
+    "uml",
+    "dfd",
     "client",
     "ai",
     "ml",
     "machine learning",
     "llm",
     "recommendation",
+    "recommendations",
+    "timer",
+    "planning",
+    "productivity",
     "real-time",
     "role based",
+    "role-based",
     "business process",
     "ux process",
     "wireframe",
@@ -1074,7 +1602,9 @@ function analyzeProjects(context: ResumeContext) {
     ACTION_VERBS.some((verb) => new RegExp(`\\b${verb}\\b`, "i").test(line))
   );
   const projectExistenceScore =
-    hasProjectSection && descriptionLines.length >= 1
+    projectEntries.length >= 2
+      ? 3
+      : hasProjectSection && descriptionLines.length >= 1
       ? 3
       : hasProjectSection || projectTitleLines.length >= 1 || projectSignals >= 2
         ? 2
@@ -1083,7 +1613,7 @@ function analyzeProjects(context: ResumeContext) {
           : 0;
   const rawScore =
     projectExistenceScore +
-    (descriptionLines.length >= 2 ? 3 : descriptionLines.length === 1 ? 2 : 0) +
+    (descriptionLines.length >= 3 ? 3 : descriptionLines.length >= 1 ? 2 : 0) +
     (tools.length >= 4 ? 3 : tools.length >= 2 ? 2 : tools.length >= 1 ? 1 : 0) +
     (actualProof ? 3 : visibleProof ? 2 : 0) +
     (complexitySignals.length >= 6 ? 4 : complexitySignals.length >= 3 ? 3 : complexitySignals.length >= 1 ? 2 : 0) +
@@ -1101,10 +1631,15 @@ function analyzeProjects(context: ResumeContext) {
     descriptionLines.length >= 2 &&
     tools.length >= 3 &&
     complexitySignals.length >= 3;
+  const detailedStudentProjects =
+    estimatedProjectCount >= 2 &&
+    descriptionLines.length >= 3 &&
+    complexitySignals.length >= 5 &&
+    (visibleProof || actualProof || projectEntries.some((entry) => entry.hasTimeline));
   const projectWithProof =
     projectExistenceScore >= 2 &&
     descriptionLines.length >= 1 &&
-    tools.length >= 2 &&
+    (tools.length >= 2 || complexitySignals.length >= 4) &&
     (actualProof || visibleProof);
   const strongProjectEvidence =
     substantialStudentProject && (actualProof || visibleProof);
@@ -1138,6 +1673,8 @@ function analyzeProjects(context: ResumeContext) {
       ? 14
       : strongProjectEvidence
         ? 13
+        : detailedStudentProjects
+          ? 11
         : projectWithProof
           ? 10
           : goodStudentProject
@@ -1157,6 +1694,9 @@ function analyzeProjects(context: ResumeContext) {
     [
       hasProjectSection ? "Projects, portfolio, case studies, or selected work section found" : "",
       estimatedProjectCount ? `Estimated project count: ${estimatedProjectCount}` : "",
+      projectEntries.length ? `Detected project titles: ${projectEntries.map((entry) => entry.title).slice(0, 4).join(", ")}` : "",
+      projectEntries.length ? `Project bullet/detail counts: ${projectEntries.map((entry) => `${entry.title}: ${Math.max(0, entry.lines.length - 1)}`).slice(0, 4).join("; ")}` : "",
+      projectEntries.some((entry) => entry.hasTimeline) ? "Structured project timeline(s) found" : "",
       projectTitleLines.length ? `${projectTitleLines.length} project title/name signal(s)` : "",
       descriptionLines.length ? `${descriptionLines.length} clear project/work sample description line(s)` : "",
       tools.length ? `Tools/methods used: ${tools.slice(0, 8).join(", ")}` : "",
