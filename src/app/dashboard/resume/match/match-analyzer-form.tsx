@@ -1,18 +1,65 @@
 "use client";
 
-import { useActionState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import { analyzeResumeMatch } from "@/app/dashboard/resume/match/actions";
 import { initialMatchResumeState } from "@/app/dashboard/resume/match/state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import type { JobDescriptionMatchAnalysis } from "@/lib/jd-match-analyzer";
 
 type ResumeOption = {
   id: string;
   title: string;
   createdAtLabel: string;
 };
+
+type SavedMatchState = {
+  resumeId: string;
+  jobDescription: string;
+  analysis: JobDescriptionMatchAnalysis;
+};
+
+const JD_MATCH_STORAGE_KEY = "talentforge.jdMatch.latest";
+const JD_MATCH_STORAGE_EVENT = "talentforge.jdMatch.storage";
+
+function subscribeToSavedMatch(callback: () => void) {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  window.addEventListener("storage", callback);
+  window.addEventListener(JD_MATCH_STORAGE_EVENT, callback);
+
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener(JD_MATCH_STORAGE_EVENT, callback);
+  };
+}
+
+function getSavedMatchSnapshot() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.localStorage.getItem(JD_MATCH_STORAGE_KEY);
+}
+
+function getServerSavedMatchSnapshot() {
+  return null;
+}
+
+function notifySavedMatchChanged() {
+  window.dispatchEvent(new Event(JD_MATCH_STORAGE_EVENT));
+}
 
 function scoreWidth(score: number, maxScore = 100) {
   return `${Math.max(0, Math.min(100, (score / maxScore) * 100))}%`;
@@ -84,7 +131,94 @@ export function MatchAnalyzerForm({ resumes }: { resumes: ResumeOption[] }) {
     analyzeResumeMatch,
     initialMatchResumeState
   );
-  const analysis = state.analysis;
+  const [hideCurrentActionResult, setHideCurrentActionResult] = useState(false);
+  const lastSubmittedResumeId = useRef("");
+  const lastSubmittedJobDescription = useRef("");
+  const savedMatchSnapshot = useSyncExternalStore(
+    subscribeToSavedMatch,
+    getSavedMatchSnapshot,
+    getServerSavedMatchSnapshot
+  );
+  const resumeIds = useMemo(() => new Set(resumes.map((resume) => resume.id)), [resumes]);
+  const savedMatchState = useMemo(() => {
+    if (!savedMatchSnapshot) return null;
+
+    try {
+      const parsed = JSON.parse(savedMatchSnapshot) as Partial<SavedMatchState>;
+
+      if (
+        typeof parsed.resumeId !== "string" ||
+        typeof parsed.jobDescription !== "string" ||
+        !parsed.analysis
+      ) {
+        return null;
+      }
+
+      return parsed as SavedMatchState;
+    } catch {
+      return null;
+    }
+  }, [savedMatchSnapshot]);
+  const validSavedMatchState =
+    savedMatchState && resumeIds.has(savedMatchState.resumeId)
+      ? savedMatchState
+      : null;
+  const analysis = hideCurrentActionResult
+    ? validSavedMatchState?.analysis ?? null
+    : state.analysis ?? validSavedMatchState?.analysis ?? null;
+
+  useEffect(() => {
+    if (savedMatchSnapshot && !validSavedMatchState) {
+      window.localStorage.removeItem(JD_MATCH_STORAGE_KEY);
+      notifySavedMatchChanged();
+    }
+  }, [savedMatchSnapshot, validSavedMatchState]);
+
+  useEffect(() => {
+    if (
+      state.status !== "success" ||
+      !state.analysis ||
+      !lastSubmittedResumeId.current
+    ) {
+      return;
+    }
+
+    const nextSavedState: SavedMatchState = {
+      resumeId: lastSubmittedResumeId.current,
+      jobDescription: lastSubmittedJobDescription.current,
+      analysis: state.analysis,
+    };
+
+    window.localStorage.setItem(
+      JD_MATCH_STORAGE_KEY,
+      JSON.stringify(nextSavedState)
+    );
+    notifySavedMatchChanged();
+  }, [state.analysis, state.status]);
+
+  function submitMatch(formData: FormData) {
+    const resumeId = formData.get("resumeId");
+    const jobDescription = formData.get("jobDescription");
+
+    lastSubmittedResumeId.current =
+      typeof resumeId === "string" ? resumeId : "";
+    lastSubmittedJobDescription.current =
+      typeof jobDescription === "string" ? jobDescription : "";
+    setHideCurrentActionResult(false);
+    formAction(formData);
+  }
+
+  function clearSavedMatch() {
+    const confirmed = window.confirm("Clear this saved match analysis?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    window.localStorage.removeItem(JD_MATCH_STORAGE_KEY);
+    notifySavedMatchChanged();
+    setHideCurrentActionResult(true);
+  }
 
   return (
     <div className="space-y-10">
@@ -104,7 +238,7 @@ export function MatchAnalyzerForm({ resumes }: { resumes: ResumeOption[] }) {
           </div>
         </CardHeader>
         <CardContent>
-          <form action={formAction} className="space-y-6 pt-6">
+          <form action={submitMatch} className="space-y-6 pt-6">
             <div className="grid gap-5 lg:grid-cols-[380px_1fr]">
               <div className="rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
                 <label htmlFor="resumeId" className="text-sm font-medium text-zinc-200">
@@ -114,9 +248,11 @@ export function MatchAnalyzerForm({ resumes }: { resumes: ResumeOption[] }) {
                   Select a readable uploaded resume. Only your resumes appear here.
                 </p>
                 <select
+                  key={`resume-${validSavedMatchState?.resumeId ?? "empty"}`}
                   id="resumeId"
                   name="resumeId"
                   required
+                  defaultValue={validSavedMatchState?.resumeId ?? ""}
                   className="mt-3 h-12 w-full rounded-xl border border-white/10 bg-slate-950/70 px-3 text-sm text-white outline-none ring-cyan-300/20 transition focus:border-cyan-200/50 focus:ring-2"
                 >
                   <option value="">Select a resume</option>
@@ -139,10 +275,12 @@ export function MatchAnalyzerForm({ resumes }: { resumes: ResumeOption[] }) {
                   and preferred qualifications for best results.
                 </p>
                 <Textarea
+                  key={`jd-${validSavedMatchState?.resumeId ?? "empty"}`}
                   id="jobDescription"
                   name="jobDescription"
                   required
                   rows={12}
+                  defaultValue={validSavedMatchState?.jobDescription ?? ""}
                   placeholder="Paste the full job description with responsibilities, requirements, and qualifications..."
                   className="mt-3 min-h-80 rounded-xl border-white/10 bg-slate-950/70 p-4 text-white shadow-inner placeholder:text-zinc-500 focus-visible:border-cyan-200/50 focus-visible:ring-cyan-300/20"
                 />
@@ -175,6 +313,24 @@ export function MatchAnalyzerForm({ resumes }: { resumes: ResumeOption[] }) {
 
       {analysis ? (
         <section className="space-y-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase text-cyan-100">
+                Latest Match Report
+              </p>
+              <p className="mt-1 text-sm text-zinc-500">
+                Saved locally in this browser for refresh recovery.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={clearSavedMatch}
+              className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
+            >
+              Clear saved match
+            </Button>
+          </div>
           <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-white/[0.09] via-white/[0.045] to-cyan-300/[0.055] text-white shadow-[0_28px_100px_rgba(0,0,0,0.38)] ring-1 ring-white/10">
             <CardContent className="space-y-5 pt-6">
               <div className="grid gap-5 lg:grid-cols-[260px_1fr]">

@@ -296,6 +296,16 @@ export default async function ResumePage() {
               Upload a PDF resume to generate a criteria-based analysis with
               explainable scoring, missing evidence, quick wins, and red flags.
             </p>
+            <div className="mt-6">
+              <Button
+                asChild
+                className="bg-gradient-to-r from-cyan-200 to-emerald-200 text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,0.18)] hover:from-cyan-100 hover:to-emerald-100"
+              >
+                <Link href="/dashboard/resume/match">
+                  Match Resume to Job Description
+                </Link>
+              </Button>
+            </div>
             <div className="mt-7 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
               {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
                 (item) => (
