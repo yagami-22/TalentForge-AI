@@ -539,24 +539,29 @@ function detectProfileType(text: string) {
 function detectSeniority(text: string): ResumeSeniority {
   const lower = text.toLowerCase();
   const hasExperienceSection = hasSection(text, EXPERIENCE_SECTION_NAMES);
-  const hasProfessionalSignal =
+  const hasFullTimeSignal =
     hasExperienceSection ||
-    /\b(?:full-time|professional experience|employment|company|associate|analyst|engineer|developer|designer|manager|consultant)\b/i.test(
+    /\b(?:full-time|professional experience|employment|work experience|company|associate|analyst|engineer|developer|designer|manager|consultant)\b/i.test(
       text
     );
-  const hasPracticalSignal =
-    hasProfessionalSignal ||
-    /\b(?:intern|internship|freelance|client work|volunteer|open source|hackathon|competition|leadership)\b/i.test(
+  const hasInternshipSignal =
+    /\b(?:intern|internship|trainee|apprentice)\b/i.test(text);
+  const hasOtherPracticalSignal =
+    /\b(?:freelance|client work|volunteer|open source|hackathon|competition|leadership)\b/i.test(
       text
     );
   const hasCurrentEducationSignal =
-    /\b(?:student|undergraduate|currently pursuing|pursuing|expected graduation|graduating|class 12|class 10|campus|college student)\b/i.test(
+    /\b(?:student|undergraduate|currently pursuing|pursuing|expected|expected graduation|graduating|graduation|b\.?\s?tech|b\.?\s?e\.?|bachelor(?:\s+of\s+(?:technology|engineering))?|cse|computer science|engineering|college|university|institute|class 12|class xii|class 10|class x|cgpa|campus|college student)\b/i.test(
       text
     );
   const hasRecentGraduateSignal =
-    /\b(?:fresher|entry level|new graduate|recent graduate|graduate trainee)\b/i.test(
+    /\b(?:fresher|entry level|new graduate|recent graduate|graduate trainee|recently graduated)\b/i.test(
       text
     );
+  const hasProjectHeavyStudentSignal =
+    hasSection(text, PROJECT_SECTION_NAMES) &&
+    hasCurrentEducationSignal &&
+    !hasFullTimeSignal;
 
   const experienceMatch = lower.match(/\b(\d{1,2})\+?\s*(?:years|yrs)\b/);
   const years = experienceMatch ? Number(experienceMatch[1]) : null;
@@ -565,14 +570,26 @@ function detectSeniority(text: string): ResumeSeniority {
   if (years !== null && years >= 4) return "Mid Level";
   if (years !== null && years >= 1) return "Early Career";
 
-  if (hasProfessionalSignal) return "Early Career";
+  if (hasFullTimeSignal) return "Early Career";
 
-  if (hasRecentGraduateSignal && !hasProfessionalSignal) {
+  if (hasInternshipSignal && !hasCurrentEducationSignal) {
+    return "Early Career";
+  }
+
+  if (hasRecentGraduateSignal && !hasFullTimeSignal) {
     return "Fresher";
   }
 
-  if (hasCurrentEducationSignal && !hasPracticalSignal) {
+  if (hasInternshipSignal && hasCurrentEducationSignal) {
+    return "Fresher";
+  }
+
+  if (hasCurrentEducationSignal || hasProjectHeavyStudentSignal) {
     return "Student";
+  }
+
+  if (hasOtherPracticalSignal) {
+    return "Fresher";
   }
 
   return "Unknown";

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { DeleteResumeButton } from "@/app/dashboard/resume/delete-resume-button";
 import { UploadResumeForm } from "@/app/dashboard/resume/upload-resume-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -152,7 +153,7 @@ function CompactListCard({
         : "text-zinc-200";
 
   return (
-    <Card className="border-white/10 bg-white/[0.04] text-white ring-white/10">
+    <Card className="border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.035] text-white shadow-[0_18px_60px_rgba(0,0,0,0.28)] ring-1 ring-white/10">
       <CardHeader className="pb-3">
         <CardTitle className={`text-base ${titleTone}`}>{title}</CardTitle>
       </CardHeader>
@@ -173,17 +174,17 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
   const breakdownRows = getBreakdownRows(category);
 
   return (
-    <Card className="border-white/10 bg-white/[0.04] text-white ring-white/10">
+    <Card className="border-white/10 bg-gradient-to-b from-white/[0.075] to-white/[0.035] text-white shadow-[0_18px_60px_rgba(0,0,0,0.25)] ring-1 ring-white/10">
       <CardHeader className="space-y-3 pb-3">
         <div className="flex items-start justify-between gap-3">
           <CardTitle className="text-base leading-6">{category.name}</CardTitle>
-          <p className="shrink-0 text-sm font-semibold text-cyan-200">
+          <p className="shrink-0 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-2 py-1 text-sm font-semibold text-cyan-100">
             {category.score}/{category.maxScore}
           </p>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/10 shadow-inner">
           <div
-            className="h-full rounded-full bg-cyan-300"
+            className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300"
             style={{ width: scoreWidth(category.score, category.maxScore) }}
           />
         </div>
@@ -192,7 +193,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        <details className="rounded-md border border-white/10 bg-black/10 px-3 py-2">
+        <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
           <summary className="cursor-pointer text-xs font-medium text-emerald-200">
             Evidence found ({evidenceRows.length})
           </summary>
@@ -204,7 +205,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
               ))}
           </ul>
         </details>
-        <details className="rounded-md border border-white/10 bg-black/10 px-3 py-2">
+        <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
           <summary className="cursor-pointer text-xs font-medium text-amber-200">
             Missing evidence ({missingRows.length})
           </summary>
@@ -216,7 +217,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
               ))}
           </ul>
         </details>
-        <details className="rounded-md border border-white/10 bg-black/10 px-3 py-2">
+        <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
           <summary className="cursor-pointer text-xs font-medium text-cyan-200">
             Suggestions ({category.suggestions.length})
           </summary>
@@ -231,7 +232,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
           </ul>
         </details>
         {breakdownRows.length ? (
-          <details className="rounded-md border border-white/10 bg-black/10 px-3 py-2">
+          <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
             <summary className="cursor-pointer text-xs font-medium text-zinc-300">
               Subcriteria ({breakdownRows.length})
             </summary>
@@ -268,37 +269,49 @@ export default async function ResumePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-8 text-white lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_32rem),linear-gradient(180deg,#05070d_0%,#08111d_48%,#05070d_100%)] px-5 py-7 text-white sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between rounded-md border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_18px_60px_rgba(0,0,0,0.25)] backdrop-blur">
         <Link href="/" className="text-lg font-semibold tracking-tight">
           TalentForge AI
         </Link>
         <Button
           asChild
           variant="outline"
-          className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+          className="border-white/15 bg-white/[0.04] text-white shadow-sm hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
         >
           <Link href="/dashboard">Dashboard</Link>
         </Button>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl py-10">
-        <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
-          <div className="flex flex-col justify-center">
-            <p className="text-sm font-semibold uppercase text-cyan-200">
-              Resume Analyzer v3
+      <section className="mx-auto w-full max-w-7xl py-10 lg:py-12">
+        <div className="grid gap-6 lg:grid-cols-[1fr_430px]">
+          <div className="flex flex-col justify-center rounded-md border border-white/10 bg-white/[0.035] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.3)] backdrop-blur sm:p-8">
+            <p className="text-sm font-semibold uppercase text-cyan-100">
+              Resume Intelligence
             </p>
-            <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
               Evidence-based resume diagnostics.
             </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-300">
+            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
               Upload a PDF resume to generate a criteria-based analysis with
               explainable scoring, missing evidence, quick wins, and red flags.
             </p>
+            <div className="mt-7 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
+              {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
+                (item) => (
+                  <div
+                    key={item}
+                    className="rounded-md border border-cyan-200/10 bg-cyan-300/[0.06] px-3 py-2 text-cyan-50"
+                  >
+                    {item}
+                  </div>
+                )
+              )}
+            </div>
           </div>
 
-          <Card className="border-white/10 bg-white/[0.055] text-white ring-white/10">
-            <CardHeader className="pb-3">
+          <Card className="border-cyan-200/15 bg-gradient-to-b from-cyan-300/[0.09] to-white/[0.045] text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)] ring-1 ring-cyan-200/10">
+            <CardHeader className="pb-4">
               <CardTitle className="text-lg">Upload Resume</CardTitle>
               <CardDescription className="text-sm leading-6 text-zinc-400">
                 Existing uploads stay compatible. New uploads store the full
@@ -315,7 +328,7 @@ export default async function ResumePage() {
       <section className="mx-auto w-full max-w-7xl pb-16">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase text-cyan-200">
+            <p className="text-sm font-semibold uppercase text-cyan-100">
               Library
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight">
@@ -358,7 +371,7 @@ export default async function ResumePage() {
 
               return (
                 <article key={resume.id} className="space-y-4">
-                  <Card className="border-white/10 bg-white/[0.055] text-white ring-white/10">
+                  <Card className="border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.04] text-white shadow-[0_24px_90px_rgba(0,0,0,0.34)] ring-1 ring-white/10">
                     <CardHeader className="pb-4">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
@@ -376,16 +389,16 @@ export default async function ResumePage() {
                           ) : (
                             <p className="mt-3 text-sm leading-6 text-zinc-500">
                               Full diagnostics will appear after this resume is
-                              analyzed with Resume Analyzer v3.
+                              analyzed with Resume Intelligence.
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 lg:justify-end">
+                        <div className="flex items-start gap-3 lg:justify-end">
                           {resume.fileUrl ? (
                             <Button
                               asChild
                               variant="outline"
-                              className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                              className="border-cyan-200/25 bg-cyan-300/10 text-cyan-50 shadow-sm hover:border-cyan-100/40 hover:bg-cyan-300/15 hover:text-white"
                             >
                               <a
                                 href={resume.fileUrl}
@@ -396,12 +409,16 @@ export default async function ResumePage() {
                               </a>
                             </Button>
                           ) : null}
+                          <DeleteResumeButton
+                            resumeId={resume.id}
+                            resumeTitle={resume.title}
+                          />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                        <div className="rounded-md border border-white/10 bg-black/15 p-3">
+                        <div className="rounded-md border border-cyan-200/15 bg-cyan-300/[0.07] p-3 shadow-inner">
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Overall
                           </p>
@@ -413,7 +430,7 @@ export default async function ResumePage() {
                             {score === null ? "--" : score}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/15 p-3">
+                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Grade
                           </p>
@@ -421,7 +438,7 @@ export default async function ResumePage() {
                             {grade ?? "Not scored"}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/15 p-3">
+                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Readiness
                           </p>
@@ -429,7 +446,7 @@ export default async function ResumePage() {
                             {hiringReadiness}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/15 p-3">
+                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Profile
                           </p>
@@ -437,7 +454,7 @@ export default async function ResumePage() {
                             {detectedProfileType}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/15 p-3">
+                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Seniority
                           </p>
@@ -446,9 +463,9 @@ export default async function ResumePage() {
                           </p>
                         </div>
                       </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-white/10 shadow-inner">
                         <div
-                          className="h-full rounded-full bg-cyan-300"
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300"
                           style={{ width: scoreWidth(score) }}
                         />
                       </div>
@@ -462,13 +479,13 @@ export default async function ResumePage() {
                       ))}
                     </div>
                   ) : (
-                    <Card className="border-white/10 bg-white/[0.035] text-white ring-white/10">
+                    <Card className="border-white/10 bg-white/[0.045] text-white ring-white/10">
                       <CardHeader>
                         <CardTitle className="text-base">
                           Category scoring pending
                         </CardTitle>
                         <CardDescription className="leading-6 text-zinc-400">
-                          Upload this resume again to generate the full v3
+                          Upload this resume again to generate the full
                           category breakdown.
                         </CardDescription>
                       </CardHeader>
@@ -499,7 +516,7 @@ export default async function ResumePage() {
             })}
           </div>
         ) : (
-          <Card className="border-white/10 bg-white/[0.035] text-white ring-white/10">
+          <Card className="border-white/10 bg-white/[0.045] text-white ring-white/10">
             <CardHeader>
               <CardTitle>No resumes uploaded yet</CardTitle>
               <CardDescription className="leading-6 text-zinc-400">

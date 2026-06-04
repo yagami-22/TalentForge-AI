@@ -1,12 +1,15 @@
 "use server";
 
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, unlink, writeFile } from "fs/promises";
 import path from "path";
 
 import { revalidatePath } from "next/cache";
 
-import type { UploadResumeState } from "@/app/dashboard/resume/state";
+import type {
+  DeleteResumeState,
+  UploadResumeState,
+} from "@/app/dashboard/resume/state";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { extractPdfText } from "@/lib/pdf-text";
 import { prisma } from "@/lib/prisma";
@@ -26,6 +29,25 @@ function sanitizeFileName(fileName: string) {
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Unknown PDF extraction error";
+}
+
+function getSafeStoredResumePath(fileUrl: string | null, userId: string) {
+  if (!fileUrl || !fileUrl.startsWith(`/uploads/resumes/${userId}/`)) {
+    return null;
+  }
+
+  const relativePath = fileUrl.replace(/^\/+/, "");
+  const storedPath = path.resolve(process.cwd(), "public", relativePath);
+  const userUploadRoot = path.resolve(UPLOAD_ROOT, userId);
+
+  if (
+    storedPath !== userUploadRoot &&
+    !storedPath.startsWith(`${userUploadRoot}${path.sep}`)
+  ) {
+    return null;
+  }
+
+  return storedPath;
 }
 
 export async function uploadResume(
@@ -161,6 +183,90 @@ export async function uploadResume(
 
   return {
     message: `Resume uploaded and analyzed from ${extractionSource}. ATS score: ${atsAnalysis.overallScore}.`,
+    status: "success",
+  };
+}
+
+export async function deleteResume(
+  _prevState: DeleteResumeState,
+  formData: FormData
+): Promise<DeleteResumeState> {
+  const user = await getCurrentDbUser();
+
+  if (!user.role) {
+    return {
+      message: "Complete onboarding before deleting a resume.",
+      status: "error",
+    };
+  }
+
+  const resumeId = formData.get("resumeId");
+
+  if (typeof resumeId !== "string" || !resumeId.trim()) {
+    return {
+      message: "Resume id is missing.",
+      status: "error",
+    };
+  }
+
+  const resume = await prisma.resume.findFirst({
+    where: {
+      id: resumeId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+      fileUrl: true,
+      title: true,
+    },
+  });
+
+  if (!resume) {
+    return {
+      message: "Resume not found or you do not have permission to delete it.",
+      status: "error",
+    };
+  }
+
+  const storedPath = getSafeStoredResumePath(resume.fileUrl, user.id);
+
+  if (storedPath) {
+    try {
+      await unlink(storedPath);
+    } catch (error) {
+      const isMissingFile =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "ENOENT";
+
+      if (!isMissingFile) {
+        if (isDevelopment) {
+          console.error("[resume-delete] File deletion failed", {
+            resumeId: resume.id,
+            fileUrl: resume.fileUrl,
+            error: getErrorMessage(error),
+          });
+        }
+
+        return {
+          message: "We could not delete the uploaded PDF. Try again.",
+          status: "error",
+        };
+      }
+    }
+  }
+
+  await prisma.resume.delete({
+    where: {
+      id: resume.id,
+    },
+  });
+
+  revalidatePath("/dashboard/resume");
+
+  return {
+    message: `${resume.title} deleted.`,
     status: "success",
   };
 }

@@ -23,7 +23,7 @@ export function UploadResumeForm() {
           id="title"
           name="title"
           placeholder="Software Engineer Resume"
-          className="border-white/10 bg-white/[0.06] text-white placeholder:text-zinc-500"
+          className="border-white/10 bg-black/20 text-white shadow-inner placeholder:text-zinc-500 focus-visible:border-cyan-200/40 focus-visible:ring-cyan-300/20"
         />
       </div>
 
@@ -37,7 +37,7 @@ export function UploadResumeForm() {
           type="file"
           accept="application/pdf,.pdf"
           required
-          className="border-white/10 bg-white/[0.06] text-white file:mr-4 file:rounded-md file:border-0 file:bg-cyan-300 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-950"
+          className="border-white/10 bg-black/20 text-white shadow-inner file:mr-4 file:rounded-md file:border-0 file:bg-cyan-200 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-950 hover:border-cyan-200/30 focus-visible:border-cyan-200/40 focus-visible:ring-cyan-300/20"
         />
         <p className="text-xs text-zinc-500">PDF only, up to 8 MB.</p>
       </div>
@@ -58,7 +58,7 @@ export function UploadResumeForm() {
       <Button
         type="submit"
         disabled={pending}
-        className="w-full bg-cyan-300 text-slate-950 hover:bg-cyan-200 disabled:opacity-60"
+        className="w-full bg-gradient-to-r from-cyan-200 to-emerald-200 text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,0.18)] hover:from-cyan-100 hover:to-emerald-100 disabled:opacity-60"
       >
         {pending ? "Uploading..." : "Upload Resume"}
       </Button>
