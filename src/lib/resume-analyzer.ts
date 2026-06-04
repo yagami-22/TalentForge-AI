@@ -431,6 +431,44 @@ function hasDateSignal(text: string) {
   return YEAR_RANGE_REGEX.test(text) || DATE_REGEX.test(text);
 }
 
+const DEGREE_REGEX =
+  /\b(?:b\s*\.?\s*tech|bachelor\s+of\s+technology|b\s*\.?\s*e\s*\.?|bachelor\s+of\s+engineering|b\s*\.?\s*sc|bachelor\s+of\s+science|b\s*\.?\s*s\b|m\s*\.?\s*tech|master\s+of\s+technology|m\s*\.?\s*e\s*\.?|master\s+of\s+engineering|m\s*\.?\s*sc|master\s+of\s+science|mca|mba|bba|b\s*\.?\s*com|m\s*\.?\s*com|ph\s*\.?\s*d|diploma|degree)\b/i;
+
+const INSTITUTION_REGEX =
+  /\b(?:university|college|engineering college|institute|polytechnic|school|academy|iit|nit|iiit|bits|vit|srm|manipal|amity|business school|vidyalaya|public school)\b/i;
+
+const EDUCATION_TIMELINE_REGEX =
+  /\b(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:(?:19|20)\d{2}|present|current|ongoing)\b|\b(?:expected|anticipated)\s+(?:graduation|completion)?\s*:?\s*(?:19|20)\d{2}\b|\b(?:graduat(?:e|ion|ing)|passing|passout)\s*(?:year)?\s*:?\s*(?:19|20)\d{2}\b/i;
+
+const FIELD_REGEX =
+  /\b(?:computer science|cse|ai\/?ml|artificial intelligence|machine learning|information technology|\bit\b|engineering|design|marketing|finance|commerce|economics|business|management|data science|statistics|psychology|operations|human resources|research|biology|physics|mathematics|law)\b/i;
+
+function findEvidenceLine(lines: string[], regex: RegExp) {
+  return lines.find((line) => regex.test(line));
+}
+
+function extractEducationEvidence(context: ResumeContext) {
+  const education =
+    extractSection(context.text, ["education"]) ||
+    extractNearbySection(context.text, ["education", "academics"], 14);
+  const scope = education || context.text;
+  const scopeLines = getLines(scope);
+  const allLines = education ? scopeLines : context.lines;
+  const degreeLine = findEvidenceLine(allLines, DEGREE_REGEX);
+  const institutionLine = findEvidenceLine(allLines, INSTITUTION_REGEX);
+  const timelineLine = findEvidenceLine(allLines, EDUCATION_TIMELINE_REGEX);
+  const fieldLine = findEvidenceLine(allLines, FIELD_REGEX);
+
+  return {
+    education,
+    scope,
+    degreeLine,
+    institutionLine,
+    timelineLine,
+    fieldLine,
+  };
+}
+
 function stripNonAchievementNumbers(line: string) {
   return line
     .replace(EMAIL_REGEX, " ")
@@ -615,25 +653,30 @@ function buildContext(text: string): ResumeContext {
     lower: text.toLowerCase(),
     lines,
     bulletLines,
-    headerText: lines.slice(0, 12).join(" "),
+    headerText: lines.slice(0, 20).join(" "),
     profileType,
     seniority: detectSeniority(text),
   };
 }
 
 function analyzeContact(context: ResumeContext) {
-  const header = context.headerText;
+  const contactScope = `${context.headerText} ${extractNearbySection(context.text, [
+    "contact",
+    "links",
+    "profiles",
+  ], 8)}`;
   const hasEmail = EMAIL_REGEX.test(context.text);
   const hasPhone = PHONE_REGEX.test(context.text);
   const hasLocation =
-    /\b(?:remote|india|usa|canada|uk|delhi|mumbai|pune|bengaluru|bangalore|hyderabad|chennai|kolkata|noida|gurgaon|new york|london|toronto|san francisco)\b/i.test(
-      header
+    /\b(?:remote|india|usa|canada|uk|delhi|new delhi|mumbai|pune|bengaluru|bangalore|hyderabad|chennai|kolkata|noida|gurgaon|gurugram|ahmedabad|jaipur|chandigarh|lucknow|indore|bhopal|kochi|new york|london|toronto|san francisco)\b(?:\s*,\s*[a-z][a-z .-]+)?/i.test(
+      contactScope
     );
-  const actualLinkedIn = hasActualUrl(header, ["linkedin.com"]);
-  const visibleLinkedIn = hasVisibleLabel(header, ["linkedin"]);
-  const actualProfessionalProfile = hasActualUrl(header, [
+  const actualLinkedIn = hasActualUrl(contactScope, ["linkedin.com"]);
+  const visibleLinkedIn = hasVisibleLabel(contactScope, ["linkedin"]);
+  const actualProfessionalProfile = hasActualUrl(contactScope, [
     "github.com",
     "gitlab.com",
+    "leetcode.com",
     "behance.net",
     "dribbble.com",
     "medium.com",
@@ -641,17 +684,20 @@ function analyzeContact(context: ResumeContext) {
     "scholar.google.com",
   ]);
   const visibleProfessionalProfile =
-    hasVisibleLabel(header, [
+    hasVisibleLabel(contactScope, [
       "github",
       "git hub",
+      "leetcode",
+      "leet code",
       "portfolio",
       "behance",
       "dribbble",
       "medium",
       "kaggle",
       "google scholar",
-    ]) || hasArrowLinkMarker(header);
-  const actualRelevantWebsite = hasActualUrl(header, [
+    ]) || hasArrowLinkMarker(contactScope);
+  const actualRelevantWebsite = hasActualUrl(contactScope, [
+    "leetcode.com",
     "behance.net",
     "dribbble.com",
     "medium.com",
@@ -715,23 +761,18 @@ function analyzeContact(context: ResumeContext) {
 }
 
 function analyzeEducation(context: ResumeContext) {
-  const education =
-    extractSection(context.text, ["education"]) ||
-    extractNearbySection(context.text, ["education", "academics"]);
-  const scope = education || context.text;
-  const hasDegree =
-    /\b(?:b\.?\s?tech|bachelor(?:\s+of\s+(?:technology|engineering))?|b\.?\s?e\.?|master|m\.?\s?tech|mba|bba|b\.?\s?com|m\.?\s?com|ph\.?d|diploma|degree)\b/i.test(
-      scope
-    );
-  const hasInstitution =
-    /\b(?:university|college|institute|school|academy|iit|nit|iiit|bits|vit|srm|manipal|amity|business school|vidyalaya|public school)\b/i.test(
-      scope
-    );
-  const hasTimeline = hasDateSignal(scope);
-  const hasField =
-    /\b(?:computer science|cse|ai\/?ml|artificial intelligence|machine learning|information technology|\bit\b|engineering|design|marketing|finance|commerce|economics|business|management|data science|statistics|psychology|operations|human resources|research|biology|physics|mathematics|law)\b/i.test(
-      scope
-    );
+  const {
+    education,
+    scope,
+    degreeLine,
+    institutionLine,
+    timelineLine,
+    fieldLine,
+  } = extractEducationEvidence(context);
+  const hasDegree = Boolean(degreeLine);
+  const hasInstitution = Boolean(institutionLine);
+  const hasTimeline = Boolean(timelineLine) || hasDateSignal(scope);
+  const hasField = Boolean(fieldLine);
   const hasAcademicPerformance =
     /\b(?:cgpa|gpa|sgpa|percentage|percent|marks|grade|aggregate)\b\s*:?\s*\d+(?:\.\d+)?(?:\s*(?:\/\s*10|%|percent))?/i.test(
       scope
@@ -744,7 +785,7 @@ function analyzeEducation(context: ResumeContext) {
     /\b(?:class|grade|standard|std\.?|x|10th|secondary|matriculation|cbse|icse|ssc)\b/i.test(
       scope
     ) && /\b(?:x|10th|10|secondary|matriculation|cbse|icse|ssc)\b/i.test(scope);
-  const score =
+  const rawScore =
     (hasDegree ? 2 : 0) +
     (hasInstitution ? 2 : 0) +
     (hasTimeline ? 2 : 0) +
@@ -752,16 +793,19 @@ function analyzeEducation(context: ResumeContext) {
     (hasAcademicPerformance ? 1 : 0) +
     (hasClass12 ? 1 : 0) +
     (hasClass10 ? 1 : 0);
+  const score = hasDegree && hasInstitution && hasTimeline
+    ? Math.max(7, rawScore)
+    : rawScore;
 
   return makeCategory(
     "Education Strength",
     score,
     10,
     [
-      hasDegree ? "Degree or program found" : "",
-      hasInstitution ? "Institution found" : "",
-      hasTimeline ? "Graduation timeline found" : "",
-      hasField ? "Relevant field or specialization found" : "",
+      hasDegree ? `Degree or program found${degreeLine ? `: ${degreeLine}` : ""}` : "",
+      hasInstitution ? `Institution found${institutionLine ? `: ${institutionLine}` : ""}` : "",
+      hasTimeline ? `Graduation timeline found${timelineLine ? `: ${timelineLine}` : ""}` : "",
+      hasField ? `Relevant field or specialization found${fieldLine ? `: ${fieldLine}` : ""}` : "",
       hasAcademicPerformance ? "Academic performance found" : "",
       hasClass12 ? "Class 12 or equivalent found" : "",
       hasClass10 ? "Class 10 or equivalent found" : "",
@@ -775,7 +819,7 @@ function analyzeEducation(context: ResumeContext) {
       !hasClass12 ? "Class 12 or equivalent missing" : "",
       !hasClass10 ? "Class 10 or equivalent missing" : "",
     ],
-    `Awarded ${score}/10 from ${education ? "the education area" : "resume-wide education evidence"}. Degree, institution, timeline, and field alone cap this category at 7/10; full marks require academic performance plus school education.`,
+    `Awarded ${score}/10 from ${education ? "the education area" : "resume-wide education evidence"}. Degree, institution, and timeline evidence create a 7/10 floor; full marks require academic performance plus school education.`,
     [
       !hasAcademicPerformance ? "Add CGPA, percentage, honors, or another credible academic performance signal." : "",
       !hasClass12 && context.seniority !== "Senior" ? "Add Class 12 or equivalent if it strengthens a student/fresher resume." : "",

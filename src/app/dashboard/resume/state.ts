@@ -5,6 +5,7 @@ export type UploadResumeState = {
 };
 
 export type DeleteResumeState = UploadResumeState;
+export type ReanalyzeResumeState = UploadResumeState;
 
 export const initialUploadResumeState: UploadResumeState = {
   message: "",
@@ -12,6 +13,11 @@ export const initialUploadResumeState: UploadResumeState = {
 };
 
 export const initialDeleteResumeState: DeleteResumeState = {
+  message: "",
+  status: "idle",
+};
+
+export const initialReanalyzeResumeState: ReanalyzeResumeState = {
   message: "",
   status: "idle",
 };

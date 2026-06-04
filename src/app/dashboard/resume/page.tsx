@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { DeleteResumeButton } from "@/app/dashboard/resume/delete-resume-button";
+import { ReanalyzeResumeButton } from "@/app/dashboard/resume/reanalyze-resume-button";
 import { UploadResumeForm } from "@/app/dashboard/resume/upload-resume-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -296,7 +297,7 @@ export default async function ResumePage() {
               Upload a PDF resume to generate a criteria-based analysis with
               explainable scoring, missing evidence, quick wins, and red flags.
             </p>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-3">
               <Button
                 asChild
                 className="bg-gradient-to-r from-cyan-200 to-emerald-200 text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,0.18)] hover:from-cyan-100 hover:to-emerald-100"
@@ -304,6 +305,13 @@ export default async function ResumePage() {
                 <Link href="/dashboard/resume/match">
                   Match Resume to Job Description
                 </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="border-cyan-200/25 bg-cyan-300/10 text-cyan-50 shadow-sm hover:border-cyan-100/40 hover:bg-cyan-300/15 hover:text-white"
+              >
+                <Link href="/dashboard/resume/ats">Optimize Resume for ATS</Link>
               </Button>
             </div>
             <div className="mt-7 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
@@ -419,6 +427,10 @@ export default async function ResumePage() {
                               </a>
                             </Button>
                           ) : null}
+                          <ReanalyzeResumeButton
+                            resumeId={resume.id}
+                            resumeTitle={resume.title}
+                          />
                           <DeleteResumeButton
                             resumeId={resume.id}
                             resumeTitle={resume.title}

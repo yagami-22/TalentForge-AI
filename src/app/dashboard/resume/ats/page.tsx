@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { MatchAnalyzerForm } from "@/app/dashboard/resume/match/match-analyzer-form";
+import { ATSOptimizerForm } from "@/app/dashboard/resume/ats/ats-optimizer-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-export default async function ResumeMatchPage() {
+export default async function ATSOptimizerPage() {
   const user = await getCurrentDbUser();
 
   if (!user.role) {
@@ -39,13 +39,13 @@ export default async function ResumeMatchPage() {
         <Link href="/" className="text-lg font-semibold tracking-tight">
           TalentForge AI
         </Link>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap justify-end gap-3">
           <Button
             asChild
             variant="outline"
             className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
           >
-            <Link href="/dashboard/resume/ats">Optimize Resume for ATS</Link>
+            <Link href="/dashboard/resume/match">JD Match</Link>
           </Button>
           <Button
             asChild
@@ -53,13 +53,6 @@ export default async function ResumeMatchPage() {
             className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
           >
             <Link href="/dashboard/resume">Resume Dashboard</Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
-          >
-            <Link href="/dashboard">Dashboard</Link>
           </Button>
         </div>
       </div>
@@ -70,21 +63,21 @@ export default async function ResumeMatchPage() {
           <div className="pointer-events-none absolute -bottom-24 left-16 h-56 w-56 rounded-full bg-emerald-300/10 blur-3xl" />
           <div className="relative">
             <span className="inline-flex rounded-full border border-cyan-200/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase text-cyan-100">
-              Evidence-based resume intelligence
+              ATS Optimization Engine v0.4
             </span>
             <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              See exactly how your resume matches the role.
+              Tune your resume for the job description.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Paste a job description, choose one uploaded resume, and get a
-              structured match report across skills, tools, responsibilities,
-              seniority, and proof.
+              Select an uploaded resume, paste a complete JD, and receive an
+              ATS-focused report with missing keywords, warnings, weak bullets,
+              improved bullet rewrites, strengths, and quick wins.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               {[
-                ["100-point score", "Weighted by job-critical evidence"],
-                ["Evidence table", "See what matched and what is missing"],
-                ["Gap analysis", "Prioritized edits for faster tailoring"],
+                ["100-point ATS score", "Weighted by required JD evidence"],
+                ["Keyword coverage", "Matched and missing terms from the JD"],
+                ["Bullet rewrites", "Practical edits without invented claims"],
               ].map(([title, description]) => (
                 <div
                   key={title}
@@ -103,7 +96,7 @@ export default async function ResumeMatchPage() {
 
       <section className="mx-auto w-full max-w-7xl pb-16">
         {resumes.length ? (
-          <MatchAnalyzerForm
+          <ATSOptimizerForm
             resumes={resumes.map((resume) => ({
               id: resume.id,
               title: resume.title,
@@ -115,8 +108,7 @@ export default async function ResumeMatchPage() {
             <CardHeader>
               <CardTitle>No readable resumes available</CardTitle>
               <CardDescription className="leading-6 text-zinc-400">
-                Upload a text-based resume PDF before matching it to a job
-                description.
+                Upload a text-based resume PDF before optimizing it for ATS.
               </CardDescription>
             </CardHeader>
           </Card>

@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 
 import type {
   DeleteResumeState,
+  ReanalyzeResumeState,
   UploadResumeState,
 } from "@/app/dashboard/resume/state";
 import { getCurrentDbUser } from "@/lib/current-user";
@@ -368,6 +369,76 @@ export async function deleteResume(
 
   return {
     message: `${resume.title} deleted.`,
+    status: "success",
+  };
+}
+
+export async function reanalyzeResume(
+  _prevState: ReanalyzeResumeState,
+  formData: FormData
+): Promise<ReanalyzeResumeState> {
+  const user = await getCurrentDbUser();
+
+  if (!user.role) {
+    return {
+      message: "Complete onboarding before re-analyzing a resume.",
+      status: "error",
+    };
+  }
+
+  const resumeId = formData.get("resumeId");
+
+  if (typeof resumeId !== "string" || !resumeId.trim()) {
+    return {
+      message: "Resume id is missing.",
+      status: "error",
+    };
+  }
+
+  const resume = await prisma.resume.findFirst({
+    where: {
+      id: resumeId,
+      userId: user.id,
+    },
+    select: {
+      id: true,
+      title: true,
+      extractedText: true,
+    },
+  });
+
+  if (!resume) {
+    return {
+      message: "Resume not found or you do not have permission to re-analyze it.",
+      status: "error",
+    };
+  }
+
+  if (!resume.extractedText || resume.extractedText.replace(/\s+/g, "").length < 120) {
+    return {
+      message: "This resume does not have enough readable text to re-analyze.",
+      status: "error",
+    };
+  }
+
+  const atsAnalysis = analyzeResume(resume.extractedText);
+
+  await prisma.resume.update({
+    where: {
+      id: resume.id,
+    },
+    data: {
+      atsScore: atsAnalysis.overallScore,
+      atsAnalysis,
+      atsIssues: atsAnalysis.topIssues,
+      atsSuggestions: atsAnalysis.quickWins,
+    },
+  });
+
+  revalidatePath("/dashboard/resume");
+
+  return {
+    message: `${resume.title} re-analyzed. Updated score: ${atsAnalysis.overallScore}.`,
     status: "success",
   };
 }
