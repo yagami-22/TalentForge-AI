@@ -111,8 +111,8 @@ export default async function ATSOptimizerPage() {
             }))}
           />
         ) : (
-          <Card className="border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.035] text-white shadow-[0_24px_80px_rgba(0,0,0,0.3)] ring-white/10">
-            <CardHeader>
+          <Card className="h-fit border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.035] text-white shadow-[0_18px_60px_rgba(0,0,0,0.24)] ring-white/10">
+            <CardHeader className="pb-4">
               <CardTitle>No readable resumes available</CardTitle>
               <CardDescription className="leading-6 text-zinc-400">
                 Upload a text-based resume PDF before optimizing it for ATS.

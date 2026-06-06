@@ -238,9 +238,9 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
           </div>
         </CardHeader>
         <CardContent>
-          <form action={submitATSOptimization} className="space-y-6 pt-6">
-            <div className="grid gap-5 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
+          <form action={submitATSOptimization} className="space-y-5 pt-5">
+            <div className="grid gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
+              <div className="h-fit rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
                 <label htmlFor="resumeId" className="text-sm font-medium text-zinc-200">
                   Resume
                 </label>
@@ -262,6 +262,21 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
                     </option>
                   ))}
                 </select>
+                <div className="mt-4 border-t border-white/10 pt-3">
+                  <p className="text-xs font-medium uppercase text-zinc-500">
+                    Optimization focus
+                  </p>
+                  <div className="mt-2 grid gap-2 text-xs text-zinc-400">
+                    {["Keyword coverage", "Bullet strength", "ATS warnings"].map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-lg border border-cyan-200/10 bg-cyan-300/[0.06] px-3 py-2 text-cyan-50"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
@@ -283,7 +298,7 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
                   rows={12}
                   defaultValue={validSavedATSState?.jobDescription ?? ""}
                   placeholder="Paste the complete job description with responsibilities, requirements, and qualifications..."
-                  className="mt-3 min-h-80 rounded-xl border-white/10 bg-slate-950/70 p-4 text-white shadow-inner placeholder:text-zinc-500 focus-visible:border-cyan-200/50 focus-visible:ring-cyan-300/20"
+                  className="mt-3 min-h-72 rounded-xl border-white/10 bg-slate-950/70 p-4 text-white shadow-inner placeholder:text-zinc-500 focus-visible:border-cyan-200/50 focus-visible:ring-cyan-300/20"
                 />
               </div>
             </div>

@@ -285,8 +285,8 @@ export default async function ResumePage() {
       </div>
 
       <section className="mx-auto w-full max-w-7xl py-10 lg:py-12">
-        <div className="grid gap-6 lg:grid-cols-[1fr_430px]">
-          <div className="flex flex-col justify-center rounded-md border border-white/10 bg-white/[0.035] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.3)] backdrop-blur sm:p-8">
+        <div className="grid gap-5 lg:grid-cols-[1fr_400px] lg:items-start">
+          <div className="rounded-md border border-white/10 bg-white/[0.035] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.3)] backdrop-blur sm:p-7">
             <p className="text-sm font-semibold uppercase text-cyan-100">
               Resume Intelligence
             </p>
@@ -321,7 +321,7 @@ export default async function ResumePage() {
                 <Link href="/dashboard/resume/rewrite">AI Resume Rewriter</Link>
               </Button>
             </div>
-            <div className="mt-7 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
+            <div className="mt-6 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
               {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
                 (item) => (
                   <div
@@ -335,15 +335,15 @@ export default async function ResumePage() {
             </div>
           </div>
 
-          <Card className="border-cyan-200/15 bg-gradient-to-b from-cyan-300/[0.09] to-white/[0.045] text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)] ring-1 ring-cyan-200/10">
-            <CardHeader className="pb-4">
+          <Card className="h-fit border-cyan-200/15 bg-gradient-to-b from-cyan-300/[0.09] to-white/[0.045] text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)] ring-1 ring-cyan-200/10">
+            <CardHeader className="pb-3">
               <CardTitle className="text-lg">Upload Resume</CardTitle>
               <CardDescription className="text-sm leading-6 text-zinc-400">
                 Existing uploads stay compatible. New uploads store the full
                 analysis JSON.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               <UploadResumeForm />
             </CardContent>
           </Card>
@@ -508,8 +508,8 @@ export default async function ResumePage() {
                       ))}
                     </div>
                   ) : (
-                    <Card className="border-white/10 bg-white/[0.045] text-white ring-white/10">
-                      <CardHeader>
+                    <Card className="h-fit border-white/10 bg-white/[0.045] text-white ring-white/10">
+                      <CardHeader className="pb-4">
                         <CardTitle className="text-base">
                           Category scoring pending
                         </CardTitle>
@@ -545,8 +545,8 @@ export default async function ResumePage() {
             })}
           </div>
         ) : (
-          <Card className="border-white/10 bg-white/[0.045] text-white ring-white/10">
-            <CardHeader>
+          <Card className="h-fit border-white/10 bg-white/[0.045] text-white ring-white/10">
+            <CardHeader className="pb-4">
               <CardTitle>No resumes uploaded yet</CardTitle>
               <CardDescription className="leading-6 text-zinc-400">
                 Upload your first PDF resume to start building your career

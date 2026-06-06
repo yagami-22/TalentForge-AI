@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Download } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   useActionState,
@@ -33,6 +33,7 @@ type SavedResumeRewriteState = {
 
 const RESUME_REWRITE_STORAGE_KEY = "talentforge_resume_rewrite";
 const RESUME_REWRITE_STORAGE_EVENT = "talentforge.resumeRewrite.storage";
+const SHOW_REWRITE_DEBUG_PANELS = process.env.NODE_ENV === "development";
 
 function subscribeToSavedRewrite(callback: () => void) {
   if (typeof window === "undefined") {
@@ -72,13 +73,69 @@ function isResumeRewriteResult(value: unknown): value is ResumeRewriteResult {
   if (!value || typeof value !== "object") return false;
 
   const candidate = value as Partial<ResumeRewriteResult>;
+  const isEducationArray = (items: unknown) =>
+    Array.isArray(items) &&
+    items.every(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        typeof (item as { degree?: unknown }).degree === "string" &&
+        typeof (item as { institution?: unknown }).institution === "string" &&
+        typeof (item as { duration?: unknown }).duration === "string" &&
+        isStringArray((item as { details?: unknown }).details)
+    );
+  const isProjectArray = (items: unknown) =>
+    Array.isArray(items) &&
+    items.every(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        typeof (item as { title?: unknown }).title === "string" &&
+        typeof (item as { duration?: unknown }).duration === "string" &&
+        isStringArray((item as { bullets?: unknown }).bullets)
+    );
+  const isExperienceArray = (items: unknown) =>
+    Array.isArray(items) &&
+    items.every(
+      (item) =>
+        item &&
+        typeof item === "object" &&
+        typeof (item as { title?: unknown }).title === "string" &&
+        typeof (item as { organization?: unknown }).organization === "string" &&
+        typeof (item as { duration?: unknown }).duration === "string" &&
+        isStringArray((item as { bullets?: unknown }).bullets)
+    );
+  const isPortfolio = (item: unknown) =>
+    !!item &&
+    typeof item === "object" &&
+    (!("github" in item) || typeof (item as { github?: unknown }).github === "string") &&
+    (!("leetcode" in item) || typeof (item as { leetcode?: unknown }).leetcode === "string") &&
+    (!("website" in item) || typeof (item as { website?: unknown }).website === "string");
 
   return (
     typeof candidate.professionalSummary === "string" &&
+    isEducationArray(candidate.education) &&
+    isExperienceArray(candidate.workExperience) &&
+    isProjectArray(candidate.projects) &&
+    isPortfolio(candidate.portfolio) &&
     isStringArray(candidate.experienceBullets) &&
     isStringArray(candidate.skillsSection) &&
     isStringArray(candidate.atsKeywords) &&
-    isStringArray(candidate.missingSkills)
+    isStringArray(candidate.missingSkills) &&
+    !!candidate.debug &&
+    typeof candidate.debug.rawText === "string" &&
+    typeof candidate.debug.rawTextLength === "number" &&
+    (!("candidateName" in candidate.debug) ||
+      typeof candidate.debug.candidateName === "string") &&
+    isStringArray(candidate.debug.parsedSectionNamesFound) &&
+    isStringArray(candidate.debug.technicalSkills) &&
+    typeof candidate.debug.technicalSkillCount === "number" &&
+    typeof candidate.debug.educationCount === "number" &&
+    (!("experienceCount" in candidate.debug) ||
+      typeof candidate.debug.experienceCount === "number") &&
+    typeof candidate.debug.projectCount === "number" &&
+    typeof candidate.debug.portfolioDetected === "boolean" &&
+    typeof candidate.debug.finalPrompt === "string"
   );
 }
 
@@ -149,12 +206,457 @@ function BulletList({ items, tone = "default" }: { items: string[]; tone?: "defa
   );
 }
 
+function DebugAccordion({
+  title,
+  meta,
+  children,
+}: {
+  title: string;
+  meta?: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="rounded-xl border border-white/10 bg-black/25 text-white shadow-inner">
+      <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-cyan-100">
+        {title}
+        {meta ? <span className="ml-2 font-normal text-zinc-500">{meta}</span> : null}
+      </summary>
+      <div className="border-t border-white/10 p-4">{children}</div>
+    </details>
+  );
+}
+
+function DebugCodeBlock({ value }: { value: string }) {
+  return (
+    <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-white/10 bg-slate-950/80 p-4 text-xs leading-5 text-zinc-300">
+      {value}
+    </pre>
+  );
+}
+
+function RewriteDebugPanels({ rewrite }: { rewrite: ResumeRewriteResult }) {
+  const { debug } = rewrite;
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl border border-cyan-200/15 bg-cyan-300/10 p-4 text-sm text-cyan-50">
+        <p className="font-semibold">Debug visibility</p>
+        <p className="mt-1 text-zinc-300">
+          Raw text length: {debug.rawTextLength.toLocaleString()} characters ·
+          Parsed sections: {debug.parsedSectionNamesFound.length} · Extracted
+          skills: {debug.technicalSkillCount} · Education entries:{" "}
+          {debug.educationCount} · Projects: {debug.projectCount} · Portfolio:{" "}
+          {debug.portfolioDetected ? "detected" : "not detected"}
+        </p>
+      </div>
+
+      <DebugAccordion
+        title="Raw PDF Extracted Text"
+        meta={`${debug.rawTextLength.toLocaleString()} chars`}
+      >
+        <DebugCodeBlock value={debug.rawText} />
+      </DebugAccordion>
+
+      <DebugAccordion
+        title="Parsed Resume Sections JSON"
+        meta={
+          debug.parsedSectionNamesFound.length
+            ? debug.parsedSectionNamesFound.join(", ")
+            : "No headings detected"
+        }
+      >
+        <DebugCodeBlock value={JSON.stringify(debug.parsedSections, null, 2)} />
+      </DebugAccordion>
+
+      <DebugAccordion
+        title="Extracted Technical Skills Array"
+        meta={`${debug.technicalSkillCount} skills`}
+      >
+        <DebugCodeBlock value={JSON.stringify(debug.technicalSkills, null, 2)} />
+      </DebugAccordion>
+
+      <DebugAccordion title="Final Prompt Sent To AI Model">
+        <DebugCodeBlock value={debug.finalPrompt} />
+      </DebugAccordion>
+    </div>
+  );
+}
+
+async function loadJsPdf() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    throw new Error("PDF export must run in the browser.");
+  }
+
+  const { jsPDF } = await import("jspdf");
+
+  if (typeof jsPDF !== "function") {
+    throw new Error("jsPDF did not resolve to a callable constructor.");
+  }
+
+  return jsPDF;
+}
+
+function normalizePdfText(text: string) {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function getPdfLines(text: string) {
+  return text
+    .split(/\r?\n/)
+    .map((line) =>
+      line
+        .replace(/[–—]/g, "-")
+        .replace(/^[•*]\s*/, "")
+        .replace(/\s+/g, " ")
+        .trim()
+    )
+    .filter(Boolean)
+    .filter((line) => !/\b(?:page\s*-?\s*\d|break|-{4,})\b/i.test(line));
+}
+
+function extractPdfContact(rewrite: ResumeRewriteResult) {
+  const lines = getPdfLines(rewrite.debug.rawText);
+  const rawText = rewrite.debug.rawText;
+  const email = rawText.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] ?? "";
+  const phone =
+    rawText.match(/(?:\+91[\s-]?)?[6-9]\d{9}\b/)?.[0]?.replace(/\s+/g, " ") ?? "";
+  const location = /\bDelhi\b/i.test(rawText) ? "Delhi" : "";
+  const portfolioLinks = [
+    rewrite.portfolio.github,
+    rewrite.portfolio.leetcode,
+    rewrite.portfolio.website,
+  ]
+    .map((item) => normalizePdfText(item ?? ""))
+    .filter(Boolean);
+  const emailLineIndex = email
+    ? lines.findIndex((line) => line.toLowerCase().includes(email.toLowerCase()))
+    : -1;
+  const nearbyLines =
+    emailLineIndex >= 0
+      ? lines.slice(Math.max(0, emailLineIndex - 4), emailLineIndex + 5)
+      : lines.slice(0, 12);
+  const name =
+    normalizePdfText(rewrite.debug.candidateName ?? "") ||
+    (nearbyLines.find((line) =>
+      /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}$/.test(line)
+    ) ??
+      lines.find((line) => /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2}$/.test(line)) ??
+      "Resume");
+
+  return {
+    name,
+    contactLine: [email, phone, location].filter(Boolean).join(" | "),
+    portfolioLine: portfolioLinks.join(" | "),
+  };
+}
+
+function groupTechnicalSkills(skills: string[]) {
+  const groups = {
+    languages: new Set<string>(),
+    frameworks: new Set<string>(),
+    databases: new Set<string>(),
+    tools: new Set<string>(),
+    concepts: new Set<string>(),
+    machineLearning: new Set<string>(),
+  };
+  const used = new Set<string>();
+
+  function add(skill: string, group: keyof typeof groups) {
+    const cleaned = normalizePdfText(skill);
+    const key = cleaned.toLowerCase();
+
+    if (!cleaned || used.has(key)) return;
+
+    groups[group].add(cleaned);
+    used.add(key);
+  }
+
+  skills.forEach((skill) => {
+    if (/^(?:c\+\+|javascript|typescript|sql)$/i.test(skill)) {
+      add(skill, "languages");
+      return;
+    }
+
+    if (/^(?:react|next\.js)$/i.test(skill)) {
+      add(skill, "frameworks");
+      return;
+    }
+
+    if (/^(?:mysql)$/i.test(skill)) {
+      add(skill, "databases");
+      return;
+    }
+
+    if (/^(?:git|github)$/i.test(skill)) {
+      add(skill, "tools");
+      return;
+    }
+
+    if (/machine learning/i.test(skill)) {
+      add(skill, "machineLearning");
+      return;
+    }
+
+    if (/\b(?:dsa|algorithms|oop|apis?|rest api|software testing|ci\/cd|test automation|frontend development|backend development)\b/i.test(skill)) {
+      add(skill, "concepts");
+    }
+  });
+
+  return [
+    { label: "Languages", items: Array.from(groups.languages) },
+    { label: "Frameworks & Libraries", items: Array.from(groups.frameworks) },
+    { label: "Databases", items: Array.from(groups.databases) },
+    { label: "Tools", items: Array.from(groups.tools) },
+    { label: "Concepts", items: Array.from(groups.concepts) },
+    { label: "Machine Learning", items: Array.from(groups.machineLearning) },
+  ].filter((group) => group.items.length > 0);
+}
+
+function extractResumeExportActivities(rewrite: ResumeRewriteResult) {
+  const activityLines = Object.entries(rewrite.debug.parsedSections)
+    .filter(([sectionName]) =>
+      /\b(?:extra\s*curricular|extracurricular|activities|achievements|leadership)\b/i.test(
+        sectionName
+      )
+    )
+    .flatMap(([, lines]) => lines);
+
+  return activityLines
+    .map((line) => normalizePdfText(line.replace(/^[\-–]\s*/, "")))
+    .filter(Boolean)
+    .filter((line) => !/\b(?:page\s*-?\s*\d|break|-{4,}|rest api|test automation)\b/i.test(line))
+    .filter((line) => line.length >= 20 && line.length <= 180)
+    .slice(0, 5);
+}
+
+function writeResumeExportPdf(
+  doc: InstanceType<Awaited<ReturnType<typeof loadJsPdf>>>,
+  rewrite: ResumeRewriteResult
+) {
+  const marginX = 54;
+  const marginTop = 54;
+  const marginBottom = 54;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const maxWidth = pageWidth - marginX * 2;
+  const bodyLineHeight = 14;
+  let y = marginTop;
+
+  function ensureSpace(requiredHeight: number) {
+    if (y + requiredHeight > pageHeight - marginBottom) {
+      doc.addPage();
+      y = marginTop;
+    }
+  }
+
+  function addHeader(name: string, contactLine: string, portfolioLine: string) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(17);
+    doc.setTextColor(17, 17, 17);
+    ensureSpace(28);
+    doc.text(name, pageWidth / 2, y, { align: "center" });
+    y += 15;
+
+    if (contactLine) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.text(contactLine, pageWidth / 2, y, { align: "center" });
+      y += 10;
+    }
+
+    if (portfolioLine) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      doc.text(portfolioLine, pageWidth / 2, y, { align: "center" });
+      y += 10;
+    }
+
+    doc.setDrawColor(209, 213, 219);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 18;
+  }
+
+  function addHeading(title: string) {
+    ensureSpace(28);
+    y += 6;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(17, 17, 17);
+    doc.text(title.toUpperCase(), marginX, y);
+    y += 7;
+    doc.setDrawColor(209, 213, 219);
+    doc.line(marginX, y, pageWidth - marginX, y);
+    y += 14;
+  }
+
+  function addParagraph(text: string) {
+    const cleaned = normalizePdfText(text);
+
+    if (!cleaned) return;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(17, 17, 17);
+
+    const lines = doc.splitTextToSize(cleaned, maxWidth) as string[];
+    ensureSpace(lines.length * bodyLineHeight);
+    doc.text(lines, marginX, y);
+    y += lines.length * bodyLineHeight + 4;
+  }
+
+  function addBulletList(items: string[]) {
+    const cleanedItems = items.map(normalizePdfText).filter(Boolean);
+
+    if (!cleanedItems.length) return;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(17, 17, 17);
+
+    cleanedItems.forEach((item) => {
+      const lines = doc.splitTextToSize(item, maxWidth - 18) as string[];
+      ensureSpace(lines.length * bodyLineHeight);
+      doc.text("•", marginX, y);
+      doc.text(lines, marginX + 18, y);
+      y += lines.length * bodyLineHeight + 3;
+    });
+  }
+
+  function addEducation() {
+    const educationItems = rewrite.education.filter(
+      (item) => item.degree || item.institution || item.duration || item.details.length
+    );
+
+    if (!educationItems.length) return;
+
+    addHeading("Education");
+    educationItems.forEach((item) => {
+      const headline = [item.degree, item.institution, item.duration]
+        .map(normalizePdfText)
+        .filter(Boolean)
+        .join(" | ");
+      addParagraph(headline);
+      if (item.details.length) {
+        addBulletList(item.details);
+      }
+    });
+  }
+
+  function addProjects() {
+    const projectItems = rewrite.projects.filter((item) => item.title || item.bullets.length);
+
+    if (!projectItems.length) return;
+
+    addHeading("Projects");
+    projectItems.forEach((project) => {
+      const title = [project.title, project.duration]
+        .map(normalizePdfText)
+        .filter(Boolean)
+        .join(" | ");
+      addParagraph(title);
+      addBulletList(project.bullets);
+    });
+  }
+
+  function addWorkExperience() {
+    const experienceItems = rewrite.workExperience.filter(
+      (item) => item.title || item.organization || item.duration || item.bullets.length
+    );
+
+    if (!experienceItems.length) return;
+
+    addHeading("Work Experience");
+    experienceItems.forEach((item) => {
+      const headline = [item.title, item.organization, item.duration]
+        .map(normalizePdfText)
+        .filter(Boolean)
+        .join(" | ");
+      addParagraph(headline);
+      addBulletList(item.bullets);
+    });
+  }
+
+  function addPortfolio() {
+    const portfolioItems = [
+      rewrite.portfolio.github,
+      rewrite.portfolio.leetcode,
+      rewrite.portfolio.website,
+    ]
+      .map((item) => normalizePdfText(item ?? ""))
+      .filter(Boolean);
+
+    if (!portfolioItems.length) return;
+
+    addHeading("Portfolio");
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(17, 17, 17);
+    portfolioItems.forEach((item) => {
+      const isUrl = /^https?:\/\//i.test(item) || /^(?:www\.)?[a-z0-9.-]+\.[a-z]{2,}\//i.test(item);
+      const lines = doc.splitTextToSize(item, maxWidth - 18) as string[];
+
+      ensureSpace(lines.length * bodyLineHeight);
+      doc.text("•", marginX, y);
+
+      if (isUrl) {
+        doc.textWithLink(lines[0] ?? item, marginX + 18, y, {
+          url: item.startsWith("http") ? item : `https://${item}`,
+        });
+        if (lines.length > 1) {
+          doc.text(lines.slice(1), marginX + 18, y + bodyLineHeight);
+        }
+      } else {
+        doc.text(lines, marginX + 18, y);
+      }
+
+      y += lines.length * bodyLineHeight + 3;
+    });
+  }
+
+  function addTechnicalSkills() {
+    const groupedSkills = groupTechnicalSkills(rewrite.skillsSection);
+
+    if (!groupedSkills.length) return;
+
+    addHeading("Technical Skills");
+    groupedSkills.forEach((group) => {
+      addParagraph(`${group.label}: ${group.items.join(", ")}`);
+    });
+  }
+
+  function addActivities() {
+    const activities = extractResumeExportActivities(rewrite);
+
+    if (!activities.length) return;
+
+    addHeading("Extra Curricular Activities");
+    addBulletList(activities);
+  }
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, pageWidth, pageHeight, "F");
+  const contact = extractPdfContact(rewrite);
+
+  addHeader(contact.name, contact.contactLine, contact.portfolioLine);
+  addHeading("Professional Summary");
+  addParagraph(rewrite.professionalSummary);
+  addEducation();
+  addWorkExperience();
+  addProjects();
+  addTechnicalSkills();
+  addActivities();
+  addPortfolio();
+}
+
 export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
   const [state, formAction, pending] = useActionState(
     rewriteResumeForJD,
     initialResumeRewriteState
   );
   const [hideCurrentActionResult, setHideCurrentActionResult] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportMessage, setExportMessage] = useState("");
+  const [exportStatus, setExportStatus] = useState<"idle" | "success" | "error">("idle");
   const lastSubmittedResumeId = useRef("");
   const lastSubmittedJobDescription = useRef("");
   const savedRewriteSnapshot = useSyncExternalStore(
@@ -243,6 +745,55 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
     window.localStorage.removeItem(RESUME_REWRITE_STORAGE_KEY);
     notifySavedRewriteChanged();
     setHideCurrentActionResult(true);
+    setExportMessage("");
+    setExportStatus("idle");
+  }
+
+  async function exportRewritePdf() {
+    if (!rewrite || exportingPdf) {
+      return;
+    }
+
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      setExportMessage("PDF export is only available in the browser.");
+      setExportStatus("error");
+      return;
+    }
+
+    setExportingPdf(true);
+    setExportMessage("");
+    setExportStatus("idle");
+
+    try {
+      const jsPDF = await loadJsPdf();
+      const doc = new jsPDF({
+        unit: "pt",
+        format: "letter",
+        orientation: "portrait",
+      });
+
+      writeResumeExportPdf(doc, rewrite);
+      doc.save("talentforge-rewritten-resume.pdf");
+
+      setExportMessage("PDF export started.");
+      setExportStatus("success");
+    } catch (error) {
+      console.error("Resume rewrite PDF export failed", error);
+      console.error("Resume rewrite PDF export debug", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        hasSummary: Boolean(rewrite.professionalSummary.trim()),
+        bulletCount: rewrite.experienceBullets.length,
+        skillCount: rewrite.skillsSection.length,
+        atsKeywordCount: rewrite.atsKeywords.length,
+        hasWindow: typeof window !== "undefined",
+        hasDocument: typeof document !== "undefined",
+      });
+      setExportMessage("PDF export failed. Please try again.");
+      setExportStatus("error");
+    } finally {
+      setExportingPdf(false);
+    }
   }
 
   return (
@@ -263,9 +814,9 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
           </div>
         </CardHeader>
         <CardContent>
-          <form action={submitRewrite} className="space-y-6 pt-6">
-            <div className="grid gap-5 lg:grid-cols-[380px_1fr]">
-              <div className="rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
+          <form action={submitRewrite} className="space-y-5 pt-5">
+            <div className="grid gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
+              <div className="h-fit rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
                 <label htmlFor="resumeId" className="text-sm font-medium text-zinc-200">
                   Resume
                 </label>
@@ -287,6 +838,21 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
                     </option>
                   ))}
                 </select>
+                <div className="mt-4 border-t border-white/10 pt-3">
+                  <p className="text-xs font-medium uppercase text-zinc-500">
+                    Generated output
+                  </p>
+                  <div className="mt-2 grid gap-2 text-xs text-zinc-400">
+                    {["Summary rewrite", "Resume sections", "PDF export"].map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-lg border border-cyan-200/10 bg-cyan-300/[0.06] px-3 py-2 text-cyan-50"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="rounded-xl border border-white/10 bg-black/20 p-4 shadow-inner">
@@ -308,7 +874,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
                   rows={12}
                   defaultValue={validSavedRewriteState?.jobDescription ?? ""}
                   placeholder="Paste the job description you want to tailor this resume toward..."
-                  className="mt-3 min-h-80 rounded-xl border-white/10 bg-slate-950/70 p-4 text-white shadow-inner placeholder:text-zinc-500 focus-visible:border-cyan-200/50 focus-visible:ring-cyan-300/20"
+                  className="mt-3 min-h-72 rounded-xl border-white/10 bg-slate-950/70 p-4 text-white shadow-inner placeholder:text-zinc-500 focus-visible:border-cyan-200/50 focus-visible:ring-cyan-300/20"
                 />
               </div>
             </div>
@@ -349,15 +915,39 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
                 added as claimed experience.
               </p>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={clearSavedRewrite}
-              className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
-            >
-              Clear saved rewrite
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="button"
+                onClick={exportRewritePdf}
+                disabled={exportingPdf}
+                className="bg-gradient-to-r from-cyan-200 to-emerald-200 text-slate-950 shadow-[0_16px_45px_rgba(34,211,238,0.22)] hover:from-cyan-100 hover:to-emerald-100 disabled:opacity-60"
+              >
+                <Download />
+                {exportingPdf ? "Exporting..." : "Export PDF"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={clearSavedRewrite}
+                className="border-white/15 bg-white/[0.04] text-white hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
+              >
+                Clear saved rewrite
+              </Button>
+            </div>
           </div>
+
+          {exportMessage ? (
+            <p
+              aria-live="polite"
+              className={
+                exportStatus === "error"
+                  ? "rounded-md border border-red-300/20 bg-red-400/10 px-3 py-2 text-sm text-red-200"
+                  : "rounded-md border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200"
+              }
+            >
+              {exportMessage}
+            </p>
+          ) : null}
 
           <SectionCard
             title="Rewritten Professional Summary"
@@ -431,6 +1021,8 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
               )}
             </SectionCard>
           </div>
+
+          {SHOW_REWRITE_DEBUG_PANELS ? <RewriteDebugPanels rewrite={rewrite} /> : null}
         </section>
       ) : (
         <Card className="border-white/10 bg-gradient-to-b from-white/[0.055] to-white/[0.025] text-white shadow-[0_18px_60px_rgba(0,0,0,0.2)] ring-1 ring-white/10">

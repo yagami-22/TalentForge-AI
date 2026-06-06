@@ -14,7 +14,7 @@ export function UploadResumeForm() {
   );
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form action={formAction} className="space-y-4">
       <div className="space-y-2">
         <label htmlFor="title" className="text-sm font-medium text-zinc-200">
           Resume title
