@@ -1,6 +1,16 @@
-export type MatchGrade = "Poor" | "Fair" | "Good" | "Strong" | "Excellent";
+import {
+  COMMON_DOMAIN_DEFINITIONS as DOMAIN_DEFINITIONS,
+  COMMON_GENERIC_TERMS as GENERIC_TERMS,
+  type EvidenceStatus,
+  type SharedDomainDefinition as DomainDefinition,
+  countTermMatches as countMatches,
+  escapeRegExp,
+  getTextLines as getLines,
+  normalizeText as normalize,
+  uniqueValues as unique,
+} from "@/lib/resume-analysis-shared";
 
-export type EvidenceStatus = "Matched" | "Partial" | "Missing";
+export type MatchGrade = "Poor" | "Fair" | "Good" | "Strong" | "Excellent";
 
 export type JobDescriptionMatchAnalysis = {
   matchScore: number;
@@ -43,13 +53,6 @@ export type JobDescriptionValidation = {
   reason: string;
 };
 
-type DomainDefinition = {
-  name: string;
-  keywords: string[];
-  tools: string[];
-  responsibilities: string[];
-};
-
 type ParsedJobDescription = {
   targetRole: string;
   domain: DomainDefinition;
@@ -69,93 +72,6 @@ type ResponsibilityFamily = {
   strongResumePatterns: RegExp[];
   partialResumePatterns: RegExp[];
 };
-
-const GENERIC_TERMS = [
-  "communication",
-  "teamwork",
-  "leadership",
-  "motivated",
-  "hardworking",
-  "passionate",
-  "self starter",
-  "problem solving",
-  "detail oriented",
-];
-
-const DOMAIN_DEFINITIONS: DomainDefinition[] = [
-  {
-    name: "Software",
-    keywords: ["software", "frontend", "backend", "full stack", "web", "application"],
-    tools: ["react", "next.js", "node.js", "typescript", "javascript", "java", "python", "api", "apis", "sql", "git", "docker", "postgresql", "mongodb"],
-    responsibilities: ["build", "develop", "implement", "debug", "test", "deploy", "integrate", "maintain"],
-  },
-  {
-    name: "Data",
-    keywords: ["data", "analytics", "dashboard", "statistics", "insights", "etl"],
-    tools: ["sql", "python", "excel", "power bi", "tableau", "pandas", "statistics", "dashboard", "etl", "analytics"],
-    responsibilities: ["analyze", "visualize", "report", "model", "forecast", "clean", "dashboard"],
-  },
-  {
-    name: "Design",
-    keywords: ["design", "ux", "ui", "user experience", "product design"],
-    tools: ["figma", "ux research", "wireframes", "prototypes", "design systems", "user flows"],
-    responsibilities: ["design", "prototype", "research", "wireframe", "test", "iterate"],
-  },
-  {
-    name: "Marketing",
-    keywords: ["marketing", "growth", "brand", "campaign", "content"],
-    tools: ["seo", "ga4", "google analytics", "campaigns", "conversion", "content", "social media", "email marketing"],
-    responsibilities: ["campaign", "optimize", "content", "convert", "engage", "analyze"],
-  },
-  {
-    name: "Finance",
-    keywords: ["finance", "accounting", "investment", "valuation", "budget"],
-    tools: ["valuation", "financial modeling", "accounting", "excel", "budgeting", "forecasting"],
-    responsibilities: ["model", "budget", "forecast", "audit", "analyze", "report"],
-  },
-  {
-    name: "Sales",
-    keywords: ["sales", "revenue", "client", "lead", "pipeline"],
-    tools: ["crm", "leads", "pipeline", "clients", "revenue", "negotiation", "cold outreach"],
-    responsibilities: ["prospect", "sell", "negotiate", "close", "manage", "outreach"],
-  },
-  {
-    name: "Operations",
-    keywords: ["operations", "process", "logistics", "supply chain"],
-    tools: ["process improvement", "logistics", "inventory", "vendor", "supply chain", "optimization"],
-    responsibilities: ["coordinate", "optimize", "improve", "manage", "track", "operate"],
-  },
-  {
-    name: "Product",
-    keywords: ["product", "roadmap", "requirements", "user research"],
-    tools: ["roadmap", "prd", "user research", "metrics", "requirements", "prioritization"],
-    responsibilities: ["prioritize", "define", "research", "measure", "roadmap", "launch"],
-  },
-  {
-    name: "Consulting",
-    keywords: ["consulting", "strategy", "business", "case", "stakeholder"],
-    tools: ["market research", "strategy", "analysis", "stakeholder", "presentation", "business case"],
-    responsibilities: ["analyze", "recommend", "present", "research", "stakeholder", "strategy"],
-  },
-  {
-    name: "HR",
-    keywords: ["hr", "human resources", "talent", "employee", "recruitment"],
-    tools: ["recruitment", "onboarding", "payroll", "employee engagement", "hrms"],
-    responsibilities: ["recruit", "onboard", "screen", "engage", "coordinate", "manage"],
-  },
-  {
-    name: "Research",
-    keywords: ["research", "publication", "methodology", "experiment"],
-    tools: ["publication", "methodology", "experiment", "literature review", "data analysis"],
-    responsibilities: ["research", "experiment", "review", "analyze", "publish", "document"],
-  },
-  {
-    name: "General",
-    keywords: ["business", "project", "coordination", "analysis"],
-    tools: ["excel", "presentation", "documentation", "reporting"],
-    responsibilities: ["coordinate", "manage", "analyze", "support", "document"],
-  },
-];
 
 const RESPONSIBILITY_FAMILIES: ResponsibilityFamily[] = [
   {
@@ -281,37 +197,8 @@ const RESPONSIBILITY_FAMILIES: ResponsibilityFamily[] = [
   },
 ];
 
-function normalize(text: string) {
-  return text.replace(/\s+/g, " ").trim();
-}
-
-function unique(items: string[]) {
-  return Array.from(new Set(items.filter(Boolean)));
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function countMatches(text: string, terms: string[]) {
-  const lower = text.toLowerCase();
-
-  return unique(terms).filter((term) =>
-    new RegExp(`(^|[^a-z0-9+#.])${escapeRegExp(term.toLowerCase())}([^a-z0-9+#.]|$)`, "i").test(
-      lower
-    )
-  );
-}
-
 function matchesAnyPattern(text: string, patterns: RegExp[]) {
   return patterns.some((pattern) => pattern.test(text));
-}
-
-function getLines(text: string) {
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
 }
 
 export function validateJobDescription(text: string): JobDescriptionValidation {
@@ -470,6 +357,34 @@ function scoreCategory(
   };
 }
 
+function scoreWeightedCategory(
+  name: string,
+  matchedRequired: string[],
+  required: string[],
+  matchedPreferred: string[],
+  preferred: string[],
+  maxScore: number
+) {
+  const requiredWeight = 3;
+  const denominator = required.length * requiredWeight + preferred.length;
+  const numerator = matchedRequired.length * requiredWeight + matchedPreferred.length;
+  const score = denominator
+    ? Math.round((numerator / denominator) * maxScore)
+    : Math.round(maxScore * 0.55);
+
+  return {
+    name,
+    score: Math.max(0, Math.min(maxScore, score)),
+    maxScore,
+    reason: `${matchedRequired.length}/${required.length} required term(s) and ${matchedPreferred.length}/${preferred.length} preferred term(s) matched from resume evidence. Required terms carry 3x weight.`,
+    evidenceFound: unique([...matchedRequired, ...matchedPreferred]),
+    missingEvidence: unique([
+      ...required.filter((term) => !matchedRequired.includes(term)).map((term) => `Required: ${term}`),
+      ...preferred.filter((term) => !matchedPreferred.includes(term)).map((term) => `Preferred: ${term}`),
+    ]),
+  };
+}
+
 function findEvidenceForPatterns(resumeText: string, patterns: RegExp[]) {
   return getLines(resumeText).find((line) =>
     patterns.some((pattern) => pattern.test(line))
@@ -541,6 +456,69 @@ function scoreResponsibilityRelevance(
   };
 }
 
+function getSeniorityAlignment(jobDescription: string, resumeText: string) {
+  const requiresSenior = /\b(?:senior|lead|staff|principal|[3-9]\+?\s*(?:years|yrs)|[1-9][0-9]\+?\s*(?:years|yrs))\b/i.test(
+    jobDescription
+  );
+  const requiresExplicitYears = /\b(?:[3-9]|[1-9][0-9])\+?\s*(?:years|yrs)\b/i.test(
+    jobDescription
+  );
+  const resumeHasExplicitYears = /\b(?:[3-9]|[1-9][0-9])\+?\s*(?:years|yrs)\b/i.test(
+    resumeText
+  );
+  const resumeHasRoleWithDate =
+    /\b(?:engineer|developer|analyst|consultant|manager|designer|specialist)\b.{0,80}\b(?:20\d{2}|present)\b/i.test(
+      resumeText
+    ) ||
+    /\b(?:20\d{2}|present)\b.{0,80}\b(?:engineer|developer|analyst|consultant|manager|designer|specialist)\b/i.test(
+      resumeText
+    );
+  const resumeHasSeniorSignal = /\b(?:senior|lead|staff|principal|managed|mentored|owned|architected)\b/i.test(
+    resumeText
+  );
+  const resumeHasPracticalSignal =
+    resumeHasRoleWithDate ||
+    /\b(?:internship|intern|freelance|client work|open source|volunteer|work experience|professional experience)\b/i.test(
+      resumeText
+    );
+
+  if (requiresSenior) {
+    const matched =
+      (requiresExplicitYears ? resumeHasExplicitYears : resumeHasPracticalSignal) &&
+      (resumeHasSeniorSignal || resumeHasExplicitYears);
+
+    return {
+      matched,
+      score: matched ? 9 : resumeHasPracticalSignal ? 4 : 2,
+      evidenceFound: matched
+        ? [
+            resumeHasExplicitYears
+              ? "Explicit years-of-experience evidence found"
+              : "Senior/practical role evidence found",
+          ]
+        : resumeHasPracticalSignal
+          ? ["Some practical evidence found, but seniority is not fully supported"]
+          : [],
+      missingEvidence: matched
+        ? []
+        : ["Direct seniority evidence such as years, senior role scope, ownership, or leadership"],
+      reason: matched
+        ? "The resume supports the seniority level requested by the JD."
+        : "The JD has senior/years-of-experience requirements that are not directly supported by the resume.",
+    };
+  }
+
+  return {
+    matched: resumeHasPracticalSignal || !/\b(?:experience|years|intern|junior|entry level)\b/i.test(jobDescription),
+    score: resumeHasPracticalSignal ? 8 : 5,
+    evidenceFound: resumeHasPracticalSignal ? ["Practical work or internship evidence found"] : [],
+    missingEvidence: resumeHasPracticalSignal ? [] : ["Clear practical work, internship, or project responsibility evidence"],
+    reason: resumeHasPracticalSignal
+      ? "The resume contains practical work evidence for this JD level."
+      : "The JD seniority level is not strict, but practical-work evidence is limited.",
+  };
+}
+
 export function analyzeJobDescriptionMatch({
   resumeTitle,
   resumeText,
@@ -552,6 +530,9 @@ export function analyzeJobDescriptionMatch({
 }): JobDescriptionMatchAnalysis {
   const parsed = parseJobDescription(jobDescription);
   const resume = resumeText.toLowerCase();
+  const matchedMustHave = countMatches(resume, parsed.mustHave);
+  const missingMustHave = parsed.mustHave.filter((term) => !matchedMustHave.includes(term));
+  const matchedNiceToHave = countMatches(resume, parsed.niceToHave);
   const matchedSkills = countMatches(resume, parsed.coreSkills);
   const missingSkills = parsed.coreSkills.filter((term) => !matchedSkills.includes(term));
   const matchedTools = countMatches(resume, parsed.tools);
@@ -559,14 +540,13 @@ export function analyzeJobDescriptionMatch({
   const responsibilityScore = scoreResponsibilityRelevance(parsed, resumeText);
   const matchedResponsibilities = responsibilityScore.matchedResponsibilities;
   const missingResponsibilities = responsibilityScore.missingResponsibilities;
-  const matchedKeywords = countMatches(resume, parsed.domainKeywords);
-  const missingKeywords = parsed.domainKeywords.filter(
-    (term) => !matchedKeywords.includes(term)
+  const domainKeywordMatches = countMatches(resume, parsed.domainKeywords);
+  const domainKeywordMissing = parsed.domainKeywords.filter(
+    (term) => !domainKeywordMatches.includes(term)
   );
-  const seniorityMatched =
-    parsed.senioritySignals.length === 0 ||
-    countMatches(resume, parsed.senioritySignals).length > 0 ||
-    /\b(?:intern|project|experience|work|freelance|client|years)\b/i.test(resumeText);
+  const matchedKeywords = unique([...matchedMustHave, ...matchedNiceToHave, ...domainKeywordMatches]);
+  const missingKeywords = unique([...missingMustHave, ...domainKeywordMissing]);
+  const seniorityAlignment = getSeniorityAlignment(jobDescription, resumeText);
   const proofSignals = countMatches(resume, [
     "reduced",
     "increased",
@@ -580,26 +560,33 @@ export function analyzeJobDescriptionMatch({
     "github",
     "portfolio",
   ]);
+  const weightedKeywordScore = scoreWeightedCategory(
+    "Required/preferred JD keyword match",
+    matchedMustHave,
+    parsed.mustHave,
+    matchedNiceToHave,
+    parsed.niceToHave,
+    20
+  );
   const categoryScores = [
-    scoreCategory("Core skill match", matchedSkills, parsed.coreSkills, 30, "core skill(s)"),
-    scoreCategory("Tool/platform match", matchedTools, parsed.tools, 20, "tool/platform term(s)"),
+    scoreCategory("Core skill match", matchedSkills, parsed.coreSkills, 25, "core skill(s)"),
+    scoreCategory("Tool/platform match", matchedTools, parsed.tools, 15, "tool/platform term(s)"),
     responsibilityScore,
+    weightedKeywordScore,
     scoreCategory(
       "Domain keyword relevance",
-      matchedKeywords,
+      domainKeywordMatches,
       parsed.domainKeywords,
-      15,
+      10,
       "domain keyword(s)"
     ),
     {
       name: "Seniority/experience alignment",
-      score: seniorityMatched ? 8 : 3,
-      maxScore: 10,
-      reason: seniorityMatched
-        ? "Resume has seniority or practical-work evidence that can support this JD."
-        : "JD seniority signals were not clearly supported by the resume.",
-      evidenceFound: seniorityMatched ? ["Practical or seniority evidence found"] : [],
-      missingEvidence: seniorityMatched ? [] : parsed.senioritySignals,
+      score: Math.min(5, Math.round(seniorityAlignment.score / 2)),
+      maxScore: 5,
+      reason: seniorityAlignment.reason,
+      evidenceFound: seniorityAlignment.evidenceFound,
+      missingEvidence: seniorityAlignment.missingEvidence,
     },
     {
       name: "Proof/impact alignment",
@@ -614,13 +601,18 @@ export function analyzeJobDescriptionMatch({
     },
   ];
   const rawScore = categoryScores.reduce((total, item) => total + item.score, 0);
+  const requiredCoverage = parsed.mustHave.length
+    ? matchedMustHave.length / parsed.mustHave.length
+    : 1;
   const hasStrongCore = matchedSkills.length >= Math.min(4, parsed.coreSkills.length || 4);
   const hasStrongTools = matchedTools.length >= Math.min(3, parsed.tools.length || 3);
   const cappedScore =
     rawScore >= 85 && (!hasStrongCore || !hasStrongTools || proofSignals.length < 3)
       ? 84
       : rawScore;
-  const matchScore = Math.max(0, Math.min(100, cappedScore));
+  const requiredCoverageCap = requiredCoverage < 0.35 ? 54 : requiredCoverage < 0.55 ? 68 : 100;
+  const seniorityCap = seniorityAlignment.score <= 4 ? 70 : 100;
+  const matchScore = Math.max(0, Math.min(100, cappedScore, requiredCoverageCap, seniorityCap));
   const evidenceTerms = unique([
     ...parsed.mustHave,
     ...parsed.coreSkills,
@@ -643,12 +635,15 @@ export function analyzeJobDescriptionMatch({
     proofSignals.length ? "Includes some proof, project, or impact evidence." : "",
   ]);
   const gaps = unique([
+    missingMustHave.length ? `Missing required JD terms: ${missingMustHave.slice(0, 5).join(", ")}` : "",
     missingSkills.length ? `Missing core skills: ${missingSkills.slice(0, 5).join(", ")}` : "",
     missingTools.length ? `Missing tools/platforms: ${missingTools.slice(0, 5).join(", ")}` : "",
     missingResponsibilities.length ? "Responsibilities from the JD are not fully reflected." : "",
+    seniorityAlignment.score <= 4 ? "Seniority or years-of-experience evidence is weak for this JD." : "",
     proofSignals.length < 3 ? "Proof or measurable impact is thin for this JD." : "",
   ]);
   const quickWins = unique([
+    missingMustHave[0] ? `Add honest evidence for required JD term: ${missingMustHave[0]}.` : "",
     missingSkills[0] ? `Add honest evidence for ${missingSkills[0]} if you have used it.` : "",
     missingTools[0] ? `Mention where you used ${missingTools[0]} in a project or role.` : "",
     missingResponsibilities[0] ? `Rewrite one bullet to reflect ${missingResponsibilities[0]} work.` : "",

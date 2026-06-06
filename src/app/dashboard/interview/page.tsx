@@ -1,16 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { ResumeRewriterForm } from "@/app/dashboard/resume/rewrite/resume-rewriter-form";
+import { InterviewSetupForm } from "@/app/dashboard/interview/interview-setup-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
+import { INTERVIEW_MODE_OPTIONS } from "@/lib/interview-prep";
 import { prisma } from "@/lib/prisma";
 import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
 
-export default async function ResumeRewritePage() {
+export default async function InterviewPage() {
   const user = await getCurrentDbUser();
 
   if (!user.role) {
@@ -46,21 +52,14 @@ export default async function ResumeRewritePage() {
             variant="outline"
             className={forge.secondaryButton}
           >
-            <Link href="/dashboard/resume/match">JD Match</Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className={forge.secondaryButton}
-          >
-            <Link href="/dashboard/resume/ats">ATS Optimizer</Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className={forge.secondaryButton}
-          >
             <Link href="/dashboard/resume">Resume Dashboard</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className={forge.secondaryButton}
+          >
+            <Link href="/dashboard">Dashboard</Link>
           </Button>
         </div>
       </div>
@@ -71,29 +70,28 @@ export default async function ResumeRewritePage() {
           <div className={forge.heroGlowPurple} />
           <div className="relative">
             <span className={forge.badge}>
-              Truthful JD-tailored rewriting
+              Mock Interview Preparation
             </span>
             <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              AI Resume Rewriter
+              Practice the questions your resume is likely to trigger.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Rewrite resume content for a specific job description while
-              preserving evidence. The tool improves wording, highlights ATS
-              keywords, and keeps missing skills separate from claimed skills.
+              Select a parsed resume, paste a job description, choose an
+              interview mode, and generate focused text-based practice with
+              evaluation feedback.
             </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {[
-                ["Professional summary", "Role-aligned and evidence-safe"],
-                ["Bullet rewrites", "Stronger action verbs and JD language"],
-                ["Skills guidance", "Matched keywords plus missing skills"],
-              ].map(([title, description]) => (
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {INTERVIEW_MODE_OPTIONS.map((mode) => (
                 <div
-                  key={title}
+                  key={mode.value}
                   className={`${forge.metric} ${forge.hoverCard}`}
                 >
-                  <p className="font-semibold text-zinc-100">{title}</p>
+                  <div className="mb-3 grid h-9 w-9 place-items-center rounded-xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-xs font-semibold text-cyan-100 shadow-[0_0_18px_rgba(0,229,255,0.14)]">
+                    {mode.iconPlaceholder}
+                  </div>
+                  <p className="font-semibold text-zinc-100">{mode.title}</p>
                   <p className="mt-1 text-sm leading-6 text-zinc-400">
-                    {description}
+                    {mode.description}
                   </p>
                 </div>
               ))}
@@ -104,7 +102,7 @@ export default async function ResumeRewritePage() {
 
       <section className="mx-auto w-full max-w-7xl pb-16">
         {resumes.length ? (
-          <ResumeRewriterForm
+          <InterviewSetupForm
             resumes={resumes.map((resume) => ({
               id: resume.id,
               title: resume.title,
@@ -116,8 +114,8 @@ export default async function ResumeRewritePage() {
             <CardHeader className="pb-4">
               <CardTitle>No readable resumes available</CardTitle>
               <CardDescription className="leading-6 text-zinc-400">
-                Upload and analyze a text-based resume PDF before generating a
-                JD-tailored rewrite.
+                Upload and analyze a text-based resume PDF before starting mock
+                interview practice.
               </CardDescription>
             </CardHeader>
           </Card>

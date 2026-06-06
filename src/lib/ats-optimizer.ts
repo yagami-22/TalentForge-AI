@@ -1,3 +1,14 @@
+import {
+  COMMON_DOMAIN_DEFINITIONS as DOMAIN_DEFINITIONS,
+  COMMON_GENERIC_TERMS as GENERIC_TERMS,
+  type SharedDomainDefinition as DomainDefinition,
+  countTermMatches as countMatches,
+  getTextLines as getLines,
+  normalizeText as normalize,
+  scoreRatio,
+  uniqueValues as unique,
+} from "@/lib/resume-analysis-shared";
+
 export type ATSWarningSeverity = "Low" | "Medium" | "High";
 
 export type ATSOptimizationAnalysis = {
@@ -35,13 +46,6 @@ export type ATSJobDescriptionValidation = {
   reason: string;
 };
 
-type DomainDefinition = {
-  name: string;
-  keywords: string[];
-  tools: string[];
-  responsibilities: string[];
-};
-
 type ParsedATSJobDescription = {
   targetRole: string;
   domain: DomainDefinition;
@@ -52,33 +56,6 @@ type ParsedATSJobDescription = {
   responsibilities: string[];
   allKeywords: string[];
 };
-
-const GENERIC_TERMS = [
-  "communication",
-  "teamwork",
-  "leadership",
-  "motivated",
-  "hardworking",
-  "passionate",
-  "self starter",
-  "problem solving",
-  "detail oriented",
-  "fast paced",
-  "collaborative",
-  "excellent",
-  "strong",
-  "good",
-  "frontend",
-  "web",
-  "design",
-  "application",
-  "applications",
-  "requirements",
-  "product",
-  "project",
-  "projects",
-  "usability",
-];
 
 const FRONTEND_REQUIRED_KEYWORDS = [
   "react",
@@ -147,117 +124,6 @@ const IMPACT_TERMS = [
   "published",
   "certified",
 ];
-
-const DOMAIN_DEFINITIONS: DomainDefinition[] = [
-  {
-    name: "Software",
-    keywords: ["software", "frontend", "backend", "full stack", "web", "application", "engineering"],
-    tools: ["react", "next.js", "node.js", "typescript", "javascript", "java", "python", "api", "apis", "rest api", "rest apis", "graphql", "sql", "git", "docker", "ci/cd", "ci cd", "jest", "cypress", "testing", "testing frameworks", "accessibility", "seo", "cloud", "cloud platforms", "deployment", "postgresql", "mongodb", "firebase", "aws", "vercel"],
-    responsibilities: ["build", "develop", "implement", "debug", "test", "deploy", "integrate", "maintain", "architecture", "optimize", "accessibility", "seo", "responsive design", "performance optimization", "reusable ui components"],
-  },
-  {
-    name: "Data",
-    keywords: ["data", "analytics", "dashboard", "statistics", "insights", "etl", "analysis"],
-    tools: ["sql", "python", "excel", "power bi", "tableau", "pandas", "statistics", "dashboard", "etl", "analytics", "r"],
-    responsibilities: ["analyze", "visualize", "report", "model", "forecast", "clean", "dashboard", "derive insights"],
-  },
-  {
-    name: "Design",
-    keywords: ["design", "ux", "ui", "user experience", "product design", "visual"],
-    tools: ["figma", "ux research", "wireframes", "prototypes", "design systems", "user flows", "adobe"],
-    responsibilities: ["design", "prototype", "research", "wireframe", "test", "iterate", "usability"],
-  },
-  {
-    name: "Marketing",
-    keywords: ["marketing", "growth", "brand", "campaign", "content", "seo"],
-    tools: ["seo", "ga4", "google analytics", "campaigns", "conversion", "content", "social media", "email marketing", "crm"],
-    responsibilities: ["campaign", "optimize", "content", "convert", "engage", "analyze", "segment"],
-  },
-  {
-    name: "Finance",
-    keywords: ["finance", "accounting", "investment", "valuation", "budget", "financial"],
-    tools: ["valuation", "financial modeling", "accounting", "excel", "budgeting", "forecasting", "audit"],
-    responsibilities: ["model", "budget", "forecast", "audit", "analyze", "report", "reconcile"],
-  },
-  {
-    name: "Sales",
-    keywords: ["sales", "revenue", "client", "lead", "pipeline", "account"],
-    tools: ["crm", "leads", "pipeline", "clients", "revenue", "negotiation", "cold outreach", "salesforce"],
-    responsibilities: ["prospect", "sell", "negotiate", "close", "manage", "outreach", "qualify"],
-  },
-  {
-    name: "Operations",
-    keywords: ["operations", "process", "logistics", "supply chain", "vendor"],
-    tools: ["process improvement", "logistics", "inventory", "vendor", "supply chain", "optimization", "erp"],
-    responsibilities: ["coordinate", "optimize", "improve", "manage", "track", "operate", "standardize"],
-  },
-  {
-    name: "Product",
-    keywords: ["product", "roadmap", "requirements", "user research", "metrics"],
-    tools: ["roadmap", "prd", "user research", "metrics", "requirements", "prioritization", "jira"],
-    responsibilities: ["prioritize", "define", "research", "measure", "roadmap", "launch", "stakeholder"],
-  },
-  {
-    name: "Consulting",
-    keywords: ["consulting", "strategy", "business", "case", "stakeholder"],
-    tools: ["market research", "strategy", "analysis", "stakeholder", "presentation", "business case", "excel"],
-    responsibilities: ["analyze", "recommend", "present", "research", "stakeholder", "strategy", "diagnose"],
-  },
-  {
-    name: "HR",
-    keywords: ["hr", "human resources", "talent", "employee", "recruitment"],
-    tools: ["recruitment", "onboarding", "payroll", "employee engagement", "hrms", "ats"],
-    responsibilities: ["recruit", "onboard", "screen", "engage", "coordinate", "manage", "interview"],
-  },
-  {
-    name: "Research",
-    keywords: ["research", "publication", "methodology", "experiment", "study"],
-    tools: ["publication", "methodology", "experiment", "literature review", "data analysis", "spss", "matlab"],
-    responsibilities: ["research", "experiment", "review", "analyze", "publish", "document", "evaluate"],
-  },
-  {
-    name: "General",
-    keywords: ["business", "project", "coordination", "analysis", "operations"],
-    tools: ["excel", "presentation", "documentation", "reporting", "crm"],
-    responsibilities: ["coordinate", "manage", "analyze", "support", "document", "communicate"],
-  },
-];
-
-function normalize(text: string) {
-  return text.replace(/\s+/g, " ").trim();
-}
-
-function unique(items: string[]) {
-  return Array.from(new Set(items.map((item) => item.trim()).filter(Boolean)));
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function getLines(text: string) {
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-function countMatches(text: string, terms: string[]) {
-  const lower = text.toLowerCase();
-
-  return unique(terms).filter((term) =>
-    new RegExp(
-      `(^|[^a-z0-9+#.])${escapeRegExp(term.toLowerCase())}([^a-z0-9+#.]|$)`,
-      "i"
-    ).test(lower)
-  );
-}
-
-function scoreRatio(matched: number, required: number, maxScore: number) {
-  if (required <= 0) return Math.round(maxScore * 0.55);
-
-  return Math.max(0, Math.min(maxScore, Math.round((matched / required) * maxScore)));
-}
 
 function isGenericKeyword(term: string) {
   return GENERIC_TERMS.includes(term.toLowerCase());
@@ -570,7 +436,7 @@ function detectWeakBullets(resumeText: string, jdTerms: string[]) {
 function projectContextForBullet(resumeText: string, original: string) {
   const lines = getLines(resumeText);
   const targetIndex = lines.findIndex((line) => line.includes(original));
-  const fallback = "[project/product]";
+  const fallback = "";
 
   if (targetIndex < 0) return fallback;
 
@@ -594,20 +460,24 @@ function improveBullet(original: string, jdTerms: string[], resumeText: string) 
   const meaningfulTerms = jdTerms.filter(isMeaningfulATSKeyword);
   const matchedTerms = countMatches(original, meaningfulTerms);
   const hasFrontendContext = /\b(?:frontend|interface|ui|responsive|web)\b/i.test(original);
-  const toolPhrase =
-    matchedTerms.slice(0, 2).join("/") ||
-    (hasFrontendContext ? "[React/Next.js if used]" : "[relevant tool if used]");
+  const toolPhrase = matchedTerms.slice(0, 2).join("/") || "";
   const projectContext = projectContextForBullet(resumeText, original);
   const cleaned = original.replace(/^[•\-*–]\s*/, "").replace(/\.$/, "");
-  const outcome = hasMetric(original)
-    ? "supporting the measured outcome already stated"
-    : "improving [metric] or [outcome]";
+  const contextClause = projectContext ? ` for ${projectContext}` : "";
+  const toolClause = toolPhrase
+    ? ` using ${toolPhrase}`
+    : hasFrontendContext
+      ? " with clearer frontend implementation context"
+      : "";
+  const outcomeClause = hasMetric(original)
+    ? ", preserving the measured outcome already stated"
+    : "";
 
   return {
     original,
-    improved: `${cleaned.replace(/\.$/, "")} for ${projectContext} using ${toolPhrase}, ${outcome}.`,
+    improved: `${cleaned.replace(/\.$/, "")}${contextClause}${toolClause}${outcomeClause}.`,
     reason:
-      "Preserves the original evidence while adding project context, target keywords, and honest placeholders without inventing unsupported tools or metrics.",
+      "Preserves the original evidence while adding only resume-backed context and JD terms already present in the bullet.",
   };
 }
 

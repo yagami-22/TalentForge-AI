@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { reanalyzeResume } from "@/app/dashboard/resume/actions";
 import { initialReanalyzeResumeState } from "@/app/dashboard/resume/state";
 import { Button } from "@/components/ui/button";
+import { forge } from "@/lib/talentforge-design";
 
 type ReanalyzeResumeButtonProps = {
   resumeId: string;
@@ -39,7 +40,7 @@ export function ReanalyzeResumeButton({
         type="submit"
         disabled={pending}
         variant="outline"
-        className="border-emerald-200/25 bg-emerald-300/10 text-emerald-50 shadow-sm hover:border-emerald-100/40 hover:bg-emerald-300/15 hover:text-white disabled:opacity-60"
+        className={`${forge.secondaryButton} disabled:opacity-60`}
       >
         {pending ? "Re-analyzing..." : "Re-analyze resume"}
       </Button>

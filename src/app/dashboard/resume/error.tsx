@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
+import { forge } from "@/lib/talentforge-design";
 
 export default function Error({
   error,
@@ -16,8 +17,8 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#05070d] px-6 text-white">
-      <div className="max-w-md text-center">
+    <main className={`${forge.page} flex items-center justify-center`}>
+      <div className={`max-w-md p-8 text-center ${forge.panel}`}>
         <p className="text-sm font-semibold uppercase text-red-300">
           Resume Library Error
         </p>
@@ -30,7 +31,7 @@ export default function Error({
         </p>
         <Button
           onClick={() => unstable_retry()}
-          className="mt-6 bg-cyan-300 text-slate-950 hover:bg-cyan-200"
+          className={`mt-6 ${forge.primaryButton}`}
         >
           Try Again
         </Button>

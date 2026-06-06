@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { forge } from "@/lib/talentforge-design";
 import type {
   ResumeCategoryScore,
   ResumeDiagnostics,
@@ -154,8 +155,8 @@ function CompactListCard({
         : "text-zinc-200";
 
   return (
-    <Card className="border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.035] text-white shadow-[0_18px_60px_rgba(0,0,0,0.28)] ring-1 ring-white/10">
-      <CardHeader className="pb-3">
+    <Card className={`overflow-hidden ${forge.card} ${forge.hoverCard}`}>
+      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
         <CardTitle className={`text-base ${titleTone}`}>{title}</CardTitle>
       </CardHeader>
       <CardContent>
@@ -175,17 +176,17 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
   const breakdownRows = getBreakdownRows(category);
 
   return (
-    <Card className="border-white/10 bg-gradient-to-b from-white/[0.075] to-white/[0.035] text-white shadow-[0_18px_60px_rgba(0,0,0,0.25)] ring-1 ring-white/10">
-      <CardHeader className="space-y-3 pb-3">
+    <Card className={`overflow-hidden ${forge.card} ${forge.hoverCard}`}>
+      <CardHeader className="space-y-3 border-b border-white/10 bg-[#070B1F]/60 pb-3">
         <div className="flex items-start justify-between gap-3">
           <CardTitle className="text-base leading-6">{category.name}</CardTitle>
-          <p className="shrink-0 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-2 py-1 text-sm font-semibold text-cyan-100">
+          <p className="shrink-0 rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-2.5 py-1 text-sm font-semibold text-cyan-100">
             {category.score}/{category.maxScore}
           </p>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/10 shadow-inner">
+        <div className={`h-1.5 ${forge.progressTrack}`}>
           <div
-            className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300"
+            className={forge.progressFill}
             style={{ width: scoreWidth(category.score, category.maxScore) }}
           />
         </div>
@@ -270,84 +271,91 @@ export default async function ResumePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.14),transparent_32rem),linear-gradient(180deg,#05070d_0%,#08111d_48%,#05070d_100%)] px-5 py-7 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between rounded-md border border-white/10 bg-white/[0.035] px-4 py-3 shadow-[0_18px_60px_rgba(0,0,0,0.25)] backdrop-blur">
+    <main className={forge.page}>
+      <div className={forge.topNav}>
         <Link href="/" className="text-lg font-semibold tracking-tight">
           TalentForge AI
         </Link>
         <Button
           asChild
           variant="outline"
-          className="border-white/15 bg-white/[0.04] text-white shadow-sm hover:border-cyan-200/30 hover:bg-cyan-300/10 hover:text-white"
+          className={forge.secondaryButton}
         >
           <Link href="/dashboard">Dashboard</Link>
         </Button>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl py-10 lg:py-12">
-        <div className="grid gap-5 lg:grid-cols-[1fr_400px] lg:items-start">
-          <div className="rounded-md border border-white/10 bg-white/[0.035] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.3)] backdrop-blur sm:p-7">
-            <p className="text-sm font-semibold uppercase text-cyan-100">
-              Resume Intelligence
-            </p>
-            <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-              Evidence-based resume diagnostics.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Upload a PDF resume to generate a criteria-based analysis with
-              explainable scoring, missing evidence, quick wins, and red flags.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button
-                asChild
-                className="bg-gradient-to-r from-cyan-200 to-emerald-200 text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,0.18)] hover:from-cyan-100 hover:to-emerald-100"
-              >
-                <Link href="/dashboard/resume/match">
-                  Match Resume to Job Description
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="border-cyan-200/25 bg-cyan-300/10 text-cyan-50 shadow-sm hover:border-cyan-100/40 hover:bg-cyan-300/15 hover:text-white"
-              >
-                <Link href="/dashboard/resume/ats">Optimize Resume for ATS</Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="border-cyan-200/25 bg-cyan-300/10 text-cyan-50 shadow-sm hover:border-cyan-100/40 hover:bg-cyan-300/15 hover:text-white"
-              >
-                <Link href="/dashboard/resume/rewrite">AI Resume Rewriter</Link>
-              </Button>
-            </div>
-            <div className="mt-6 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
-              {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
-                (item) => (
-                  <div
-                    key={item}
-                    className="rounded-md border border-cyan-200/10 bg-cyan-300/[0.06] px-3 py-2 text-cyan-50"
-                  >
-                    {item}
-                  </div>
-                )
-              )}
-            </div>
+      <section className="mx-auto w-full max-w-7xl space-y-5 py-10 lg:py-12">
+        <div className={forge.hero}>
+          <div className={forge.heroGlowCyan} />
+          <div className={forge.heroGlowPurple} />
+          <p className={forge.badge}>
+            Resume Intelligence
+          </p>
+          <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            Evidence-based resume diagnostics.
+          </h1>
+          <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
+            Upload a PDF resume to generate a criteria-based analysis with
+            explainable scoring, missing evidence, quick wins, and red flags.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button
+              asChild
+              className={forge.primaryButton}
+            >
+              <Link href="/dashboard/resume/match">
+                Match Resume to Job Description
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className={forge.secondaryButton}
+            >
+              <Link href="/dashboard/resume/ats">Optimize Resume for ATS</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className={forge.secondaryButton}
+            >
+              <Link href="/dashboard/resume/rewrite">AI Resume Rewriter</Link>
+            </Button>
           </div>
-
-          <Card className="h-fit border-cyan-200/15 bg-gradient-to-b from-cyan-300/[0.09] to-white/[0.045] text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)] ring-1 ring-cyan-200/10">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Upload Resume</CardTitle>
-              <CardDescription className="text-sm leading-6 text-zinc-400">
-                Existing uploads stay compatible. New uploads store the full
-                analysis JSON.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <UploadResumeForm />
-            </CardContent>
-          </Card>
+          <div className="mt-6 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
+            {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
+              (item) => (
+                <div
+                  key={item}
+                  className="rounded-full border border-[#00E5FF]/15 bg-[#00E5FF]/10 px-3 py-2 text-cyan-50 shadow-[0_0_18px_rgba(0,229,255,0.08)]"
+                >
+                  {item}
+                </div>
+              )
+            )}
+          </div>
         </div>
+
+        <Card className={forge.cardStrong}>
+          <CardHeader className="pb-3">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <CardTitle className="text-lg">Upload Resume</CardTitle>
+                <CardDescription className="text-sm leading-6 text-zinc-400">
+                  Existing uploads stay compatible. New uploads store the full
+                  analysis JSON.
+                </CardDescription>
+              </div>
+              <p className="text-xs font-medium uppercase text-cyan-100">
+                PDF only
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <UploadResumeForm />
+          </CardContent>
+        </Card>
       </section>
 
       <section className="mx-auto w-full max-w-7xl pb-16">
@@ -396,7 +404,7 @@ export default async function ResumePage() {
 
               return (
                 <article key={resume.id} className="space-y-4">
-                  <Card className="border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.04] text-white shadow-[0_24px_90px_rgba(0,0,0,0.34)] ring-1 ring-white/10">
+                  <Card className={forge.cardStrong}>
                     <CardHeader className="pb-4">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
@@ -423,7 +431,7 @@ export default async function ResumePage() {
                             <Button
                               asChild
                               variant="outline"
-                              className="border-cyan-200/25 bg-cyan-300/10 text-cyan-50 shadow-sm hover:border-cyan-100/40 hover:bg-cyan-300/15 hover:text-white"
+                              className={forge.secondaryButton}
                             >
                               <a
                                 href={resume.fileUrl}
@@ -447,7 +455,7 @@ export default async function ResumePage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                        <div className="rounded-md border border-cyan-200/15 bg-cyan-300/[0.07] p-3 shadow-inner">
+                        <div className={forge.metric}>
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Overall
                           </p>
@@ -459,7 +467,7 @@ export default async function ResumePage() {
                             {score === null ? "--" : score}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                        <div className={forge.metric}>
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Grade
                           </p>
@@ -467,7 +475,7 @@ export default async function ResumePage() {
                             {grade ?? "Not scored"}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                        <div className={forge.metric}>
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Readiness
                           </p>
@@ -475,7 +483,7 @@ export default async function ResumePage() {
                             {hiringReadiness}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                        <div className={forge.metric}>
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Profile
                           </p>
@@ -483,7 +491,7 @@ export default async function ResumePage() {
                             {detectedProfileType}
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
+                        <div className={forge.metric}>
                           <p className="text-xs font-medium uppercase text-zinc-500">
                             Seniority
                           </p>
@@ -492,9 +500,9 @@ export default async function ResumePage() {
                           </p>
                         </div>
                       </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-white/10 shadow-inner">
+                      <div className={`h-1.5 ${forge.progressTrack}`}>
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300"
+                          className={forge.progressFill}
                           style={{ width: scoreWidth(score) }}
                         />
                       </div>
@@ -508,7 +516,7 @@ export default async function ResumePage() {
                       ))}
                     </div>
                   ) : (
-                    <Card className="h-fit border-white/10 bg-white/[0.045] text-white ring-white/10">
+                    <Card className={`h-fit ${forge.card}`}>
                       <CardHeader className="pb-4">
                         <CardTitle className="text-base">
                           Category scoring pending
@@ -545,7 +553,7 @@ export default async function ResumePage() {
             })}
           </div>
         ) : (
-          <Card className="h-fit border-white/10 bg-white/[0.045] text-white ring-white/10">
+          <Card className={`h-fit ${forge.card}`}>
             <CardHeader className="pb-4">
               <CardTitle>No resumes uploaded yet</CardTitle>
               <CardDescription className="leading-6 text-zinc-400">
