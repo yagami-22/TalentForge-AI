@@ -29,7 +29,9 @@ export function UploadResumeForm() {
         <Input
           id="title"
           name="title"
+          maxLength={90}
           placeholder="Software Engineer Resume"
+          aria-invalid={state.status === "error"}
           className={`mt-2 ${forge.input}`}
         />
       </div>
@@ -47,6 +49,7 @@ export function UploadResumeForm() {
           type="file"
           accept="application/pdf,.pdf"
           required
+          aria-invalid={state.status === "error"}
           className={`mt-2 ${forge.input} file:mr-4 file:rounded-md file:border-0 file:bg-[#00E5FF] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-950 hover:border-[#00E5FF]/30`}
         />
         <p className="text-xs text-zinc-500">PDF only, up to 8 MB.</p>

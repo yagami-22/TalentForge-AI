@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import type { ResumeRewriteState } from "@/app/dashboard/resume/rewrite/state";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -7,6 +9,10 @@ import {
   generateResumeRewriteForJD,
   validateResumeRewriteJobDescription,
 } from "@/lib/resume-rewriter";
+import {
+  createResumeVersion,
+  formatResumeRewriteVersionContent,
+} from "@/lib/resume-versioning";
 
 export async function rewriteResumeForJD(
   _prevState: ResumeRewriteState,
@@ -58,6 +64,7 @@ export async function rewriteResumeForJD(
         userId: user.id,
       },
       select: {
+        id: true,
         title: true,
         extractedText: true,
       },
@@ -79,14 +86,26 @@ export async function rewriteResumeForJD(
       };
     }
 
+    const rewrite = generateResumeRewriteForJD({
+      resumeTitle: resume.title,
+      resumeText: resume.extractedText,
+      jobDescription,
+    });
+
+    await createResumeVersion({
+      resumeId: resume.id,
+      sourceType: "resume_rewriter",
+      content: formatResumeRewriteVersionContent(rewrite),
+      atsScore: null,
+      jobMatchScore: null,
+    });
+
+    revalidatePath("/dashboard/resume/history");
+
     return {
       message: "Resume rewrite generated.",
       status: "success",
-      rewrite: generateResumeRewriteForJD({
-        resumeTitle: resume.title,
-        resumeText: resume.extractedText,
-        jobDescription,
-      }),
+      rewrite,
     };
   } catch (error) {
     console.error("Resume rewrite generation failed", {

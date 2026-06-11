@@ -834,6 +834,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
                     name="resumeId"
                     required
                     defaultValue={validSavedRewriteState?.selectedResumeId ?? ""}
+                    aria-invalid={state.status === "error"}
                     className={`mt-3 ${forge.select}`}
                   >
                     <option value="">Select a resume</option>
@@ -896,8 +897,10 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
                 id="jobDescription"
                 name="jobDescription"
                 required
+                minLength={80}
                 rows={9}
                 defaultValue={validSavedRewriteState?.jobDescription ?? ""}
+                aria-invalid={state.status === "error"}
                 placeholder="Paste the job description you want to tailor this resume toward..."
                 className={`mt-3 max-h-[52vh] min-h-60 resize-y overflow-y-auto p-4 ${forge.input}`}
               />

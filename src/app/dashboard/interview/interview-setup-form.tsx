@@ -12,6 +12,9 @@ import {
   INTERVIEW_ANSWERS_STORAGE_KEY,
   INTERVIEW_EVALUATION_STORAGE_KEY,
   INTERVIEW_SESSION_STORAGE_KEY,
+  OA_ANSWERS_STORAGE_KEY,
+  OA_REPORT_STORAGE_KEY,
+  OA_SESSION_STORAGE_KEY,
 } from "@/app/dashboard/interview/interview-storage";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,7 +35,22 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
   );
 
   useEffect(() => {
-    if (state.status !== "success" || !state.session) {
+    if (state.status !== "success") {
+      return;
+    }
+
+    if (state.oaSession) {
+      window.localStorage.setItem(
+        OA_SESSION_STORAGE_KEY,
+        JSON.stringify(state.oaSession)
+      );
+      window.localStorage.removeItem(OA_ANSWERS_STORAGE_KEY);
+      window.localStorage.removeItem(OA_REPORT_STORAGE_KEY);
+      router.push("/dashboard/interview/oa/session");
+      return;
+    }
+
+    if (!state.session) {
       return;
     }
 
@@ -43,7 +61,7 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
     window.localStorage.removeItem(INTERVIEW_ANSWERS_STORAGE_KEY);
     window.localStorage.removeItem(INTERVIEW_EVALUATION_STORAGE_KEY);
     router.push("/dashboard/interview/session");
-  }, [router, state.session, state.status]);
+  }, [router, state.oaSession, state.session, state.status]);
 
   return (
     <CardShell title="Create Interview Session" badge="Local session v1">
@@ -64,6 +82,7 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
                 id="resumeId"
                 name="resumeId"
                 required
+                aria-invalid={state.status === "error"}
                 className={`mt-3 ${forge.select}`}
               >
                 <option value="">Select a resume</option>
@@ -147,7 +166,9 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
             id="jobDescription"
             name="jobDescription"
             required
+            minLength={80}
             rows={9}
+            aria-invalid={state.status === "error"}
             placeholder="Paste the job description you want to practice for..."
             className={`mt-3 max-h-[52vh] min-h-60 resize-y overflow-y-auto p-4 ${forge.input}`}
           />

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { withRetry } from "@/lib/retry";
 import { forge } from "@/lib/talentforge-design";
 import type {
   ResumeCategoryScore,
@@ -265,10 +266,12 @@ export default async function ResumePage() {
     redirect("/onboarding");
   }
 
-  const resumes = await prisma.resume.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-  });
+  const resumes = await withRetry(() =>
+    prisma.resume.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+    })
+  );
 
   return (
     <main className={forge.page}>
@@ -321,6 +324,13 @@ export default async function ResumePage() {
               className={forge.secondaryButton}
             >
               <Link href="/dashboard/resume/rewrite">AI Resume Rewriter</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className={forge.secondaryButton}
+            >
+              <Link href="/dashboard/resume/history">Version History</Link>
             </Button>
           </div>
           <div className="mt-6 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">

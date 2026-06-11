@@ -41,11 +41,29 @@ model Resume {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions ResumeVersion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId, fileHash])
+}
+
+model ResumeVersion {
+  id             String   @id @default(cuid())
+  resumeId       String
+  resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  versionNumber  Int
+  sourceType     String
+  atsScore       Int?
+  jobMatchScore  Int?
+  addedKeywords  Json?
+  removedKeywords Json?
+  content        String   @db.Text
+  createdAt      DateTime @default(now())
+
+  @@unique([resumeId, versionNumber])
+  @@index([resumeId, createdAt])
 }
 
 model Job {

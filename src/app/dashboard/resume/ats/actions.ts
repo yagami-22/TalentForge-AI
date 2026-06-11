@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import type { ATSOptimizerState } from "@/app/dashboard/resume/ats/state";
 import {
   analyzeATSOptimization,
@@ -7,6 +9,10 @@ import {
 } from "@/lib/ats-optimizer";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import {
+  createResumeVersion,
+  formatATSOptimizedVersionContent,
+} from "@/lib/resume-versioning";
 
 export async function optimizeResumeForATS(
   _prevState: ATSOptimizerState,
@@ -57,6 +63,7 @@ export async function optimizeResumeForATS(
       userId: user.id,
     },
     select: {
+      id: true,
       title: true,
       extractedText: true,
     },
@@ -78,13 +85,25 @@ export async function optimizeResumeForATS(
     };
   }
 
+  const analysis = analyzeATSOptimization({
+    resumeTitle: resume.title,
+    resumeText: resume.extractedText,
+    jobDescription,
+  });
+
+  await createResumeVersion({
+    resumeId: resume.id,
+    sourceType: "ats_optimizer",
+    content: formatATSOptimizedVersionContent(resume.extractedText, analysis),
+    atsScore: analysis.atsScore,
+    jobMatchScore: null,
+  });
+
+  revalidatePath("/dashboard/resume/history");
+
   return {
     message: "ATS optimization report complete.",
     status: "success",
-    analysis: analyzeATSOptimization({
-      resumeTitle: resume.title,
-      resumeText: resume.extractedText,
-      jobDescription,
-    }),
+    analysis,
   };
 }

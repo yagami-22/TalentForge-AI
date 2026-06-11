@@ -258,6 +258,7 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
                     name="resumeId"
                     required
                     defaultValue={validSavedATSState?.resumeId ?? ""}
+                    aria-invalid={state.status === "error"}
                     className={`mt-3 ${forge.select}`}
                   >
                     <option value="">Select a resume</option>
@@ -320,8 +321,10 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
                 id="jobDescription"
                 name="jobDescription"
                 required
+                minLength={80}
                 rows={9}
                 defaultValue={validSavedATSState?.jobDescription ?? ""}
+                aria-invalid={state.status === "error"}
                 placeholder="Paste the complete job description with responsibilities, requirements, and qualifications..."
                 className={`mt-3 max-h-[52vh] min-h-60 resize-y overflow-y-auto p-4 ${forge.input}`}
               />

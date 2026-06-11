@@ -13,6 +13,7 @@ import {
   type InterviewSession,
   validateInterviewJobDescription,
 } from "@/lib/interview-prep";
+import { generateOASession } from "@/lib/oa-session";
 import { prisma } from "@/lib/prisma";
 
 export async function generateMockInterview(
@@ -91,6 +92,20 @@ export async function generateMockInterview(
       message: "This resume does not have enough readable text for interview practice.",
       status: "error",
       session: null,
+    };
+  }
+
+  if (mode === "OA") {
+    return {
+      message: "OA assessment generated.",
+      status: "success",
+      session: null,
+      oaSession: generateOASession({
+        resumeId,
+        resumeTitle: resume.title,
+        resumeText: resume.extractedText,
+        jobDescription,
+      }),
     };
   }
 

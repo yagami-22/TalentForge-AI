@@ -19,6 +19,7 @@ import {
   validateResumeFile,
   validateResumeText,
 } from "@/lib/resume-validation";
+import { createResumeVersion } from "@/lib/resume-versioning";
 
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "resumes");
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -265,7 +266,7 @@ export async function uploadResume(
   await mkdir(userUploadDir, { recursive: true });
   await writeFile(storedPath, buffer);
 
-  await prisma.resume.create({
+  const createdResume = await prisma.resume.create({
     data: {
       title,
       fileUrl,
@@ -280,7 +281,16 @@ export async function uploadResume(
     },
   });
 
+  await createResumeVersion({
+    resumeId: createdResume.id,
+    sourceType: "original",
+    content: extractedText,
+    atsScore: atsAnalysis.overallScore,
+    jobMatchScore: null,
+  });
+
   revalidatePath("/dashboard/resume");
+  revalidatePath("/dashboard/resume/history");
 
   return {
     message: `Resume uploaded and analyzed from ${extractionSource}. ATS score: ${atsAnalysis.overallScore}.`,
@@ -366,6 +376,7 @@ export async function deleteResume(
   });
 
   revalidatePath("/dashboard/resume");
+  revalidatePath("/dashboard/resume/history");
 
   return {
     message: `${resume.title} deleted.`,
@@ -436,6 +447,7 @@ export async function reanalyzeResume(
   });
 
   revalidatePath("/dashboard/resume");
+  revalidatePath("/dashboard/resume/history");
 
   return {
     message: `${resume.title} re-analyzed. Updated score: ${atsAnalysis.overallScore}.`,

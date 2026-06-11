@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { ATSOptimizerForm } from "@/app/dashboard/resume/ats/ats-optimizer-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { withRetry } from "@/lib/retry";
 import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
@@ -17,22 +18,24 @@ export default async function ATSOptimizerPage() {
     redirect("/onboarding");
   }
 
-  const resumes = await prisma.resume.findMany({
-    where: {
-      userId: user.id,
-      extractedText: {
-        not: null,
+  const resumes = await withRetry(() =>
+    prisma.resume.findMany({
+      where: {
+        userId: user.id,
+        extractedText: {
+          not: null,
+        },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      title: true,
-      createdAt: true,
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+      },
+    })
+  );
 
   return (
     <main className={forge.page}>
@@ -112,14 +115,12 @@ export default async function ATSOptimizerPage() {
             }))}
           />
         ) : (
-          <Card className={`h-fit ${forge.card}`}>
-            <CardHeader className="pb-4">
-              <CardTitle>No readable resumes available</CardTitle>
-              <CardDescription className="leading-6 text-zinc-400">
-                Upload a text-based resume PDF before optimizing it for ATS.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <DashboardEmptyState
+            title="No readable resumes available"
+            description="Upload a text-based resume PDF before optimizing it for ATS."
+            actionHref="/dashboard/resume"
+            actionLabel="Upload Resume"
+          />
         )}
       </section>
     </main>

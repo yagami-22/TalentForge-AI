@@ -1,17 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { InterviewSetupForm } from "@/app/dashboard/interview/interview-setup-form";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { INTERVIEW_MODE_OPTIONS } from "@/lib/interview-prep";
 import { prisma } from "@/lib/prisma";
+import { withRetry } from "@/lib/retry";
 import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
@@ -23,22 +19,24 @@ export default async function InterviewPage() {
     redirect("/onboarding");
   }
 
-  const resumes = await prisma.resume.findMany({
-    where: {
-      userId: user.id,
-      extractedText: {
-        not: null,
+  const resumes = await withRetry(() =>
+    prisma.resume.findMany({
+      where: {
+        userId: user.id,
+        extractedText: {
+          not: null,
+        },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      title: true,
-      createdAt: true,
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+      },
+    })
+  );
 
   return (
     <main className={forge.page}>
@@ -53,6 +51,13 @@ export default async function InterviewPage() {
             className={forge.secondaryButton}
           >
             <Link href="/dashboard/resume">Resume Dashboard</Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            className={forge.secondaryButton}
+          >
+            <Link href="/dashboard/interview/history">Interview History</Link>
           </Button>
           <Button
             asChild
@@ -110,15 +115,12 @@ export default async function InterviewPage() {
             }))}
           />
         ) : (
-          <Card className={`h-fit ${forge.card}`}>
-            <CardHeader className="pb-4">
-              <CardTitle>No readable resumes available</CardTitle>
-              <CardDescription className="leading-6 text-zinc-400">
-                Upload and analyze a text-based resume PDF before starting mock
-                interview practice.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <DashboardEmptyState
+            title="No readable resumes available"
+            description="Upload and analyze a text-based resume PDF before starting mock interview practice."
+            actionHref="/dashboard/resume"
+            actionLabel="Upload Resume"
+          />
         )}
       </section>
     </main>

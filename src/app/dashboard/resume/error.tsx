@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 
-import { Button } from "@/components/ui/button";
-import { forge } from "@/lib/talentforge-design";
+import { DashboardErrorFallback } from "@/app/dashboard/dashboard-production";
+import { logClientError } from "@/lib/client-error-logging";
 
 export default function Error({
   error,
@@ -13,29 +13,18 @@ export default function Error({
   unstable_retry: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    logClientError(error, {
+      digest: error.digest,
+      route: "/dashboard/resume",
+      source: "resume-error-boundary",
+    });
   }, [error]);
 
   return (
-    <main className={`${forge.page} flex items-center justify-center`}>
-      <div className={`max-w-md p-8 text-center ${forge.panel}`}>
-        <p className="text-sm font-semibold uppercase text-red-300">
-          Resume Library Error
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-          We could not load your resumes.
-        </h1>
-        <p className="mt-4 text-sm leading-6 text-zinc-400">
-          Try again. If this keeps happening, check the database connection and
-          upload storage path.
-        </p>
-        <Button
-          onClick={() => unstable_retry()}
-          className={`mt-6 ${forge.primaryButton}`}
-        >
-          Try Again
-        </Button>
-      </div>
-    </main>
+    <DashboardErrorFallback
+      title="We could not load your resumes."
+      description="Try again. If this keeps happening, check the database connection and upload storage path."
+      onRetry={unstable_retry}
+    />
   );
 }

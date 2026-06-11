@@ -24,6 +24,7 @@ import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { withRetry } from "@/lib/retry";
 
 type NavItem = {
   label: string;
@@ -203,17 +204,19 @@ export default async function DashboardPage() {
     role: user.role,
     initial: user.email?.[0]?.toUpperCase() ?? "U",
   };
-  const latestResume = await prisma.resume.findFirst({
-    where: { userId: user.id },
-    orderBy: { updatedAt: "desc" },
-    select: {
-      title: true,
-      atsScore: true,
-      matchScore: true,
-      updatedAt: true,
-      atsAnalysis: true,
-    },
-  });
+  const latestResume = await withRetry(() =>
+    prisma.resume.findFirst({
+      where: { userId: user.id },
+      orderBy: { updatedAt: "desc" },
+      select: {
+        title: true,
+        atsScore: true,
+        matchScore: true,
+        updatedAt: true,
+        atsAnalysis: true,
+      },
+    })
+  );
   const snapshot = buildResumeSnapshot(latestResume);
 
   return (

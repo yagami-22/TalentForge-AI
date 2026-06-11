@@ -2,7 +2,7 @@ export const forge = {
   page:
     "min-h-screen bg-[#050816] bg-[radial-gradient(circle_at_top_left,rgba(0,229,255,0.12),transparent_35%),radial-gradient(circle_at_top_right,rgba(106,92,255,0.12),transparent_35%),linear-gradient(180deg,#050816_0%,#070B1F_52%,#050816_100%)] px-5 py-7 text-white sm:px-6 lg:px-8",
   topNav:
-    "mx-auto flex w-full max-w-7xl items-center justify-between rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 py-3 shadow-[0_0_40px_rgba(0,229,255,0.08),0_0_60px_rgba(106,92,255,0.08)] backdrop-blur-xl",
+    "mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] px-4 py-3 shadow-[0_0_40px_rgba(0,229,255,0.08),0_0_60px_rgba(106,92,255,0.08)] backdrop-blur-xl",
   hero:
     "relative overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(255,255,255,0.04)_48%,rgba(139,92,246,0.14))] p-6 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.12)] backdrop-blur-xl sm:p-8 lg:p-10",
   heroGlowCyan:

@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import type { MatchResumeState } from "@/app/dashboard/resume/match/state";
 import { getCurrentDbUser } from "@/lib/current-user";
 import {
@@ -7,6 +9,7 @@ import {
   validateJobDescription,
 } from "@/lib/jd-match-analyzer";
 import { prisma } from "@/lib/prisma";
+import { ensureOriginalResumeVersion } from "@/lib/resume-versioning";
 
 export async function analyzeResumeMatch(
   _prevState: MatchResumeState,
@@ -57,8 +60,10 @@ export async function analyzeResumeMatch(
       userId: user.id,
     },
     select: {
+      id: true,
       title: true,
       extractedText: true,
+      atsScore: true,
     },
   });
 
@@ -78,13 +83,45 @@ export async function analyzeResumeMatch(
     };
   }
 
+  const analysis = analyzeJobDescriptionMatch({
+    resumeTitle: resume.title,
+    resumeText: resume.extractedText,
+    jobDescription,
+  });
+  const latestVersion = await prisma.resumeVersion.findFirst({
+    where: { resumeId: resume.id },
+    orderBy: { versionNumber: "desc" },
+    select: { id: true },
+  });
+
+  await prisma.resume.update({
+    where: { id: resume.id },
+    data: {
+      matchScore: analysis.matchScore,
+    },
+  });
+
+  if (latestVersion) {
+    await prisma.resumeVersion.update({
+      where: { id: latestVersion.id },
+      data: {
+        jobMatchScore: analysis.matchScore,
+      },
+    });
+  } else {
+    await ensureOriginalResumeVersion({
+      resumeId: resume.id,
+      content: resume.extractedText,
+      atsScore: resume.atsScore,
+      jobMatchScore: analysis.matchScore,
+    });
+  }
+
+  revalidatePath("/dashboard/resume/history");
+
   return {
     message: "JD match analysis complete.",
     status: "success",
-    analysis: analyzeJobDescriptionMatch({
-      resumeTitle: resume.title,
-      resumeText: resume.extractedText,
-      jobDescription,
-    }),
+    analysis,
   };
 }

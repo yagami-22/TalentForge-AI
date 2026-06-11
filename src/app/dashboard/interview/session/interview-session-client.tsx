@@ -1,18 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { evaluateMockInterview } from "@/app/dashboard/interview/actions";
 import {
   INTERVIEW_ANSWERS_STORAGE_KEY,
   INTERVIEW_EVALUATION_STORAGE_KEY,
+  INTERVIEW_HISTORY_STORAGE_KEY,
   INTERVIEW_SESSION_STORAGE_KEY,
 } from "@/app/dashboard/interview/interview-storage";
 import { initialInterviewEvaluationState } from "@/app/dashboard/interview/state";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  createMockInterviewHistoryAttempt,
+  mergeHistoryAttempts,
+  type InterviewHistoryAttempt,
+} from "@/lib/interview-history";
 import type {
   InterviewAnswer,
   InterviewSession,
@@ -75,6 +81,26 @@ function readStoredAnswers() {
   }
 }
 
+function readHistoryAttempts() {
+  try {
+    const rawHistory = window.localStorage.getItem(INTERVIEW_HISTORY_STORAGE_KEY);
+    const parsedHistory = rawHistory ? JSON.parse(rawHistory) : [];
+
+    return Array.isArray(parsedHistory)
+      ? parsedHistory.filter(
+          (attempt): attempt is InterviewHistoryAttempt =>
+            typeof attempt === "object" &&
+            attempt !== null &&
+            "id" in attempt &&
+            "overallScore" in attempt
+        )
+      : [];
+  } catch {
+    window.localStorage.removeItem(INTERVIEW_HISTORY_STORAGE_KEY);
+    return [];
+  }
+}
+
 export function InterviewSessionClient() {
   const router = useRouter();
   const [session] = useState<InterviewSession | null>(() => readStoredSession());
@@ -86,6 +112,7 @@ export function InterviewSessionClient() {
     evaluateMockInterview,
     initialInterviewEvaluationState
   );
+  const savedEvaluationRef = useRef("");
 
   useEffect(() => {
     if (!answers.length) {
@@ -100,6 +127,12 @@ export function InterviewSessionClient() {
       return;
     }
 
+    if (savedEvaluationRef.current === state.evaluation.sessionId) {
+      return;
+    }
+
+    savedEvaluationRef.current = state.evaluation.sessionId;
+
     const completedSession = {
       ...session,
       answers,
@@ -113,6 +146,19 @@ export function InterviewSessionClient() {
     window.localStorage.setItem(
       INTERVIEW_EVALUATION_STORAGE_KEY,
       JSON.stringify(state.evaluation)
+    );
+    window.localStorage.setItem(
+      INTERVIEW_HISTORY_STORAGE_KEY,
+      JSON.stringify(
+        mergeHistoryAttempts(
+          readHistoryAttempts(),
+          createMockInterviewHistoryAttempt({
+            evaluation: state.evaluation,
+            session: completedSession,
+            answers,
+          })
+        )
+      )
     );
     router.push("/dashboard/interview/results");
   }, [answers, router, session, state.evaluation, state.status]);

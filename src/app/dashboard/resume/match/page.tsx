@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { MatchAnalyzerForm } from "@/app/dashboard/resume/match/match-analyzer-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import { withRetry } from "@/lib/retry";
 import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
@@ -17,22 +18,24 @@ export default async function ResumeMatchPage() {
     redirect("/onboarding");
   }
 
-  const resumes = await prisma.resume.findMany({
-    where: {
-      userId: user.id,
-      extractedText: {
-        not: null,
+  const resumes = await withRetry(() =>
+    prisma.resume.findMany({
+      where: {
+        userId: user.id,
+        extractedText: {
+          not: null,
+        },
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      title: true,
-      createdAt: true,
-    },
-  });
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+      },
+    })
+  );
 
   return (
     <main className={forge.page}>
@@ -40,7 +43,7 @@ export default async function ResumeMatchPage() {
         <Link href="/" className="text-lg font-semibold tracking-tight">
           TalentForge AI
         </Link>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap justify-end gap-3">
           <Button
             asChild
             variant="outline"
@@ -119,15 +122,12 @@ export default async function ResumeMatchPage() {
             }))}
           />
         ) : (
-          <Card className={`h-fit ${forge.card}`}>
-            <CardHeader className="pb-4">
-              <CardTitle>No readable resumes available</CardTitle>
-              <CardDescription className="leading-6 text-zinc-400">
-                Upload a text-based resume PDF before matching it to a job
-                description.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <DashboardEmptyState
+            title="No readable resumes available"
+            description="Upload a text-based resume PDF before matching it to a job description."
+            actionHref="/dashboard/resume"
+            actionLabel="Upload Resume"
+          />
         )}
       </section>
     </main>
