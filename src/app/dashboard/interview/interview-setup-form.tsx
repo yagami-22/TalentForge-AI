@@ -179,8 +179,8 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
             aria-live="polite"
             className={
               state.status === "error"
-                ? "rounded-md border border-red-300/20 bg-red-400/10 px-3 py-2 text-sm text-red-200"
-                : "rounded-md border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200"
+                ? forge.statusError
+                : forge.statusSuccess
             }
           >
             {state.message}

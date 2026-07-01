@@ -73,8 +73,8 @@ export function UploadResumeForm() {
           aria-live="polite"
           className={
             state.status === "error"
-              ? "text-sm text-red-300 lg:col-span-3"
-              : "text-sm text-emerald-300 lg:col-span-3"
+              ? `${forge.statusError} lg:col-span-3`
+              : `${forge.statusSuccess} lg:col-span-3`
           }
         >
           {state.message}
@@ -84,7 +84,7 @@ export function UploadResumeForm() {
       {state.warning ? (
         <p
           aria-live="polite"
-          className="rounded-md border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-sm leading-6 text-amber-100 lg:col-span-3"
+          className={`${forge.statusWarning} lg:col-span-3`}
         >
           {state.warning}
         </p>

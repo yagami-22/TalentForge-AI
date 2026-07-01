@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { deleteResume } from "@/app/dashboard/resume/actions";
 import { initialDeleteResumeState } from "@/app/dashboard/resume/state";
 import { Button } from "@/components/ui/button";
+import { forge } from "@/lib/talentforge-design";
 
 type DeleteResumeButtonProps = {
   resumeId: string;
@@ -39,7 +40,7 @@ export function DeleteResumeButton({
         type="submit"
         disabled={pending}
         variant="outline"
-        className="border-red-300/25 bg-red-400/[0.08] text-red-100 shadow-sm hover:border-red-200/40 hover:bg-red-400/15 hover:text-red-50 disabled:opacity-60"
+        className="rounded-2xl border-red-300/25 bg-red-400/[0.08] text-red-100 shadow-[0_0_24px_rgba(248,113,113,0.08)] hover:-translate-y-0.5 hover:border-red-200/40 hover:bg-red-400/15 hover:text-red-50 disabled:opacity-60"
       >
         {pending ? "Deleting..." : "Delete"}
       </Button>
@@ -48,8 +49,8 @@ export function DeleteResumeButton({
           aria-live="polite"
           className={
             state.status === "error"
-              ? "text-xs text-red-300"
-              : "text-xs text-emerald-300"
+              ? `${forge.statusError} text-xs`
+              : `${forge.statusSuccess} text-xs`
           }
         >
           {state.message}

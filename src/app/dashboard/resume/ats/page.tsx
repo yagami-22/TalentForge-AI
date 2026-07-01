@@ -68,7 +68,7 @@ export default async function ATSOptimizerPage() {
         </div>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl py-10 lg:py-12">
+      <section className={forge.section}>
         <div className={forge.hero}>
           <div className={forge.heroGlowCyan} />
           <div className={forge.heroGlowPurple} />
@@ -105,7 +105,7 @@ export default async function ATSOptimizerPage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl pb-16">
+      <section className={`${forge.content} pb-16`}>
         {resumes.length ? (
           <ATSOptimizerForm
             resumes={resumes.map((resume) => ({

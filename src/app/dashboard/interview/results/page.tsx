@@ -39,7 +39,7 @@ export default async function InterviewResultsPage() {
         </div>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl py-10 lg:py-12">
+      <section className={forge.section}>
         <InterviewResultsClient />
       </section>
     </main>

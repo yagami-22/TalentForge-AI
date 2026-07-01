@@ -31,7 +31,7 @@ export default async function InterviewHistoryPage() {
         </div>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl space-y-6 py-10 lg:py-12">
+      <section className={forge.section}>
         <div className={forge.hero}>
           <div className={forge.heroGlowCyan} />
           <div className={forge.heroGlowPurple} />

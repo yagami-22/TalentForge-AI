@@ -21,23 +21,23 @@ export function DashboardSkeleton({
   return (
     <main className={forge.page} aria-busy="true" aria-label={`${label} loading`}>
       <div className={forge.topNav}>
-        <div className="h-6 w-36 animate-pulse rounded-lg bg-white/10" />
+        <div className={`h-6 w-36 ${forge.skeleton}`} />
         <div className="flex flex-wrap justify-end gap-3">
-          <div className="h-9 w-24 animate-pulse rounded-xl bg-white/10" />
-          <div className="hidden h-9 w-32 animate-pulse rounded-xl bg-white/10 sm:block" />
+          <div className={`h-9 w-24 ${forge.skeleton}`} />
+          <div className={`hidden h-9 w-32 sm:block ${forge.skeleton}`} />
         </div>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl space-y-6 py-10 lg:py-12">
+      <section className={forge.section}>
         <div className={forge.hero}>
           <div className="h-5 w-40 animate-pulse rounded-full bg-cyan-200/15" />
-          <div className="mt-5 h-10 max-w-3xl animate-pulse rounded-xl bg-white/10" />
-          <div className="mt-4 h-5 max-w-2xl animate-pulse rounded-lg bg-white/10" />
+          <div className={`mt-5 h-10 max-w-3xl ${forge.skeleton}`} />
+          <div className={`mt-4 h-5 max-w-2xl ${forge.skeleton}`} />
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: metricCount }).map((_, index) => (
               <div key={index} className={forge.metric}>
-                <div className="h-4 w-20 animate-pulse rounded bg-white/10" />
-                <div className="mt-4 h-8 w-16 animate-pulse rounded bg-white/10" />
+                <div className={`h-4 w-20 ${forge.skeleton}`} />
+                <div className={`mt-4 h-8 w-16 ${forge.skeleton}`} />
               </div>
             ))}
           </div>
@@ -47,10 +47,10 @@ export function DashboardSkeleton({
           {Array.from({ length: chartCount }).map((_, index) => (
             <Card key={index} className={`${forge.card} overflow-hidden`}>
               <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
-                <div className="h-5 w-44 animate-pulse rounded bg-white/10" />
+                <div className={`h-5 w-44 ${forge.skeleton}`} />
               </CardHeader>
               <CardContent className="h-72 pt-5">
-                <div className="h-full animate-pulse rounded-2xl bg-white/[0.06]" />
+                <div className={`h-full ${forge.skeleton}`} />
               </CardContent>
             </Card>
           ))}
@@ -60,12 +60,12 @@ export function DashboardSkeleton({
           {Array.from({ length: listCount }).map((_, index) => (
             <Card key={index} className={`${forge.card} overflow-hidden`}>
               <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
-                <div className="h-5 w-40 animate-pulse rounded bg-white/10" />
+                <div className={`h-5 w-40 ${forge.skeleton}`} />
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="h-4 animate-pulse rounded bg-white/10" />
-                <div className="h-4 w-5/6 animate-pulse rounded bg-white/10" />
-                <div className="h-4 w-2/3 animate-pulse rounded bg-white/10" />
+                <div className={`h-4 ${forge.skeleton}`} />
+                <div className={`h-4 w-5/6 ${forge.skeleton}`} />
+                <div className={`h-4 w-2/3 ${forge.skeleton}`} />
               </CardContent>
             </Card>
           ))}
@@ -87,9 +87,11 @@ export function DashboardEmptyState({
   actionLabel?: string;
 }) {
   return (
-    <Card className={`${forge.card} h-fit`}>
-      <CardContent className="py-10 text-center">
-        <Inbox className="mx-auto h-8 w-8 text-cyan-200" aria-hidden="true" />
+    <Card className={`${forge.cardStrong} h-fit`}>
+      <CardContent className="px-6 py-12 text-center">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.16)]">
+          <Inbox className="h-7 w-7" aria-hidden="true" />
+        </span>
         <h2 className="mt-4 text-xl font-semibold">{title}</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-400">
           {description}
@@ -118,7 +120,9 @@ export function DashboardErrorFallback({
       <section className="mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center">
         <Card className={`${forge.cardStrong} w-full`}>
           <CardContent className="p-8 text-center">
-            <AlertTriangle className="mx-auto h-10 w-10 text-amber-200" aria-hidden="true" />
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-amber-300/20 bg-amber-300/10 text-amber-100 shadow-[0_0_28px_rgba(251,191,36,0.12)]">
+              <AlertTriangle className="h-7 w-7" aria-hidden="true" />
+            </span>
             <h1 className="mt-5 text-2xl font-semibold">{title}</h1>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-300">
               {description}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { clerkLocalization } from "@/lib/clerk-appearance";
+import { clerkAuthAppearance, clerkLocalization } from "@/lib/clerk-appearance";
 
 import "./globals.css";
 
@@ -50,6 +50,7 @@ export default function RootLayout({
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       afterSignOutUrl="/"
+      appearance={clerkAuthAppearance}
       localization={clerkLocalization}
     >
       <html

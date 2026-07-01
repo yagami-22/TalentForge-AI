@@ -196,7 +196,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
+        <details className={forge.detailPanel}>
           <summary className="cursor-pointer text-xs font-medium text-emerald-200">
             Evidence found ({evidenceRows.length})
           </summary>
@@ -208,7 +208,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
               ))}
           </ul>
         </details>
-        <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
+        <details className={forge.detailPanel}>
           <summary className="cursor-pointer text-xs font-medium text-amber-200">
             Missing evidence ({missingRows.length})
           </summary>
@@ -220,7 +220,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
               ))}
           </ul>
         </details>
-        <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
+        <details className={forge.detailPanel}>
           <summary className="cursor-pointer text-xs font-medium text-cyan-200">
             Suggestions ({category.suggestions.length})
           </summary>
@@ -235,7 +235,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
           </ul>
         </details>
         {breakdownRows.length ? (
-          <details className="rounded-md border border-white/10 bg-black/20 px-3 py-2">
+          <details className={forge.detailPanel}>
             <summary className="cursor-pointer text-xs font-medium text-zinc-300">
               Subcriteria ({breakdownRows.length})
             </summary>
@@ -288,7 +288,7 @@ export default async function ResumePage() {
         </Button>
       </div>
 
-      <section className="mx-auto w-full max-w-7xl space-y-5 py-10 lg:py-12">
+      <section className={forge.section}>
         <div className={forge.hero}>
           <div className={forge.heroGlowCyan} />
           <div className={forge.heroGlowPurple} />
@@ -368,7 +368,7 @@ export default async function ResumePage() {
         </Card>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl pb-16">
+      <section className={`${forge.content} pb-16`}>
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase text-cyan-100">

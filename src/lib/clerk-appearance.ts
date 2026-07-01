@@ -161,6 +161,99 @@ export const clerkAuthAppearance = {
     formFieldErrorText: {
       color: "#FDA4AF",
     },
+    userButtonTrigger: {
+      borderRadius: "1rem",
+      boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 0 28px rgba(0,229,255,0.14)",
+      transition:
+        "transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease",
+    },
+    userButtonTrigger__hover: {
+      transform: "translateY(-1px)",
+      boxShadow: "0 0 0 1px rgba(0,229,255,0.32), 0 0 34px rgba(0,229,255,0.22)",
+    },
+    userButtonAvatarBox: {
+      borderRadius: "1rem",
+      boxShadow: "0 0 0 1px rgba(0,229,255,0.24)",
+    },
+    userButtonPopoverRootBox: {
+      zIndex: "80",
+    },
+    userButtonPopoverCard: {
+      minWidth: "18rem",
+      borderRadius: "1.5rem",
+      background:
+        "linear-gradient(135deg, rgba(7,11,31,0.96), rgba(5,8,22,0.94) 48%, rgba(36,20,75,0.94))",
+      border: "1px solid rgba(255,255,255,0.1)",
+      boxShadow:
+        "0 0 44px rgba(0,229,255,0.18), 0 0 72px rgba(106,92,255,0.16), 0 24px 80px rgba(0,0,0,0.55)",
+      backdropFilter: "blur(24px)",
+      color: "#F8FAFC",
+      overflow: "hidden",
+    },
+    userButtonPopoverMain: {
+      background: "rgba(5,8,22,0.58)",
+      borderRadius: "1.5rem",
+    },
+    userButtonPopoverActions: {
+      background: "transparent",
+      borderTop: "1px solid rgba(255,255,255,0.08)",
+      padding: "0.45rem",
+    },
+    userButtonPopoverActionButton: {
+      borderRadius: "1rem",
+      color: "#CBD5E1",
+      background: "transparent",
+      transition:
+        "transform 220ms ease, background 220ms ease, color 220ms ease, box-shadow 220ms ease",
+    },
+    userButtonPopoverActionButton__hover: {
+      transform: "translateY(-1px)",
+      color: "#F8FAFC",
+      background: "rgba(0,229,255,0.1)",
+      boxShadow: "0 0 26px rgba(0,229,255,0.14)",
+    },
+    userButtonPopoverActionButtonIcon: {
+      color: "#67E8F9",
+    },
+    userButtonPopoverActionButtonText: {
+      color: "inherit",
+      fontWeight: "600",
+    },
+    userButtonPopoverFooter: {
+      background: "rgba(5,8,22,0.78)",
+      borderTop: "1px solid rgba(255,255,255,0.08)",
+      color: "#94A3B8",
+    },
+    userPreview: {
+      background: "rgba(255,255,255,0.04)",
+      borderBottom: "1px solid rgba(255,255,255,0.08)",
+    },
+    userPreviewAvatarBox: {
+      borderRadius: "1rem",
+      boxShadow: "0 0 0 1px rgba(0,229,255,0.22)",
+    },
+    userPreviewMainIdentifier: {
+      color: "#F8FAFC",
+      fontWeight: "700",
+    },
+    userPreviewSecondaryIdentifier: {
+      color: "#94A3B8",
+    },
+    popoverCard: {
+      borderRadius: "1.5rem",
+      background:
+        "linear-gradient(135deg, rgba(7,11,31,0.96), rgba(5,8,22,0.94) 48%, rgba(36,20,75,0.94))",
+      border: "1px solid rgba(255,255,255,0.1)",
+      boxShadow:
+        "0 0 44px rgba(0,229,255,0.18), 0 0 72px rgba(106,92,255,0.16), 0 24px 80px rgba(0,0,0,0.55)",
+      backdropFilter: "blur(24px)",
+      color: "#F8FAFC",
+    },
+    popoverFooter: {
+      background: "rgba(5,8,22,0.78)",
+      borderTop: "1px solid rgba(255,255,255,0.08)",
+      color: "#94A3B8",
+    },
   },
   layout: {
     applicationName: "TalentForge AI",

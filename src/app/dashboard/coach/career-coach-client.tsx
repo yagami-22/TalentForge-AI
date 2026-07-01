@@ -802,7 +802,7 @@ export function CareerCoachClient({
 
   if (!report) {
     return (
-      <div className="mx-auto w-full max-w-7xl py-10 lg:py-12">
+      <div className={forge.section}>
         <Card className={forge.cardStrong}>
           <CardContent className="py-10 text-center">
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.16)]">
@@ -831,7 +831,7 @@ export function CareerCoachClient({
     sourceState.ats || sourceState.jdMatch || sourceState.oa || sourceState.interview;
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 py-10 lg:py-12">
+    <div className={forge.section}>
       <section className={forge.hero}>
         <div className={forge.heroGlowCyan} />
         <div className={forge.heroGlowPurple} />

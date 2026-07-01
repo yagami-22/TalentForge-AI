@@ -49,8 +49,8 @@ export function ReanalyzeResumeButton({
           aria-live="polite"
           className={
             state.status === "error"
-              ? "text-xs text-red-300"
-              : "text-xs text-emerald-300"
+              ? `${forge.statusError} text-xs`
+              : `${forge.statusSuccess} text-xs`
           }
         >
           {state.message}
