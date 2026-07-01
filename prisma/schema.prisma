@@ -55,15 +55,20 @@ model ResumeVersion {
   resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   versionNumber  Int
   sourceType     String
+  sourceLabel    String?
+  targetLabel    String?
+  contentHash    String?
   atsScore       Int?
   jobMatchScore  Int?
   addedKeywords  Json?
   removedKeywords Json?
   content        String   @db.Text
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([resumeId, versionNumber])
   @@index([resumeId, createdAt])
+  @@index([resumeId, contentHash])
 }
 
 model Job {

@@ -1,89 +1,236 @@
 import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import {
+  ArrowRight,
+  BarChart3,
+  Brain,
+  CheckCircle2,
+  ClipboardCheck,
+  Compass,
+  FileSearch,
+  FileText,
+  LockKeyhole,
+  MessageSquareText,
+  PenLine,
+  Route,
+  SearchCheck,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  TrendingUp,
+  Upload,
+  Zap,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
+import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
-const features = [
+type Feature = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  metric: string;
+  metricLabel: string;
+};
+
+type WorkflowStep = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+};
+
+type TrustItem = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+};
+
+const features: Feature[] = [
   {
-    title: "Resume ATS Analysis",
+    icon: FileSearch,
+    title: "Resume Intelligence",
     description:
-      "Score your resume against hiring systems and surface the exact gaps recruiters miss.",
-    metric: "92%",
+      "Turn your resume into a scored readiness profile with role, impact, and credibility signals.",
+    metric: "3 min",
+    metricLabel: "analysis time",
   },
   {
-    title: "Job Match Analysis",
+    icon: ClipboardCheck,
+    title: "ATS Optimization",
     description:
-      "Compare any role to your profile with skill gaps, keyword overlap, and fit signals.",
-    metric: "4.8x",
+      "Find missing keywords, formatting risks, and recruiter filters before you apply.",
+    metric: "+18%",
+    metricLabel: "typical score lift",
   },
   {
-    title: "AI Mock Interviews",
+    icon: Target,
+    title: "JD Match",
     description:
-      "Practice role-specific interviews with adaptive follow-ups and instant coaching notes.",
+      "Compare any job description against your profile and see the gaps that matter.",
+    metric: "92K",
+    metricLabel: "JDs analyzed",
+  },
+  {
+    icon: PenLine,
+    title: "Resume Rewriter",
+    description:
+      "Rewrite bullets with stronger evidence, cleaner phrasing, and measurable outcomes.",
+    metric: "4.6x",
+    metricLabel: "faster edits",
+  },
+  {
+    icon: MessageSquareText,
+    title: "Mock Interviews",
+    description:
+      "Practice OA, technical, project, and behavioral rounds with structured AI feedback.",
+    metric: "31K",
+    metricLabel: "sessions completed",
+  },
+  {
+    icon: Compass,
+    title: "Career Coach",
+    description:
+      "Get focused guidance for role strategy, skill gaps, projects, and interview prep.",
     metric: "24/7",
+    metricLabel: "AI coaching",
   },
   {
-    title: "Career Roadmap Generator",
+    icon: Route,
+    title: "Roadmaps",
     description:
-      "Turn target roles into a clear plan with projects, milestones, and weekly priorities.",
-    metric: "30d",
+      "Convert career goals into weekly plans with milestones, proof points, and next actions.",
+    metric: "14d",
+    metricLabel: "planning horizon",
+  },
+  {
+    icon: BarChart3,
+    title: "Analytics",
+    description:
+      "Track readiness, resume health, interview progress, and application momentum.",
+    metric: "1 view",
+    metricLabel: "career command",
   },
 ];
 
 const stats = [
-  ["18K+", "career plans generated"],
-  ["76%", "average resume score lift"],
-  ["3.2M", "job signals analyzed"],
-  ["9/10", "users feel interview-ready"],
+  ["92K+", "job descriptions analyzed"],
+  ["38K+", "ATS reports generated"],
+  ["31K+", "mock interviews completed"],
+  ["18%", "median resume score lift"],
+];
+
+const workflow: WorkflowStep[] = [
+  {
+    icon: Upload,
+    title: "Upload Resume",
+    description: "Start with your current resume and the role you want next.",
+  },
+  {
+    icon: Brain,
+    title: "AI Analysis",
+    description: "TalentForge scores ATS fit, recruiter clarity, and evidence quality.",
+  },
+  {
+    icon: PenLine,
+    title: "Improve Resume",
+    description: "Rewrite weak bullets, close keyword gaps, and sharpen positioning.",
+  },
+  {
+    icon: MessageSquareText,
+    title: "Practice Interviews",
+    description: "Prepare for technical, behavioral, OA, and project deep dives.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Get Hired",
+    description: "Apply with a stronger resume, clearer story, and more confidence.",
+  },
+];
+
+const trustItems: TrustItem[] = [
+  {
+    icon: Sparkles,
+    title: "AI-powered analysis",
+    description: "Resume, JD, and interview feedback built for modern hiring workflows.",
+  },
+  {
+    icon: SearchCheck,
+    title: "Recruiter-focused insights",
+    description: "Guidance is framed around clarity, proof, relevance, and scannability.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "ATS optimization",
+    description: "Keyword coverage, formatting risks, and role fit are surfaced quickly.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Industry best practices",
+    description: "Recommendations prioritize measurable impact and concise positioning.",
+  },
+  {
+    icon: LockKeyhole,
+    title: "Secure authentication",
+    description: "Protected app routes keep career data behind authenticated sessions.",
+  },
+  {
+    icon: FileText,
+    title: "Privacy-first approach",
+    description: "Your documents stay tied to your account and your career workflow.",
+  },
 ];
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#05070d] text-white">
-      <section className="relative isolate border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.28),transparent_34%),linear-gradient(135deg,#06111f_0%,#071018_44%,#04130f_100%)]">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
-
-        <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            TalentForge AI
+    <PremiumBackground>
+      <nav
+        aria-label="Main navigation"
+        className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#050816]/75 backdrop-blur-2xl"
+      >
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-6 lg:px-8">
+          <Link href="/" className="flex items-center gap-3 rounded-2xl">
+            <span className="relative grid h-11 w-11 place-items-center rounded-2xl border border-cyan-300/25 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.24)]">
+              <Sparkles className="h-5 w-5" aria-hidden="true" />
+              <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-[#8B5CF6] shadow-[0_0_18px_rgba(139,92,246,0.8)]" />
+            </span>
+            <span>
+              <span className="block text-base font-semibold tracking-tight">
+                TalentForge AI
+              </span>
+              <span className="hidden text-xs text-slate-500 sm:block">
+                Career Intelligence
+              </span>
+            </span>
           </Link>
-          <div className="hidden items-center gap-8 text-sm text-zinc-300 md:flex">
-            <a href="#features" className="transition hover:text-white">
-              Features
+
+          <div className="hidden items-center gap-7 text-sm text-slate-400 lg:flex">
+            <a href="#features" className="transition hover:text-cyan-50">
+              Platform
             </a>
-            <a href="#pricing" className="transition hover:text-white">
-              Pricing
+            <a href="#how-it-works" className="transition hover:text-cyan-50">
+              Workflow
+            </a>
+            <a href="#trust" className="transition hover:text-cyan-50">
+              Trust
             </a>
           </div>
+
           <div className="flex items-center gap-3">
             <Show when="signed-out">
               <SignInButton fallbackRedirectUrl="/dashboard">
-                <Button
-                  variant="outline"
-                  className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-                >
+                <Button variant="outline" className="h-10 rounded-2xl px-4">
                   Sign In
                 </Button>
               </SignInButton>
               <SignUpButton fallbackRedirectUrl="/dashboard">
-                <Button className="hidden bg-cyan-300 text-slate-950 hover:bg-cyan-200 sm:inline-flex">
-                  Sign Up
+                <Button className="hidden h-10 rounded-2xl px-4 shadow-[0_0_32px_rgba(0,229,255,0.28)] sm:inline-flex sm:px-5">
+                  Start Free
                 </Button>
               </SignUpButton>
             </Show>
             <Show when="signed-in">
-              <Button
-                asChild
-                variant="outline"
-                className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-              >
+              <Button asChild variant="outline" className="h-10 rounded-2xl px-4">
                 <Link href="/dashboard" prefetch={false}>
                   Dashboard
                 </Link>
@@ -91,29 +238,38 @@ export default function Home() {
               <UserButton />
             </Show>
           </div>
-        </nav>
+        </div>
+      </nav>
 
-        <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 pb-24 pt-16 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:pb-32 lg:pt-24">
-          <div className="flex flex-col justify-center">
-            <p className="mb-5 inline-flex w-fit rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-sm font-medium text-cyan-100">
-              Analyze. Prepare. Get Hired.
+      <section className="relative isolate overflow-hidden border-b border-white/[0.06]">
+        <div
+          className="pointer-events-none absolute left-1/2 top-10 h-72 w-72 -translate-x-1/2 rounded-full bg-[#00E5FF]/10 blur-3xl"
+          aria-hidden="true"
+        />
+        <div className="mx-auto grid min-w-0 w-full max-w-7xl gap-10 px-5 pb-20 pt-14 sm:px-6 lg:grid-cols-[minmax(0,1.02fr)_minmax(420px,0.98fr)] lg:px-8 lg:pb-28 lg:pt-20">
+          <div className="flex min-w-0 w-80 max-w-full flex-col justify-center sm:w-auto">
+            <p className="inline-flex w-fit rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.14)]">
+              Everything you need to get hired
             </p>
-            <h1 className="max-w-4xl text-5xl font-semibold leading-[1.04] tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Turn every application into a smarter career move.
+            <h1 className="mt-6 max-w-full text-3xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl sm:leading-[0.96] lg:max-w-5xl lg:text-7xl">
+              <span className="block sm:inline">Your AI command center</span>
+              <span className="block sm:inline"> for every career move.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 sm:text-xl">
-              AI-powered platform that analyzes resumes, matches job
-              descriptions, conducts mock interviews, and generates personalized
-              career roadmaps.
+            <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+              Analyze your resume, match job descriptions, improve weak bullets,
+              practice interviews, and track hiring readiness from one premium
+              workspace.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+
+            <div className="mt-9 flex min-w-0 flex-col gap-3 sm:flex-row">
               <Show when="signed-out">
                 <SignUpButton fallbackRedirectUrl="/dashboard">
                   <Button
                     size="lg"
-                    className="h-12 bg-cyan-300 px-6 text-base font-semibold text-slate-950 hover:bg-cyan-200"
+                    className="group h-13 w-80 max-w-full rounded-2xl px-6 text-base font-semibold shadow-[0_0_44px_rgba(0,229,255,0.34)] sm:h-12 sm:w-auto"
                   >
                     Start Free Analysis
+                    <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-0.5" />
                   </Button>
                 </SignUpButton>
               </Show>
@@ -121,141 +277,150 @@ export default function Home() {
                 <Button
                   asChild
                   size="lg"
-                  className="h-12 bg-cyan-300 px-6 text-base font-semibold text-slate-950 hover:bg-cyan-200"
+                  className="group h-13 w-80 max-w-full rounded-2xl px-6 text-base font-semibold shadow-[0_0_44px_rgba(0,229,255,0.34)] sm:h-12 sm:w-auto"
                 >
                   <Link href="/dashboard" prefetch={false}>
                     Open Dashboard
+                    <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-0.5" />
                   </Link>
                 </Button>
               </Show>
               <Button
+                asChild
                 size="lg"
                 variant="outline"
-                className="h-12 border-white/15 bg-white/5 px-6 text-base text-white hover:bg-white/10 hover:text-white"
+                className="h-13 w-80 max-w-full rounded-2xl px-6 text-base sm:h-12 sm:w-auto"
               >
-                View Demo
+                <a href="#how-it-works">See How It Works</a>
               </Button>
+            </div>
+
+            <div className="mt-9 grid min-w-0 max-w-2xl gap-3 sm:grid-cols-3">
+              {["ATS-ready resumes", "Role-specific interviews", "Career analytics"].map(
+                (item) => (
+                  <div
+                    key={item}
+                    className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#070B1F]/60 px-3 py-2 text-sm text-slate-300 shadow-[0_0_24px_rgba(0,229,255,0.06)]"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
+                    <span>{item}</span>
+                  </div>
+                )
+              )}
             </div>
           </div>
 
-          <div className="relative">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-4 shadow-2xl shadow-cyan-950/40 backdrop-blur">
-              <div className="rounded-3xl border border-white/10 bg-[#08111e] p-5">
-                <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
-                  <div>
-                    <p className="text-sm text-zinc-400">Candidate Fit</p>
-                    <p className="text-2xl font-semibold text-white">94%</p>
-                  </div>
-                  <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-200">
-                    Interview-ready
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  {["Resume ATS", "Job Match", "Interview Prep"].map(
-                    (label, index) => (
-                      <div key={label}>
-                        <div className="mb-2 flex items-center justify-between text-sm">
-                          <span className="text-zinc-300">{label}</span>
-                          <span className="text-zinc-500">
-                            {[96, 88, 91][index]}%
-                          </span>
-                        </div>
-                        <div className="h-2 rounded-full bg-white/10">
-                          <div
-                            className="h-2 rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300"
-                            style={{ width: `${[96, 88, 91][index]}%` }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl bg-white/[0.06] p-4">
-                    <p className="text-sm text-zinc-400">Top gap</p>
-                    <p className="mt-1 font-medium text-white">
-                      System design examples
-                    </p>
-                  </div>
-                  <div className="rounded-2xl bg-white/[0.06] p-4">
-                    <p className="text-sm text-zinc-400">Next action</p>
-                    <p className="mt-1 font-medium text-white">
-                      Practice 3 prompts
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <HeroProductVisual />
+        </div>
+      </section>
+
+      <section className="border-b border-white/[0.06] bg-white/[0.015]">
+        <div className="mx-auto grid w-full max-w-7xl gap-4 px-5 py-8 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+          {stats.map(([value, label]) => (
+            <div
+              key={label}
+              className="rounded-[1.5rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_34px_rgba(0,229,255,0.07)] backdrop-blur-xl"
+            >
+              <p className="text-3xl font-semibold tracking-tight text-white">
+                {value}
+              </p>
+              <p className="mt-2 text-sm text-slate-400">{label}</p>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
       <section
         id="features"
-        className="mx-auto w-full max-w-7xl px-6 py-20 lg:px-8"
+        className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 lg:px-8"
       >
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase text-cyan-200">
-            Platform
-          </p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Everything you need before the recruiter call.
-          </h2>
-        </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <SectionHeader
+          eyebrow="Platform"
+          title="Eight AI workflows. One hiring-ready profile."
+          description="Every module uses the same premium workspace language as the dashboard: glass panels, focused metrics, and direct next actions."
+        />
+        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {features.map((feature) => (
-            <Card
-              key={feature.title}
-              className="border-white/10 bg-white/[0.055] text-white ring-white/10"
-            >
-              <CardHeader>
-                <div className="mb-4 text-3xl font-semibold text-cyan-200">
-                  {feature.metric}
-                </div>
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription className="leading-6 text-zinc-400">
-                  {feature.description}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-white/[0.035]">
-        <div className="mx-auto grid w-full max-w-7xl gap-6 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-          {stats.map(([value, label]) => (
-            <div key={label}>
-              <p className="text-4xl font-semibold tracking-tight text-white">
-                {value}
-              </p>
-              <p className="mt-2 text-sm text-zinc-400">{label}</p>
-            </div>
+            <FeatureCard key={feature.title} feature={feature} />
           ))}
         </div>
       </section>
 
       <section
-        id="pricing"
-        className="mx-auto w-full max-w-7xl px-6 py-20 lg:px-8"
+        id="how-it-works"
+        className="border-y border-white/[0.06] bg-[#070B1F]/30"
       >
-        <Card className="border-cyan-300/20 bg-gradient-to-br from-cyan-300/15 via-white/[0.06] to-emerald-300/10 p-4 text-white ring-cyan-300/20 md:p-8">
-          <CardContent className="flex flex-col items-start justify-between gap-8 p-0 md:flex-row md:items-center">
+        <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <SectionHeader
+              eyebrow="How TalentForge Works"
+              title="From resume upload to interview confidence."
+              description="A guided system for improving every signal recruiters and hiring systems evaluate."
+            />
+            <div className="mt-8 rounded-[1.75rem] border border-cyan-300/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.12),rgba(255,255,255,0.04)_48%,rgba(139,92,246,0.12))] p-5 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.12)] backdrop-blur-xl">
+              <p className="text-sm font-medium text-cyan-100">
+                Hiring readiness combines resume quality, JD fit, ATS coverage,
+                and interview preparation into one focused workflow.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            {workflow.map((step, index) => (
+              <WorkflowCard
+                key={step.title}
+                step={step}
+                index={index + 1}
+                isLast={index === workflow.length - 1}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="trust"
+        className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 lg:px-8"
+      >
+        <SectionHeader
+          eyebrow="Trust"
+          title="Built for serious candidates and modern hiring loops."
+          description="Premium analysis, protected access, and practical recommendations without turning your career workflow into noise."
+        />
+        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {trustItems.map((item) => (
+            <TrustCard key={item.title} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-5 pb-20 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.16),rgba(106,92,255,0.12)_50%,rgba(139,92,246,0.18))] p-6 shadow-[0_0_40px_rgba(0,229,255,0.14),0_0_70px_rgba(106,92,255,0.16)] backdrop-blur-2xl sm:p-8 lg:p-10">
+          <div
+            className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/20 blur-3xl"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-[#8B5CF6]/18 blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase text-cyan-100">
+              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-100">
                 Ready when you are
               </p>
-              <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-                Build the proof, practice the pitch, and walk in prepared.
+              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                Build the proof, practice the pitch, and apply with confidence.
               </h2>
             </div>
             <Show when="signed-out">
               <SignUpButton fallbackRedirectUrl="/dashboard">
                 <Button
                   size="lg"
-                  className="h-12 bg-white px-6 text-base font-semibold text-slate-950 hover:bg-cyan-100"
+                  className="h-12 rounded-2xl px-6 text-base font-semibold shadow-[0_0_44px_rgba(0,229,255,0.34)]"
                 >
-                  Get Started
+                  Start Free Analysis
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </SignUpButton>
             </Show>
@@ -263,23 +428,255 @@ export default function Home() {
               <Button
                 asChild
                 size="lg"
-                className="h-12 bg-white px-6 text-base font-semibold text-slate-950 hover:bg-cyan-100"
+                className="h-12 rounded-2xl px-6 text-base font-semibold shadow-[0_0_44px_rgba(0,229,255,0.34)]"
               >
                 <Link href="/dashboard" prefetch={false}>
                   Go to Dashboard
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             </Show>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </section>
 
-      <footer className="border-t border-white/10 px-6 py-8 text-sm text-zinc-500 lg:px-8">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-medium text-zinc-300">TalentForge AI</p>
-          <p>Analyze. Prepare. Get Hired.</p>
+      <footer className="border-t border-white/[0.06] px-5 py-8 text-sm text-slate-500 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_40px_rgba(0,229,255,0.08),0_0_60px_rgba(106,92,255,0.08)] backdrop-blur-xl md:flex-row md:items-center md:justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/20 bg-[#00E5FF]/10 text-cyan-100">
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block font-semibold tracking-tight text-white">
+                TalentForge AI
+              </span>
+              <span className="text-xs text-slate-500">Career Intelligence</span>
+            </span>
+          </Link>
+          <div className="flex flex-wrap gap-4">
+            <a href="#features" className="transition hover:text-cyan-50">
+              Platform
+            </a>
+            <a href="#how-it-works" className="transition hover:text-cyan-50">
+              Workflow
+            </a>
+            <a href="#trust" className="transition hover:text-cyan-50">
+              Trust
+            </a>
+          </div>
         </div>
       </footer>
-    </main>
+    </PremiumBackground>
+  );
+}
+
+function HeroProductVisual() {
+  const readiness = [
+    ["ATS Score", 86],
+    ["JD Match", 78],
+    ["Interview Prep", 72],
+  ];
+
+  return (
+    <div
+      className="relative min-w-0 w-80 max-w-full sm:w-auto sm:max-w-full lg:pt-4"
+      aria-label="TalentForge product preview"
+    >
+      <div
+        className="pointer-events-none absolute -left-12 top-8 h-52 w-52 rounded-full bg-[#00E5FF]/14 blur-3xl"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-10 bottom-8 h-64 w-64 rounded-full bg-[#8B5CF6]/18 blur-3xl"
+        aria-hidden="true"
+      />
+
+      <div className="relative min-w-0 max-w-full overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4 shadow-[0_0_44px_rgba(0,229,255,0.14),0_0_70px_rgba(106,92,255,0.14)] backdrop-blur-2xl">
+        <div className="min-w-0 rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/72 p-4">
+          <div className="flex flex-col items-start justify-between gap-3 border-b border-white/[0.08] pb-4 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-sm text-slate-400">Hiring Readiness</p>
+              <p className="mt-1 text-3xl font-semibold tracking-tight text-white">
+                86%
+              </p>
+            </div>
+            <span className="rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-3 py-1 text-xs font-semibold text-cyan-100 shadow-[0_0_20px_rgba(0,229,255,0.18)]">
+              Interview-ready
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4">
+            {readiness.map(([label, value]) => (
+              <div key={label}>
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="text-slate-300">{label}</span>
+                  <span className="text-slate-500">{value}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#00E5FF] to-[#8B5CF6] shadow-[0_0_18px_rgba(0,229,255,0.35)]"
+                    style={{ width: `${value}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <PreviewTile label="Top gap" value="Impact metrics" icon={Zap} />
+            <PreviewTile label="Next action" value="Rewrite 4 bullets" icon={PenLine} />
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {["Resume", "Interviews", "Analytics"].map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/60 p-3 text-sm text-slate-300"
+            >
+              <p className="font-medium text-white">{item}</p>
+              <p className="mt-1 text-xs text-slate-500">Synced</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PreviewTile({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4">
+      <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+        <Icon className="h-3.5 w-3.5 text-[#00E5FF]" aria-hidden="true" />
+        {label}
+      </div>
+      <p className="mt-2 font-medium text-white">{value}</p>
+    </div>
+  );
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="max-w-3xl">
+      <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">
+        {eyebrow}
+      </p>
+      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+        {title}
+      </h2>
+      <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function FeatureCard({ feature }: { feature: Feature }) {
+  const Icon = feature.icon;
+
+  return (
+    <article className="group relative min-h-[270px] overflow-hidden rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_40px_rgba(0,229,255,0.08),0_0_60px_rgba(106,92,255,0.08)] ring-1 ring-white/[0.08] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-[#00E5FF]/25 hover:bg-white/[0.055] hover:shadow-[0_0_52px_rgba(0,229,255,0.16),0_0_70px_rgba(106,92,255,0.15)]">
+      <div
+        className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#00E5FF]/0 blur-3xl transition duration-300 group-hover:bg-[#00E5FF]/14"
+        aria-hidden="true"
+      />
+      <div className="relative flex h-full flex-col">
+        <div className="flex items-start justify-between gap-4">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl border border-cyan-300/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.12)]">
+            <Icon className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div className="text-right">
+            <p className="text-lg font-semibold text-white">{feature.metric}</p>
+            <p className="text-xs text-slate-500">{feature.metricLabel}</p>
+          </div>
+        </div>
+        <h3 className="mt-6 text-xl font-semibold tracking-tight text-white">
+          {feature.title}
+        </h3>
+        <p className="mt-3 text-sm leading-6 text-slate-400">
+          {feature.description}
+        </p>
+        <div className="mt-auto pt-6 text-sm font-medium text-cyan-100">
+          <span className="inline-flex items-center gap-2">
+            Explore workflow
+            <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function WorkflowCard({
+  step,
+  index,
+  isLast,
+}: {
+  step: WorkflowStep;
+  index: number;
+  isLast: boolean;
+}) {
+  const Icon = step.icon;
+
+  return (
+    <article className="group relative grid gap-4 rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_36px_rgba(0,229,255,0.08)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-white/[0.055] md:grid-cols-[64px_1fr]">
+      {!isLast ? (
+        <div
+          className="absolute left-8 top-[72px] hidden h-[calc(100%_-_44px)] w-px bg-gradient-to-b from-[#00E5FF]/50 to-transparent md:block"
+          aria-hidden="true"
+        />
+      ) : null}
+      <span className="relative z-10 grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.14)]">
+        <Icon className="h-5 w-5" aria-hidden="true" />
+      </span>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Step {String(index).padStart(2, "0")}
+        </p>
+        <h3 className="mt-2 text-xl font-semibold tracking-tight text-white">
+          {step.title}
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-slate-400">
+          {step.description}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function TrustCard({ item }: { item: TrustItem }) {
+  const Icon = item.icon;
+
+  return (
+    <article className="rounded-[1.5rem] border border-[rgba(255,255,255,0.08)] bg-[#070B1F]/60 p-5 shadow-[0_0_32px_rgba(0,229,255,0.07)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-white/[0.045]">
+      <div className="flex items-start gap-4">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-purple-300/20 bg-[#8B5CF6]/10 text-purple-100 shadow-[0_0_24px_rgba(139,92,246,0.12)]">
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <div>
+          <h3 className="font-semibold tracking-tight text-white">{item.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            {item.description}
+          </p>
+        </div>
+      </div>
+    </article>
   );
 }

@@ -1,8 +1,10 @@
 import { SignIn } from "@clerk/nextjs";
 
+import { PremiumBackground } from "@/components/premium-background";
+
 export default function SignInPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#05070d] px-6 py-12">
+    <PremiumBackground contentClassName="flex min-h-screen items-center justify-center px-6 py-12">
       <SignIn
         appearance={{
           variables: {
@@ -12,6 +14,6 @@ export default function SignInPage() {
         fallbackRedirectUrl="/dashboard"
         signUpUrl="/sign-up"
       />
-    </main>
+    </PremiumBackground>
   );
 }

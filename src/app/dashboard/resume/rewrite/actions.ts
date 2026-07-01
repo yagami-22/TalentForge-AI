@@ -10,9 +10,10 @@ import {
   validateResumeRewriteJobDescription,
 } from "@/lib/resume-rewriter";
 import {
-  createResumeVersion,
   formatResumeRewriteVersionContent,
-} from "@/lib/resume-versioning";
+  inferVersionTargetLabel,
+} from "@/lib/resume-versioning-client";
+import { createResumeVersion } from "@/lib/resume-versioning-server";
 
 export async function rewriteResumeForJD(
   _prevState: ResumeRewriteState,
@@ -92,9 +93,11 @@ export async function rewriteResumeForJD(
       jobDescription,
     });
 
-    await createResumeVersion({
+    const versionResult = await createResumeVersion({
       resumeId: resume.id,
       sourceType: "resume_rewriter",
+      sourceLabel: "Resume Rewrite",
+      targetLabel: inferVersionTargetLabel(jobDescription),
       content: formatResumeRewriteVersionContent(rewrite),
       atsScore: null,
       jobMatchScore: null,
@@ -103,7 +106,9 @@ export async function rewriteResumeForJD(
     revalidatePath("/dashboard/resume/history");
 
     return {
-      message: "Resume rewrite generated.",
+      message: !versionResult || versionResult.created
+        ? "Resume rewrite generated."
+        : versionResult.message,
       status: "success",
       rewrite,
     };

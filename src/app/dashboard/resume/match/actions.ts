@@ -9,7 +9,8 @@ import {
   validateJobDescription,
 } from "@/lib/jd-match-analyzer";
 import { prisma } from "@/lib/prisma";
-import { ensureOriginalResumeVersion } from "@/lib/resume-versioning";
+import { inferVersionTargetLabel } from "@/lib/resume-versioning-client";
+import { ensureOriginalResumeVersion } from "@/lib/resume-versioning-server";
 
 export async function analyzeResumeMatch(
   _prevState: MatchResumeState,
@@ -105,6 +106,8 @@ export async function analyzeResumeMatch(
     await prisma.resumeVersion.update({
       where: { id: latestVersion.id },
       data: {
+        sourceLabel: "JD Match",
+        targetLabel: inferVersionTargetLabel(jobDescription, analysis.targetRole),
         jobMatchScore: analysis.matchScore,
       },
     });

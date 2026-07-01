@@ -19,7 +19,7 @@ import {
   validateResumeFile,
   validateResumeText,
 } from "@/lib/resume-validation";
-import { createResumeVersion } from "@/lib/resume-versioning";
+import { createResumeVersion } from "@/lib/resume-versioning-server";
 
 const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "resumes");
 const isDevelopment = process.env.NODE_ENV !== "production";

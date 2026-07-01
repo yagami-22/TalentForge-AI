@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -220,41 +221,38 @@ export default async function DashboardPage() {
   const snapshot = buildResumeSnapshot(latestResume);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#050816] text-white">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_15%_5%,rgba(0,229,255,0.16),transparent_32rem),radial-gradient(circle_at_85%_8%,rgba(106,92,255,0.18),transparent_34rem),radial-gradient(circle_at_55%_85%,rgba(139,92,246,0.12),transparent_34rem),linear-gradient(180deg,#050816_0%,#070b1f_52%,#050816_100%)]" />
-      <div className="relative mx-auto flex w-full max-w-[1540px] flex-col gap-5 px-4 py-4 sm:px-6 xl:flex-row xl:px-7">
-        <div className="xl:hidden">
-          <MobileSidebar profile={profile} />
-        </div>
-
-        <div className="hidden xl:block xl:w-72 xl:shrink-0">
-          <Sidebar profile={profile} />
-        </div>
-
-        <section className="min-w-0 flex-1 space-y-5">
-          <TopHeader profile={profile} />
-
-          <div className="grid gap-5 2xl:grid-cols-[1fr_370px]">
-            <div className="space-y-5">
-              <HeroBanner />
-              <ResumeSnapshotCard snapshot={snapshot} />
-
-              <section className="grid gap-5 lg:grid-cols-3">
-                {featureCards.map((feature) => (
-                  <FeatureCard key={feature.title} feature={feature} />
-                ))}
-              </section>
-            </div>
-
-            <aside className="grid gap-5 lg:grid-cols-3 2xl:block 2xl:space-y-5">
-              <ActivityPanel />
-              <QuickActions />
-              <MotivationCard />
-            </aside>
-          </div>
-        </section>
+    <PremiumBackground contentClassName="mx-auto flex w-full max-w-[1540px] flex-col gap-5 px-4 py-4 sm:px-6 xl:flex-row xl:px-7">
+      <div className="xl:hidden">
+        <MobileSidebar profile={profile} />
       </div>
-    </main>
+
+      <div className="hidden xl:block xl:w-72 xl:shrink-0">
+        <Sidebar profile={profile} />
+      </div>
+
+      <section className="min-w-0 flex-1 space-y-5">
+        <TopHeader profile={profile} />
+
+        <div className="grid gap-5 2xl:grid-cols-[1fr_370px]">
+          <div className="space-y-5">
+            <HeroBanner />
+            <ResumeSnapshotCard snapshot={snapshot} />
+
+            <section className="grid gap-5 lg:grid-cols-3">
+              {featureCards.map((feature) => (
+                <FeatureCard key={feature.title} feature={feature} />
+              ))}
+            </section>
+          </div>
+
+          <aside className="grid gap-5 lg:grid-cols-3 2xl:block 2xl:space-y-5">
+            <ActivityPanel />
+            <QuickActions />
+            <MotivationCard />
+          </aside>
+        </div>
+      </section>
+    </PremiumBackground>
   );
 }
 

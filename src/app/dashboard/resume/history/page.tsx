@@ -1,22 +1,24 @@
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { ResumeHistoryClient } from "@/app/dashboard/resume/history/resume-history-client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentDbUser } from "@/lib/current-user";
-import { prisma } from "@/lib/prisma";
-import { withRetry } from "@/lib/retry";
 import {
-  ensureOriginalResumeVersion,
+  ResumeHistoryClient,
+  type ResumeHistoryResume,
+} from "@/app/dashboard/resume/history/resume-history-client";
+import { Button } from "@/components/ui/button";
+import {
   jsonArrayToStrings,
   type ResumeVersionSourceType,
-} from "@/lib/resume-versioning";
+} from "@/lib/resume-versioning-client";
 import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
 
 async function getResumeHistory(userId: string) {
+  const { prisma } = await import("@/lib/prisma");
+  const { withRetry } = await import("@/lib/retry");
+
   return withRetry(() =>
     prisma.resume.findMany({
       where: { userId },
@@ -30,6 +32,21 @@ async function getResumeHistory(userId: string) {
   );
 }
 
+async function getHistoryUser() {
+  if (!process.env.DATABASE_URL) {
+    const clerkUser = await currentUser();
+
+    if (!clerkUser) {
+      redirect("/sign-in");
+    }
+
+    return null;
+  }
+
+  const { getCurrentDbUser } = await import("@/lib/current-user");
+  return getCurrentDbUser();
+}
+
 function isResumeVersionSourceType(value: string): value is ResumeVersionSourceType {
   return (
     value === "original" ||
@@ -39,50 +56,98 @@ function isResumeVersionSourceType(value: string): value is ResumeVersionSourceT
   );
 }
 
-export default async function ResumeHistoryPage() {
-  const user = await getCurrentDbUser();
+function safeDateLabel(value: unknown): string {
+  const date =
+    value instanceof Date
+      ? value
+      : typeof value === "string" || typeof value === "number"
+        ? new Date(value)
+        : null;
 
-  if (!user.role) {
+  if (!date || Number.isNaN(date.getTime())) {
+    return "Unknown date";
+  }
+
+  return date.toLocaleString();
+}
+
+function normalizeScore(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function normalizeResumeVersion(
+  version: Record<string, unknown>,
+  fallbackResumeId: string,
+  fallbackVersionNumber: number
+): ResumeHistoryResume["versions"][number] {
+  const sourceType =
+    typeof version.sourceType === "string" && isResumeVersionSourceType(version.sourceType)
+      ? version.sourceType
+      : "manual";
+
+  return {
+    id: typeof version.id === "string" ? version.id : `${fallbackResumeId}-${fallbackVersionNumber}`,
+    resumeId:
+      typeof version.resumeId === "string" ? version.resumeId : fallbackResumeId,
+    versionNumber:
+      typeof version.versionNumber === "number"
+        ? version.versionNumber
+        : fallbackVersionNumber,
+    sourceType,
+    sourceLabel: typeof version.sourceLabel === "string" ? version.sourceLabel : null,
+    targetLabel: typeof version.targetLabel === "string" ? version.targetLabel : null,
+    contentHash: typeof version.contentHash === "string" ? version.contentHash : "",
+    createdAt: safeDateLabel(version.createdAt),
+    updatedAt: safeDateLabel(version.updatedAt ?? version.createdAt),
+    atsScore: normalizeScore(version.atsScore),
+    jobMatchScore: normalizeScore(version.jobMatchScore),
+    addedKeywords: jsonArrayToStrings(version.addedKeywords),
+    removedKeywords: jsonArrayToStrings(version.removedKeywords),
+    content: typeof version.content === "string" ? version.content : "",
+  };
+}
+
+export default async function ResumeHistoryPage() {
+  const user = await getHistoryUser();
+
+  if (user && !user.role) {
     redirect("/onboarding");
   }
 
-  let resumes = await getResumeHistory(user.id);
-  const resumesNeedingOriginalVersion = resumes.filter(
-    (resume) => resume.versions.length === 0 && resume.extractedText
-  );
+  let serializedResumes: ResumeHistoryResume[] = [];
 
-  for (const resume of resumesNeedingOriginalVersion) {
-    await ensureOriginalResumeVersion({
-      resumeId: resume.id,
-      content: resume.extractedText,
-      atsScore: resume.atsScore,
-      jobMatchScore: resume.matchScore,
-    });
+  if (user) {
+    let resumes = await getResumeHistory(user.id);
+    const resumesNeedingOriginalVersion = resumes.filter(
+      (resume) => resume.versions.length === 0 && resume.extractedText
+    );
+
+    for (const resume of resumesNeedingOriginalVersion) {
+      const { ensureOriginalResumeVersion } = await import(
+        "@/lib/resume-versioning-server"
+      );
+
+      await ensureOriginalResumeVersion({
+        resumeId: resume.id,
+        content: resume.extractedText,
+        atsScore: resume.atsScore,
+        jobMatchScore: resume.matchScore,
+      });
+    }
+
+    if (resumesNeedingOriginalVersion.length) {
+      resumes = await getResumeHistory(user.id);
+    }
+
+    serializedResumes = resumes.map((resume) => ({
+      id: resume.id,
+      title: resume.title,
+      createdAt: safeDateLabel(resume.createdAt),
+      versions: resume.versions.map((version, index) =>
+        normalizeResumeVersion(version, resume.id, index + 1)
+      ),
+    }));
   }
-
-  if (resumesNeedingOriginalVersion.length) {
-    resumes = await getResumeHistory(user.id);
-  }
-
-  const serializedResumes = resumes.map((resume) => ({
-    id: resume.id,
-    title: resume.title,
-    createdAt: resume.createdAt.toISOString(),
-    versions: resume.versions.map((version) => ({
-      id: version.id,
-      resumeId: version.resumeId,
-      versionNumber: version.versionNumber,
-      sourceType: isResumeVersionSourceType(version.sourceType)
-        ? version.sourceType
-        : ("manual" as const),
-      createdAt: version.createdAt.toISOString(),
-      atsScore: version.atsScore,
-      jobMatchScore: version.jobMatchScore,
-      addedKeywords: jsonArrayToStrings(version.addedKeywords),
-      removedKeywords: jsonArrayToStrings(version.removedKeywords),
-      content: version.content,
-    })),
-  }));
 
   return (
     <main className={forge.page}>
@@ -114,24 +179,7 @@ export default async function ResumeHistoryPage() {
           </p>
         </div>
 
-        {serializedResumes.length ? (
-          <ResumeHistoryClient resumes={serializedResumes} />
-        ) : (
-          <Card className={forge.cardStrong}>
-            <CardHeader>
-              <CardTitle>No resume versions yet</CardTitle>
-              <CardDescription className="text-zinc-400">
-                Upload a resume to create Version 1, then run ATS optimization
-                or the AI Resume Rewriter to build your timeline.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild className={forge.primaryButton}>
-                <Link href="/dashboard/resume">Upload Resume</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+        <ResumeHistoryClient resumes={serializedResumes} />
       </section>
     </main>
   );

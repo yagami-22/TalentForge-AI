@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { analyzeResume } from "@/lib/resume-analyzer";
-import { createResumeVersion } from "@/lib/resume-versioning";
+import { createResumeVersion } from "@/lib/resume-versioning-server";
 
 export type RestoreResumeVersionState = {
   message: string;

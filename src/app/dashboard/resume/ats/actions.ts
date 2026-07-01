@@ -10,9 +10,10 @@ import {
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import {
-  createResumeVersion,
   formatATSOptimizedVersionContent,
-} from "@/lib/resume-versioning";
+  inferVersionTargetLabel,
+} from "@/lib/resume-versioning-client";
+import { createResumeVersion } from "@/lib/resume-versioning-server";
 
 export async function optimizeResumeForATS(
   _prevState: ATSOptimizerState,
@@ -91,9 +92,11 @@ export async function optimizeResumeForATS(
     jobDescription,
   });
 
-  await createResumeVersion({
+  const versionResult = await createResumeVersion({
     resumeId: resume.id,
     sourceType: "ats_optimizer",
+    sourceLabel: "ATS Optimization",
+    targetLabel: inferVersionTargetLabel(jobDescription, analysis.targetRole),
     content: formatATSOptimizedVersionContent(resume.extractedText, analysis),
     atsScore: analysis.atsScore,
     jobMatchScore: null,
@@ -102,7 +105,9 @@ export async function optimizeResumeForATS(
   revalidatePath("/dashboard/resume/history");
 
   return {
-    message: "ATS optimization report complete.",
+    message: !versionResult || versionResult.created
+      ? "ATS optimization report complete."
+      : versionResult.message,
     status: "success",
     analysis,
   };

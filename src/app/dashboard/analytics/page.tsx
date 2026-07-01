@@ -9,7 +9,7 @@ import { withRetry } from "@/lib/retry";
 import {
   extractResumeVersionKeywords,
   jsonArrayToStrings,
-} from "@/lib/resume-versioning";
+} from "@/lib/resume-versioning-client";
 import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
