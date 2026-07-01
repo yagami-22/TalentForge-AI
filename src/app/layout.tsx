@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
+
+import { clerkLocalization } from "@/lib/clerk-appearance";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,6 +50,7 @@ export default function RootLayout({
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       afterSignOutUrl="/"
+      localization={clerkLocalization}
     >
       <html
         lang="en"
