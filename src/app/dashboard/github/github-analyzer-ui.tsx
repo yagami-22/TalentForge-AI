@@ -73,9 +73,9 @@ export function GitHubHero({
   summary?: string;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(0,229,255,0.12),rgba(106,92,255,0.09)_48%,rgba(139,92,246,0.12))] p-5 shadow-[0_0_38px_rgba(0,229,255,0.11),0_0_54px_rgba(106,92,255,0.1)] backdrop-blur-2xl sm:p-6">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/14 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.085),rgba(106,92,255,0.065)_48%,rgba(139,92,246,0.085))] p-5 shadow-[0_0_20px_rgba(0,229,255,0.045),0_0_30px_rgba(106,92,255,0.04)] backdrop-blur-2xl sm:p-6">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
       <div className="relative grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] xl:items-center">
         <div>
           <p className={forge.badge}>GitHub Profile Analyzer</p>
@@ -87,7 +87,7 @@ export function GitHubHero({
           </p>
           {children}
         </div>
-        <div className="rounded-[1.7rem] border border-white/[0.08] bg-[#050816]/55 p-4 shadow-[inset_0_0_38px_rgba(0,229,255,0.06)]">
+        <div className="rounded-[1.7rem] border border-white/[0.08] bg-[#070B16]/55 p-4 shadow-[inset_0_0_38px_rgba(0,229,255,0.06)]">
           <div className="grid gap-3 sm:grid-cols-3">
             {(metrics.length
               ? metrics
@@ -149,7 +149,7 @@ export function GitHubScoreCard({ metric }: { metric: GitHubScoreMetric }) {
           : "border-cyan-300/20 bg-cyan-300/10 text-cyan-100";
 
   return (
-    <article className="rounded-[1.45rem] border border-white/[0.08] bg-white/[0.045] p-4 shadow-[0_0_24px_rgba(0,229,255,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/18 hover:bg-white/[0.06]">
+    <article className="rounded-[1.45rem] border border-white/[0.07] bg-white/[0.035] p-4 shadow-[0_0_14px_rgba(0,229,255,0.032)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/16 hover:bg-white/[0.048]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
@@ -177,7 +177,7 @@ export function RepositoryCard({ repo }: { repo: GitHubRepositoryView }) {
   }).format(new Date(repo.updatedAt));
 
   return (
-    <article className="flex min-h-full flex-col rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/58 p-4 shadow-[0_0_24px_rgba(0,229,255,0.05)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.055]">
+    <article className="flex min-h-full flex-col rounded-[1.5rem] border border-white/[0.07] bg-[#101827]/56 p-4 shadow-[0_0_14px_rgba(0,229,255,0.032)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/16 hover:bg-white/[0.048]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-cyan-300/18 bg-[#00E5FF]/10 text-cyan-100">
@@ -374,6 +374,12 @@ export function LanguageDonut({
   languages: Array<{ language: string; bytes: number; percent: number }>;
 }) {
   const palette = ["#00E5FF", "#8B5CF6", "#34D399", "#F59E0B", "#A78BFA"];
+  const summary = languages.length
+    ? languages
+        .slice(0, 5)
+        .map((item) => `${item.language} ${item.percent}%`)
+        .join(", ")
+    : "No language data available.";
   const segmentState = languages.slice(0, 5).reduce(
     (state, language, index) => {
       const start = state.cursor;
@@ -404,9 +410,10 @@ export function LanguageDonut({
         <div
           className="grid h-32 w-32 shrink-0 place-items-center rounded-full"
           style={{ background }}
-          aria-label="Language distribution donut"
+          role="img"
+          aria-label={`Language distribution donut. ${summary}`}
         >
-          <div className="grid h-20 w-20 place-items-center rounded-full border border-white/[0.08] bg-[#070B1F] text-center">
+          <div className="grid h-20 w-20 place-items-center rounded-full border border-white/[0.08] bg-[#101827] text-center">
             <span className="text-xl font-semibold text-white">{languages.length}</span>
             <span className="-mt-4 text-[0.65rem] uppercase tracking-wide text-zinc-500">langs</span>
           </div>
@@ -523,7 +530,7 @@ export function ActivityTimeline({
 
 export function TopProjectsTable({ repos }: { repos: GitHubRepositoryView[] }) {
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/58">
+    <div className="overflow-hidden rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58">
       <div className="grid grid-cols-[1.2fr_0.45fr_0.55fr_0.9fr] gap-3 border-b border-white/[0.08] px-4 py-3 text-[0.68rem] font-semibold uppercase tracking-wide text-zinc-500">
         <span>Project</span>
         <span>Score</span>
@@ -582,7 +589,7 @@ export function GitHubInsightCard({
   icon?: LucideIcon;
 }) {
   return (
-    <div className="rounded-[1.4rem] border border-white/[0.08] bg-[#070B1F]/58 p-4">
+    <div className="rounded-[1.4rem] border border-white/[0.08] bg-[#101827]/58 p-4">
       <p className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
         <Icon className="h-4 w-4 text-cyan-100" />
         {title}
@@ -608,7 +615,7 @@ export function GitHubSection({
   action?: ReactNode;
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_30px_rgba(0,229,255,0.07)] backdrop-blur-2xl sm:p-6">
+    <section className="rounded-[1.75rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_18px_rgba(0,229,255,0.04)] backdrop-blur-2xl sm:p-6">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -631,14 +638,20 @@ export function AnalyzerEmptyState({
   description,
   details,
   action,
+  statusRole,
 }: {
   title: string;
   description: string;
   details?: string[];
   action?: ReactNode;
+  statusRole?: "status" | "alert";
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/58 p-8 text-center">
+    <div
+      role={statusRole}
+      aria-live={statusRole ? "polite" : undefined}
+      className="rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58 p-8 text-center"
+    >
       <BookOpen className="mx-auto h-8 w-8 text-cyan-100" />
       <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-400">

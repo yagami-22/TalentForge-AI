@@ -344,7 +344,7 @@ export function InterviewHistoryTable({
 }) {
   return (
     <Card className={`${forge.card} overflow-hidden`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60">
         <CardTitle className="text-lg">Attempt History</CardTitle>
         <CardDescription className="text-zinc-400">
           Every saved OA Assessment and mock interview attempt.
@@ -399,7 +399,7 @@ export function InterviewTrendChart({
 }) {
   return (
     <Card className={`${forge.card} overflow-hidden`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div>
             <CardTitle className="text-base">{metricLabel(metric)}</CardTitle>
@@ -501,7 +501,7 @@ export function WeaknessAnalysisCard({
 
   return (
     <Card className={`${forge.card} overflow-hidden`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60">
         <div className="flex items-center gap-3">
           <span className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-2 text-amber-100">
             <Target className="h-4 w-4" />
@@ -625,7 +625,7 @@ export function InterviewHistoryClient() {
       </div>
 
       <Card className={`${forge.card} overflow-hidden`}>
-        <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+        <CardHeader className="border-b border-white/10 bg-[#101827]/60">
           <CardTitle className="text-lg">Trend Analytics</CardTitle>
           <CardDescription className="text-zinc-400">
             Score movement across attempts.

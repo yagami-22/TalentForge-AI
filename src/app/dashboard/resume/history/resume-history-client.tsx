@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react";
 import {
   BarChart3,
   CheckCircle2,
@@ -415,7 +415,7 @@ function SkillCategoryList({
     <div className="grid gap-3 sm:grid-cols-2">
       {Object.entries(grouped).flatMap(([category, categorySkills]) =>
         categorySkills.length ? (
-          <div key={category} className="rounded-2xl border border-white/10 bg-[#070B1F]/55 p-3">
+          <div key={category} className="rounded-2xl border border-white/10 bg-[#101827]/55 p-3">
             <p className="text-[0.68rem] font-semibold uppercase tracking-wide text-zinc-500">
               {categoryLabel(category as ResumeSkillCategory)}
             </p>
@@ -445,7 +445,7 @@ function SectionHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-white/10 bg-[#070B1F]/60 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-b border-white/10 bg-[#101827]/60 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.12)]">
           <Icon className="h-4 w-4" aria-hidden="true" />
@@ -637,7 +637,7 @@ function TimelineCard({
       className={`group relative w-full rounded-2xl border p-3 text-left outline-none transition duration-300 focus-visible:border-[#00E5FF]/60 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/25 ${
         selected
           ? "border-[#00E5FF]/45 bg-[#00E5FF]/10 shadow-[0_0_34px_rgba(0,229,255,0.18)]"
-          : "border-white/10 bg-[#070B1F]/55 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-white/[0.055]"
+          : "border-white/10 bg-[#101827]/55 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-white/[0.055]"
       }`}
     >
       <span
@@ -950,7 +950,7 @@ export function ResumeEvolutionChart({
       <CardContent className="py-5">
         {scoredVersions.length ? (
           <div className="space-y-5">
-            <div className="relative h-64 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#050816]/70 p-4 shadow-inner">
+            <div className="relative h-64 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#070B16]/70 p-4 shadow-inner">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(0,229,255,0.14),transparent_18rem),radial-gradient(circle_at_82%_75%,rgba(139,92,246,0.14),transparent_18rem)]" />
               <svg
                 viewBox="0 0 100 100"
@@ -1072,10 +1072,50 @@ export function VersionRestoreDialog({
   version: ResumeHistoryVersion;
 }) {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const [state, formAction, pending] = useActionState(
     restoreResumeVersion,
     initialRestoreResumeVersionState
   );
+
+  useEffect(() => {
+    if (!open) return;
+
+    cancelButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !pending) {
+        setOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, pending]);
+
+  function handleDialogKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key !== "Tab") return;
+
+    const focusableElements = Array.from(
+      dialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) ?? []
+    ).filter((element) => !element.hasAttribute("disabled"));
+
+    if (!focusableElements.length) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
 
   return (
     <>
@@ -1090,9 +1130,19 @@ export function VersionRestoreDialog({
       </Button>
       {open ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#070B1F] p-6 text-white shadow-[0_0_60px_rgba(106,92,255,0.2)]">
-            <h3 className="text-xl font-semibold">Restore Version {version.versionNumber}?</h3>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="restore-version-title"
+            aria-describedby="restore-version-description"
+            onKeyDown={handleDialogKeyDown}
+            className="w-full max-w-md rounded-[1.75rem] border border-white/10 bg-[#101827] p-6 text-white shadow-[0_0_32px_rgba(106,92,255,0.12)]"
+          >
+            <h3 id="restore-version-title" className="text-xl font-semibold">
+              Restore Version {version.versionNumber}?
+            </h3>
+            <p id="restore-version-description" className="mt-3 text-sm leading-6 text-zinc-400">
               This will replace the current resume text with this version and create a new
               restored snapshot in the timeline. Uploaded PDFs are not deleted.
             </p>
@@ -1100,6 +1150,7 @@ export function VersionRestoreDialog({
               <input type="hidden" name="versionId" value={version.id} />
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <Button
+                  ref={cancelButtonRef}
                   type="button"
                   variant="outline"
                   className={forge.secondaryButton}
@@ -1118,6 +1169,7 @@ export function VersionRestoreDialog({
               {state.message ? (
                 <p
                   aria-live="polite"
+                  role={state.status === "error" ? "alert" : "status"}
                   className={
                     state.status === "error"
                       ? "text-sm text-red-300"

@@ -259,7 +259,7 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
         <input type="hidden" name="jobDescription" value={enrichedJobDescription} />
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_360px]">
-          <section className="rounded-3xl border border-[#00E5FF]/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.08),rgba(255,255,255,0.035)_48%,rgba(106,92,255,0.08))] p-4 shadow-[0_0_30px_rgba(0,229,255,0.08)]">
+          <section className="rounded-[1.5rem] border border-[#00E5FF]/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.07),rgba(255,255,255,0.035)_48%,rgba(106,92,255,0.07))] p-4 shadow-[0_0_20px_rgba(0,229,255,0.055)]">
             <div className="flex flex-col gap-2 border-b border-white/10 pb-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-medium uppercase text-cyan-100">
@@ -433,7 +433,7 @@ function CardShell({
 }) {
   return (
     <div className={forge.cardStrong}>
-      <div className="border-b border-white/10 bg-[#070B1F]/60 px-4 py-4 sm:px-6">
+      <div className="border-b border-white/10 bg-[#101827]/60 px-4 py-4 sm:px-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-xl font-semibold">{title}</h2>

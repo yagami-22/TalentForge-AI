@@ -10,7 +10,7 @@ export async function saveUserRole(formData: FormData) {
   const role = formData.get("role");
 
   if (role !== UserRole.CANDIDATE && role !== UserRole.RECRUITER) {
-    throw new Error("Invalid onboarding role.");
+    redirect("/onboarding");
   }
 
   const user = await getCurrentDbUser();

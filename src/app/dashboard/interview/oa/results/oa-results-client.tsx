@@ -78,7 +78,7 @@ export function OAResultsClient() {
 
   if (!report || !session) {
     return (
-      <div className={`${forge.card} rounded-3xl p-8 text-center`}>
+      <div className={`${forge.card} p-8 text-center`}>
         <h1 className="text-2xl font-semibold">No OA report yet</h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
           Complete an OA Assessment session to generate a readiness score and answer feedback.
@@ -93,7 +93,7 @@ export function OAResultsClient() {
   return (
     <div className="space-y-6">
       <section className={forge.cardStrong}>
-        <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
+        <div className="border-b border-white/10 bg-[#101827]/60 px-5 py-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase text-cyan-100">
@@ -104,7 +104,7 @@ export function OAResultsClient() {
                 Resume: {session.resumeTitle} · {session.questions.length} selected questions
               </p>
             </div>
-            <div className="rounded-3xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-6 py-5 text-center shadow-[0_0_32px_rgba(0,229,255,0.14)]">
+            <div className="rounded-[1.5rem] border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-6 py-5 text-center shadow-[0_0_22px_rgba(0,229,255,0.1)]">
               <p className="text-5xl font-semibold text-cyan-100">
                 {report.readinessScore}
               </p>
@@ -129,7 +129,7 @@ export function OAResultsClient() {
       </section>
 
       <section className={forge.card}>
-        <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
+        <div className="border-b border-white/10 bg-[#101827]/60 px-5 py-4">
           <p className="text-sm font-semibold uppercase text-cyan-100">
             Category Breakdown
           </p>
@@ -189,7 +189,7 @@ export function OAResultsClient() {
 
           return (
             <article key={evaluation.questionId} className={forge.card}>
-              <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
+              <div className="border-b border-white/10 bg-[#101827]/60 px-5 py-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-medium uppercase text-cyan-100">

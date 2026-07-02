@@ -186,7 +186,7 @@ export default function Home() {
     <PremiumBackground>
       <nav
         aria-label="Main navigation"
-        className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#050816]/75 backdrop-blur-2xl"
+        className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#070B16]/75 backdrop-blur-2xl"
       >
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3 rounded-2xl">
@@ -300,7 +300,7 @@ export default function Home() {
                 (item) => (
                   <div
                     key={item}
-                    className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#070B1F]/60 px-3 py-2 text-sm text-slate-300 shadow-[0_0_24px_rgba(0,229,255,0.06)]"
+                    className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-[#101827]/60 px-3 py-2 text-sm text-slate-300 shadow-[0_0_24px_rgba(0,229,255,0.06)]"
                   >
                     <CheckCircle2 className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                     <span>{item}</span>
@@ -348,7 +348,7 @@ export default function Home() {
 
       <section
         id="how-it-works"
-        className="border-y border-white/[0.06] bg-[#070B1F]/30"
+        className="border-y border-white/[0.06] bg-[#101827]/30"
       >
         <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <div className="lg:sticky lg:top-28 lg:self-start">
@@ -492,7 +492,7 @@ function HeroProductVisual() {
       />
 
       <div className="relative min-w-0 max-w-full overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4 shadow-[0_0_44px_rgba(0,229,255,0.14),0_0_70px_rgba(106,92,255,0.14)] backdrop-blur-2xl">
-        <div className="min-w-0 rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/72 p-4">
+        <div className="min-w-0 rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/72 p-4">
           <div className="flex flex-col items-start justify-between gap-3 border-b border-white/[0.08] pb-4 sm:flex-row sm:items-center">
             <div>
               <p className="text-sm text-slate-400">Hiring Readiness</p>
@@ -532,7 +532,7 @@ function HeroProductVisual() {
           {["Resume", "Interviews", "Analytics"].map((item) => (
             <div
               key={item}
-              className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/60 p-3 text-sm text-slate-300"
+              className="rounded-2xl border border-white/[0.08] bg-[#101827]/60 p-3 text-sm text-slate-300"
             >
               <p className="font-medium text-white">{item}</p>
               <p className="mt-1 text-xs text-slate-500">Synced</p>
@@ -665,7 +665,7 @@ function TrustCard({ item }: { item: TrustItem }) {
   const Icon = item.icon;
 
   return (
-    <article className="rounded-[1.5rem] border border-[rgba(255,255,255,0.08)] bg-[#070B1F]/60 p-5 shadow-[0_0_32px_rgba(0,229,255,0.07)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-white/[0.045]">
+    <article className="rounded-[1.5rem] border border-[rgba(255,255,255,0.08)] bg-[#101827]/60 p-5 shadow-[0_0_32px_rgba(0,229,255,0.07)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-white/[0.045]">
       <div className="flex items-start gap-4">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-purple-300/20 bg-[#8B5CF6]/10 text-purple-100 shadow-[0_0_24px_rgba(139,92,246,0.12)]">
           <Icon className="h-5 w-5" aria-hidden="true" />

@@ -1,14 +1,14 @@
 export const clerkAuthAppearance = {
   variables: {
     colorPrimary: "#00E5FF",
-    colorBackground: "#070B1F",
-    colorInputBackground: "rgba(5, 8, 22, 0.78)",
+    colorBackground: "#101827",
+    colorInputBackground: "#101827",
     colorInputText: "#F8FAFC",
     colorText: "#F8FAFC",
     colorTextSecondary: "#94A3B8",
     colorNeutral: "#94A3B8",
     colorDanger: "#FB7185",
-    borderRadius: "1.5rem",
+    borderRadius: "1rem",
     fontFamily: "var(--font-geist-sans)",
   },
   elements: {
@@ -18,21 +18,20 @@ export const clerkAuthAppearance = {
     },
     cardBox: {
       width: "100%",
-      borderRadius: "2rem",
+      borderRadius: "20px",
       background:
-        "linear-gradient(135deg, rgba(0,229,255,0.1), rgba(255,255,255,0.04) 48%, rgba(139,92,246,0.12))",
-      border: "1px solid rgba(255,255,255,0.08)",
-      boxShadow:
-        "0 0 44px rgba(0,229,255,0.14), 0 0 70px rgba(106,92,255,0.14)",
-      backdropFilter: "blur(24px)",
+        "linear-gradient(135deg, rgba(16,24,39,0.92), rgba(21,30,47,0.78) 52%, rgba(139,92,246,0.12))",
+      border: "1px solid rgba(255,255,255,0.06)",
+      boxShadow: "0 18px 58px rgba(0,0,0,0.18)",
+      backdropFilter: "blur(12px)",
       overflow: "hidden",
     },
     card: {
       gap: "1.25rem",
-      borderRadius: "2rem",
-      background: "rgba(7, 11, 31, 0.72)",
+      borderRadius: "20px",
+      background: "rgba(16,24,39,0.82)",
       boxShadow: "none",
-      border: "1px solid rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.06)",
       color: "#F8FAFC",
       padding: "2rem",
     },
@@ -49,10 +48,10 @@ export const clerkAuthAppearance = {
     socialButtonsBlockButton: {
       height: "2.875rem",
       borderRadius: "1rem",
-      border: "1px solid rgba(255,255,255,0.1)",
-      background: "rgba(255,255,255,0.04)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(21,30,47,0.72)",
       color: "#F8FAFC",
-      boxShadow: "0 0 24px rgba(0,229,255,0.08)",
+      boxShadow: "none",
       transition:
         "transform 250ms ease, border-color 250ms ease, background 250ms ease, box-shadow 250ms ease",
     },
@@ -60,7 +59,7 @@ export const clerkAuthAppearance = {
       transform: "translateY(-2px)",
       borderColor: "rgba(0,229,255,0.3)",
       background: "rgba(0,229,255,0.1)",
-      boxShadow: "0 0 30px rgba(0,229,255,0.16)",
+      boxShadow: "none",
     },
     socialButtonsBlockButtonText: {
       color: "#F8FAFC",
@@ -79,8 +78,8 @@ export const clerkAuthAppearance = {
     formFieldInput: {
       height: "2.875rem",
       borderRadius: "1rem",
-      border: "1px solid rgba(255,255,255,0.1)",
-      background: "rgba(5,8,22,0.78)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(16,24,39,0.82)",
       color: "#F8FAFC",
       boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
       caretColor: "#00E5FF",
@@ -105,16 +104,16 @@ export const clerkAuthAppearance = {
       background: "linear-gradient(90deg, #00E5FF, #6A5CFF, #8B5CF6)",
       color: "#FFFFFF",
       fontWeight: "700",
-      boxShadow: "0 0 32px rgba(0,229,255,0.28)",
+      boxShadow: "0 0 16px rgba(0,229,255,0.14)",
       transition: "transform 250ms ease, box-shadow 250ms ease",
     },
     formButtonPrimary__hover: {
       transform: "translateY(-2px)",
-      boxShadow: "0 0 46px rgba(0,229,255,0.38)",
+      boxShadow: "0 0 22px rgba(0,229,255,0.18)",
     },
     footer: {
-      background: "rgba(5,8,22,0.5)",
-      borderTop: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(7,11,22,0.6)",
+      borderTop: "1px solid rgba(255,255,255,0.06)",
     },
     footerActionText: {
       color: "#94A3B8",
@@ -128,8 +127,8 @@ export const clerkAuthAppearance = {
     },
     identityPreview: {
       borderRadius: "1rem",
-      border: "1px solid rgba(255,255,255,0.08)",
-      background: "rgba(255,255,255,0.04)",
+      border: "1px solid rgba(255,255,255,0.06)",
+      background: "rgba(21,30,47,0.72)",
       color: "#F8FAFC",
     },
     identityPreviewText: {
@@ -137,8 +136,8 @@ export const clerkAuthAppearance = {
     },
     alternativeMethodsBlockButton: {
       borderRadius: "1rem",
-      border: "1px solid rgba(255,255,255,0.1)",
-      background: "rgba(255,255,255,0.04)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(21,30,47,0.72)",
       color: "#F8FAFC",
     },
     formResendCodeLink: {
@@ -147,8 +146,8 @@ export const clerkAuthAppearance = {
     },
     otpCodeFieldInput: {
       borderRadius: "1rem",
-      border: "1px solid rgba(255,255,255,0.1)",
-      background: "rgba(5,8,22,0.78)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      background: "rgba(16,24,39,0.82)",
       color: "#F8FAFC",
       caretColor: "#00E5FF",
     },
@@ -163,13 +162,13 @@ export const clerkAuthAppearance = {
     },
     userButtonTrigger: {
       borderRadius: "1rem",
-      boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 0 28px rgba(0,229,255,0.14)",
+      boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 12px 26px rgba(0,0,0,0.18)",
       transition:
         "transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease",
     },
     userButtonTrigger__hover: {
       transform: "translateY(-1px)",
-      boxShadow: "0 0 0 1px rgba(0,229,255,0.32), 0 0 34px rgba(0,229,255,0.22)",
+      boxShadow: "0 0 0 1px rgba(0,229,255,0.24), 0 14px 30px rgba(0,0,0,0.2)",
     },
     userButtonAvatarBox: {
       borderRadius: "1rem",
@@ -180,23 +179,22 @@ export const clerkAuthAppearance = {
     },
     userButtonPopoverCard: {
       minWidth: "18rem",
-      borderRadius: "1.5rem",
+      borderRadius: "20px",
       background:
-        "linear-gradient(135deg, rgba(7,11,31,0.96), rgba(5,8,22,0.94) 48%, rgba(36,20,75,0.94))",
-      border: "1px solid rgba(255,255,255,0.1)",
-      boxShadow:
-        "0 0 44px rgba(0,229,255,0.18), 0 0 72px rgba(106,92,255,0.16), 0 24px 80px rgba(0,0,0,0.55)",
-      backdropFilter: "blur(24px)",
+        "linear-gradient(135deg, rgba(16,24,39,0.96), rgba(7,11,22,0.94) 48%, rgba(36,20,75,0.9))",
+      border: "1px solid rgba(255,255,255,0.08)",
+      boxShadow: "0 24px 80px rgba(0,0,0,0.48)",
+      backdropFilter: "blur(16px)",
       color: "#F8FAFC",
       overflow: "hidden",
     },
     userButtonPopoverMain: {
-      background: "rgba(5,8,22,0.58)",
-      borderRadius: "1.5rem",
+      background: "rgba(16,24,39,0.72)",
+      borderRadius: "20px",
     },
     userButtonPopoverActions: {
       background: "transparent",
-      borderTop: "1px solid rgba(255,255,255,0.08)",
+      borderTop: "1px solid rgba(255,255,255,0.06)",
       padding: "0.45rem",
     },
     userButtonPopoverActionButton: {
@@ -210,7 +208,7 @@ export const clerkAuthAppearance = {
       transform: "translateY(-1px)",
       color: "#F8FAFC",
       background: "rgba(0,229,255,0.1)",
-      boxShadow: "0 0 26px rgba(0,229,255,0.14)",
+      boxShadow: "none",
     },
     userButtonPopoverActionButtonIcon: {
       color: "#67E8F9",
@@ -221,12 +219,12 @@ export const clerkAuthAppearance = {
     },
     userButtonPopoverFooter: {
       background: "rgba(5,8,22,0.78)",
-      borderTop: "1px solid rgba(255,255,255,0.08)",
+      borderTop: "1px solid rgba(255,255,255,0.06)",
       color: "#94A3B8",
     },
     userPreview: {
       background: "rgba(255,255,255,0.04)",
-      borderBottom: "1px solid rgba(255,255,255,0.08)",
+      borderBottom: "1px solid rgba(255,255,255,0.06)",
     },
     userPreviewAvatarBox: {
       borderRadius: "1rem",
@@ -240,13 +238,12 @@ export const clerkAuthAppearance = {
       color: "#94A3B8",
     },
     popoverCard: {
-      borderRadius: "1.5rem",
+      borderRadius: "20px",
       background:
-        "linear-gradient(135deg, rgba(7,11,31,0.96), rgba(5,8,22,0.94) 48%, rgba(36,20,75,0.94))",
-      border: "1px solid rgba(255,255,255,0.1)",
-      boxShadow:
-        "0 0 44px rgba(0,229,255,0.18), 0 0 72px rgba(106,92,255,0.16), 0 24px 80px rgba(0,0,0,0.55)",
-      backdropFilter: "blur(24px)",
+        "linear-gradient(135deg, rgba(16,24,39,0.96), rgba(7,11,22,0.94) 48%, rgba(36,20,75,0.9))",
+      border: "1px solid rgba(255,255,255,0.08)",
+      boxShadow: "0 24px 80px rgba(0,0,0,0.48)",
+      backdropFilter: "blur(16px)",
       color: "#F8FAFC",
     },
     popoverFooter: {

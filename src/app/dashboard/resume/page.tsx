@@ -159,7 +159,7 @@ function CompactListCard({
 
   return (
     <Card className={`overflow-hidden ${forge.card} ${forge.hoverCard}`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60 pb-3">
         <CardTitle className={`text-base ${titleTone}`}>{title}</CardTitle>
       </CardHeader>
       <CardContent>
@@ -180,7 +180,7 @@ function CategoryCard({ category }: { category: ResumeCategoryScore }) {
 
   return (
     <Card className={`overflow-hidden ${forge.card} ${forge.hoverCard}`}>
-      <CardHeader className="space-y-3 border-b border-white/10 bg-[#070B1F]/60 pb-3">
+      <CardHeader className="space-y-3 border-b border-white/10 bg-[#101827]/60 pb-3">
         <div className="flex items-start justify-between gap-3">
           <CardTitle className="text-base leading-6">{category.name}</CardTitle>
           <p className="shrink-0 rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-2.5 py-1 text-sm font-semibold text-cyan-100">

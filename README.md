@@ -1,89 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TalentForge AI
 
-## Getting Started
+AI-powered career intelligence platform for resumes, ATS optimization, job matching, GitHub analysis, recruiter mode, and interview preparation.
 
-First, run the development server:
+## Live Demo
+
+Live Demo: add deployed URL here
+
+## Screenshots
+
+Add screenshots before publishing:
+
+- Landing Page: add screenshot here
+- Dashboard: add screenshot here
+- Resume Analyzer: add screenshot here
+- ATS Optimizer: add screenshot here
+- JD Match: add screenshot here
+- Resume Rewriter: add screenshot here
+- GitHub Analyzer: add screenshot here
+- AI Recruiter Mode: add screenshot here
+- Mock Interview: add screenshot here
+
+## Features
+
+- **Resume Intelligence**: Upload text-based PDF resumes, parse content, detect evidence, score resume quality, and surface actionable improvements.
+- **ATS Optimization**: Compare a resume against a target job description and identify keyword, formatting, and relevance gaps.
+- **JD Match**: Analyze job description fit with skill overlap, missing requirements, and match evidence.
+- **Resume Rewriter**: Generate recruiter-ready resume sections tailored to a selected job description and export rewritten content as PDF.
+- **Resume Version History**: Track resume changes, compare versions, review ATS/JD score trends, and restore saved versions.
+- **GitHub Profile Analyzer**: Inspect public GitHub repositories for project quality, modern stack evidence, documentation, deployment, and recruiter visibility.
+- **AI Recruiter Mode**: Review candidate batches against a job description, rank applicants, and generate evidence-based recruiter reports.
+- **Mock Interviews**: Run company-style technical, DSA, frontend, backend, system design, project deep dive, behavioral, and mixed interview sessions.
+- **Career Coach**: Combine resume, ATS, JD match, interview, project, skill, and GitHub signals into personalized readiness and roadmap guidance.
+- **Premium Dashboard**: Unified dark SaaS workspace with analytics, quick actions, module navigation, and consistent product UI.
+
+## Tech Stack
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Shadcn UI
+- Clerk
+- Prisma
+- Neon PostgreSQL
+- GitHub API
+- PDF parsing/export
+- Vercel
+
+## Architecture Overview
+
+TalentForge AI is a modular Next.js application organized around authenticated dashboard workflows.
+
+- **Frontend**: App Router pages and client components live under `src/app`, with shared UI in `src/components` and design tokens in `src/lib/talentforge-design.ts`.
+- **Auth**: Clerk handles sign-in, sign-up, sessions, and protected dashboard access.
+- **Database**: Prisma models persist users, resumes, analysis outputs, and version history in Neon PostgreSQL.
+- **AI analysis layer**: Domain logic in `src/lib` scores resumes, JD matches, ATS evidence, recruiter reports, interview answers, and career readiness.
+- **Resume parsing**: Text-based PDFs are validated and parsed server-side before analysis and storage.
+- **GitHub API integration**: Public repository data is fetched through a server-side API proxy with optional `GITHUB_TOKEN` support.
+- **Recruiter intelligence**: Candidate evidence is ranked against job descriptions with seniority, skills, project quality, portfolio, and recommendation signals.
+- **Dashboard modules**: Resume, ATS, JD Match, Rewriter, History, GitHub, Recruiter, Interview, Career Coach, Analytics, and Settings are separate route modules sharing the same visual system.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for more detail.
+
+## Folder Structure
+
+```text
+src/app/                         Next.js App Router routes and route modules
+src/app/api/github/fetch/        Server-side GitHub API proxy
+src/app/dashboard/               Authenticated dashboard shell and modules
+src/app/dashboard/resume/        Resume intelligence, ATS, JD match, rewrite, history
+src/app/dashboard/github/        GitHub Profile Analyzer
+src/app/dashboard/recruiter/     AI Recruiter Mode workspace
+src/app/dashboard/interview/     Interview and OA simulator flows
+src/app/dashboard/coach/         AI Career Coach
+src/components/                  Shared application components
+src/components/ui/               Shadcn-style UI primitives
+src/components/dashboard/        Dashboard-specific shared components
+src/lib/                         Domain logic, analyzers, API clients, utilities
+src/data/question-bank/          Interview and OA question data
+prisma/                          Prisma schema and database scripts
+public/uploads/resumes/          Local uploaded resume storage in development
+docs/                            Product, setup, architecture, and feature docs
+```
+
+## Environment Variables
+
+Create `.env.local` and provide the values needed for your environment. Do not commit real secrets.
 
 ```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+DATABASE_URL=
+GITHUB_TOKEN=
+```
+
+`GITHUB_TOKEN` is optional but recommended for higher GitHub API limits. It is read only on the server and must never be exposed to the browser.
+
+## Local Setup
+
+```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the local development URL printed by Next.js, usually `http://localhost:3000`.
 
-## Database Changes
+For full setup details, see [docs/SETUP.md](docs/SETUP.md).
 
-After editing `prisma/schema.prisma`, sync the Neon database and refresh the
-local Prisma Client:
+## Deployment Guide
 
-```bash
-npx prisma db push
-npx prisma generate
-```
+TalentForge AI is designed to deploy on Vercel.
 
-## GitHub Profile Analyzer
+1. Push the repository to GitHub.
+2. Import the project in Vercel.
+3. Add required environment variables in Vercel Project Settings.
+4. Connect the Neon PostgreSQL database using `DATABASE_URL`.
+5. Configure Clerk production keys and allowed redirect URLs.
+6. Add `GITHUB_TOKEN` as a server-side environment variable if using GitHub analysis at production scale.
+7. Deploy with the default Next.js build command: `npm run build`.
 
-The GitHub Profile Analyzer uses GitHub's public API to inspect repositories,
-README files, package metadata, languages, and repository structure. It works
-without a token, but unauthenticated GitHub API requests have low rate limits.
+## Security Notes
 
-### Optional GitHub token
+- Store secrets only in environment variables.
+- Keep `.env.local` out of version control.
+- The GitHub token is server-side only and is not sent to client bundles.
+- Clerk handles authentication and session state.
+- Resume uploads should be treated as sensitive user data.
+- Public GitHub analysis should only request public repository data unless the product explicitly adds private repository support later.
 
-Codex cannot create a GitHub Personal Access Token for you because token
-creation requires your own GitHub account permissions. To unlock higher request
-limits:
+## Performance Notes
 
-1. Open GitHub's Personal Access Token settings.
-2. Create a fine-grained or classic token.
-3. Public repository analysis does not require private repository access.
-4. Add the token to `.env.local`:
+- Dashboard modules are route-isolated to keep workflows focused.
+- Heavy GitHub API calls are proxied server-side and cached briefly.
+- PDF parsing and analysis run server-side where possible.
+- UI motion respects `prefers-reduced-motion`.
+- Static and dynamic routes are validated through `npm run build`.
 
-```bash
-GITHUB_TOKEN=your_github_token_here
-```
+## Accessibility Notes
 
-5. Restart the app:
+- Dashboard routes include visible focus states and keyboard-accessible controls.
+- Forms use labels or ARIA labels with live feedback for errors and status updates.
+- Charts include screen-reader summaries where visual-only graphics are used.
+- Interactive cards are implemented as links or buttons.
+- Motion is reduced when users enable reduced-motion preferences.
 
-```bash
-npm run dev
-```
+## Future Improvements
 
-The token is read only on the server. It is never exposed to the browser and is
-never logged by the application.
+- Add production screenshots and a deployed demo URL.
+- Add automated accessibility testing to CI.
+- Add deeper recruiter pipeline persistence.
+- Add optional cloud file storage for uploaded resumes.
+- Add richer observability for API failures and analysis latency.
 
-### Troubleshooting GitHub analysis
+## License
 
-- `GitHub API Rate Limit Reached`: add `GITHUB_TOKEN` to `.env.local`, then
-  restart the app.
-- `GitHub token needs attention`: check that the token was pasted correctly,
-  has not expired, and starts with a valid GitHub token prefix such as
-  `github_pat_` or `ghp_`.
-- `GitHub profile not found`: verify the username and remove any extra spaces.
-- `GitHub request timed out`: retry after a moment; GitHub may be slow or
-  temporarily unavailable.
-- `No public repositories found`: the profile may not have public repositories
-  available for analysis.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT or placeholder.

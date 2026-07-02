@@ -171,7 +171,7 @@ export function InterviewResultsClient() {
 
   if (!evaluation || !session) {
     return (
-      <div className={`${forge.card} rounded-3xl p-8 text-center`}>
+      <div className={`${forge.card} p-8 text-center`}>
         <h1 className="text-2xl font-semibold">No interview report yet</h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
           Complete an interview simulator session to generate score breakdowns, missed concepts, and a next practice plan.
@@ -213,7 +213,7 @@ export function InterviewResultsClient() {
   return (
     <div className="space-y-6">
       <section className={forge.cardStrong}>
-        <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
+        <div className="border-b border-white/10 bg-[#101827]/60 px-5 py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase text-cyan-100">
@@ -320,7 +320,7 @@ export function InterviewResultsClient() {
               key={answerEvaluation.questionId}
               className={forge.card}
             >
-              <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
+              <div className="border-b border-white/10 bg-[#101827]/60 px-5 py-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-medium uppercase text-cyan-100">

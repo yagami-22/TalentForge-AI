@@ -30,10 +30,10 @@ export function DashboardSkeleton({
 
       <section className={forge.section}>
         <div className={forge.hero}>
-          <div className="h-5 w-40 animate-pulse rounded-full bg-cyan-200/15" />
+          <div className="h-5 w-40 animate-pulse rounded-full bg-cyan-200/12" />
           <div className={`mt-5 h-10 max-w-3xl ${forge.skeleton}`} />
           <div className={`mt-4 h-5 max-w-2xl ${forge.skeleton}`} />
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: metricCount }).map((_, index) => (
               <div key={index} className={forge.metric}>
                 <div className={`h-4 w-20 ${forge.skeleton}`} />
@@ -43,10 +43,10 @@ export function DashboardSkeleton({
           </div>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-2">
+        <div className="grid gap-6 xl:grid-cols-2">
           {Array.from({ length: chartCount }).map((_, index) => (
             <Card key={index} className={`${forge.card} overflow-hidden`}>
-              <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+              <CardHeader className="border-b border-white/[0.06] bg-[#151E2F]/58">
                 <div className={`h-5 w-44 ${forge.skeleton}`} />
               </CardHeader>
               <CardContent className="h-72 pt-5">
@@ -56,10 +56,10 @@ export function DashboardSkeleton({
           ))}
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           {Array.from({ length: listCount }).map((_, index) => (
             <Card key={index} className={`${forge.card} overflow-hidden`}>
-              <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+              <CardHeader className="border-b border-white/[0.06] bg-[#151E2F]/58">
                 <div className={`h-5 w-40 ${forge.skeleton}`} />
               </CardHeader>
               <CardContent className="space-y-3">
@@ -89,7 +89,7 @@ export function DashboardEmptyState({
   return (
     <Card className={`${forge.cardStrong} h-fit`}>
       <CardContent className="px-6 py-12 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.16)]">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#00E5FF]/10 text-cyan-100 ring-1 ring-[#00E5FF]/14">
           <Inbox className="h-7 w-7" aria-hidden="true" />
         </span>
         <h2 className="mt-4 text-xl font-semibold">{title}</h2>
@@ -108,7 +108,7 @@ export function DashboardEmptyState({
 
 export function DashboardErrorFallback({
   title = "This dashboard view could not load.",
-  description = "A temporary production error interrupted this route.",
+  description = "Something interrupted this view. Try again, or return to the dashboard.",
   onRetry,
 }: {
   title?: string;
@@ -120,7 +120,7 @@ export function DashboardErrorFallback({
       <section className="mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center">
         <Card className={`${forge.cardStrong} w-full`}>
           <CardContent className="p-8 text-center">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-amber-300/20 bg-amber-300/10 text-amber-100 shadow-[0_0_28px_rgba(251,191,36,0.12)]">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-300/10 text-amber-100 ring-1 ring-amber-300/14">
               <AlertTriangle className="h-7 w-7" aria-hidden="true" />
             </span>
             <h1 className="mt-5 text-2xl font-semibold">{title}</h1>

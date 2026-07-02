@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   Activity,
   BarChart3,
@@ -1421,9 +1422,14 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
             <GitBranch className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-100" />
             <input
               id="github-username"
+              type="text"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               placeholder="GitHub username"
+              required
+              autoCapitalize="none"
+              autoComplete="username"
+              spellCheck={false}
               className={`h-12 w-full pl-11 ${forge.input}`}
             />
           </div>
@@ -1434,9 +1440,13 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
             <LinkIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-purple-100" />
             <input
               id="portfolio-url"
+              type="url"
               value={portfolioUrl}
               onChange={(event) => setPortfolioUrl(event.target.value)}
               placeholder="Portfolio URL (optional)"
+              autoCapitalize="none"
+              autoComplete="url"
+              spellCheck={false}
               className={`h-12 w-full pl-11 ${forge.input}`}
             />
           </div>
@@ -1450,6 +1460,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
         <AnalyzerEmptyState
           title="Scanning repository evidence"
           description="Fetching README content, package.json, folder structure, language data, deployment links, and recent public activity from GitHub's public API."
+          statusRole="status"
         />
       ) : null}
 
@@ -1458,6 +1469,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
           title={fallbackError.title}
           description={fallbackError.description}
           details={fallbackError.details}
+          statusRole="alert"
           action={
             <div className="flex flex-wrap justify-center gap-3">
               <Button
@@ -1571,10 +1583,10 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
               description={resumeContext.title ? `Compared against ${resumeContext.title}.` : "No uploaded resume skills found yet."}
               action={
                 <Button asChild variant="outline" className={forge.secondaryButton}>
-                  <a href="/dashboard/resume">
+                  <Link href="/dashboard/resume">
                     Update Resume
                     <Upload className="h-4 w-4" />
-                  </a>
+                  </Link>
                 </Button>
               }
             >

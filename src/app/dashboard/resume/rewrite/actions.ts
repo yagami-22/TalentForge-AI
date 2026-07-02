@@ -112,11 +112,7 @@ export async function rewriteResumeForJD(
       status: "success",
       rewrite,
     };
-  } catch (error) {
-    console.error("Resume rewrite generation failed", {
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
-
+  } catch {
     return {
       message: "We could not generate the resume rewrite. Please try again.",
       status: "error",

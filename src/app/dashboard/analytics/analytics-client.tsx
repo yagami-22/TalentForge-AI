@@ -333,23 +333,42 @@ function buildInsights({
 function ChartShell({
   title,
   description,
+  summary,
   children,
 }: {
   title: string;
   description: string;
+  summary?: string;
   children: React.ReactNode;
 }) {
   return (
     <Card className={`${forge.card} overflow-hidden`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60 pb-3">
         <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription className="text-xs text-zinc-500">
           {description}
         </CardDescription>
       </CardHeader>
-      <CardContent className="h-72 pt-5">{children}</CardContent>
+      <CardContent className="h-72 pt-5">
+        {summary ? <p className="sr-only">{summary}</p> : null}
+        {children}
+      </CardContent>
     </Card>
   );
+}
+
+function chartSummary(data: ChartPoint[], metricLabel: string) {
+  if (!data.length) {
+    return `${metricLabel} chart has no data yet.`;
+  }
+
+  const first = data[0];
+  const last = data[data.length - 1];
+  const best = data.reduce((currentBest, point) =>
+    point.score > currentBest.score ? point : currentBest
+  );
+
+  return `${metricLabel} chart with ${data.length} points. Starts at ${first.score}/100 for ${first.label}, ends at ${last.score}/100 for ${last.label}, and peaks at ${best.score}/100 for ${best.label}.`;
 }
 
 function AnalyticsTooltip({
@@ -364,7 +383,7 @@ function AnalyticsTooltip({
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-[#070B1F] px-3 py-2 text-xs text-zinc-200 shadow-xl">
+    <div className="rounded-xl border border-white/10 bg-[#101827] px-3 py-2 text-xs text-zinc-200 shadow-xl">
       <p className="font-semibold text-white">{label}</p>
       <p className="mt-1 text-cyan-100">{payload[0]?.value ?? 0}/100</p>
     </div>
@@ -486,6 +505,7 @@ export function CareerReadinessChart({ data }: { data: ChartPoint[] }) {
     <ChartShell
       title="Career Readiness Trend"
       description="Historical readiness scores from Career Coach snapshots."
+      summary={chartSummary(data, "Career readiness trend")}
     >
       <AreaTrend data={data} />
     </ChartShell>
@@ -494,7 +514,11 @@ export function CareerReadinessChart({ data }: { data: ChartPoint[] }) {
 
 export function ATSTrendChart({ data }: { data: ChartPoint[] }) {
   return (
-    <ChartShell title="ATS Trend" description="ATS score movement over resume versions.">
+    <ChartShell
+      title="ATS Trend"
+      description="ATS score movement over resume versions."
+      summary={chartSummary(data, "ATS trend")}
+    >
       <LineTrend data={data} />
     </ChartShell>
   );
@@ -502,7 +526,11 @@ export function ATSTrendChart({ data }: { data: ChartPoint[] }) {
 
 export function JDMatchChart({ data }: { data: ChartPoint[] }) {
   return (
-    <ChartShell title="JD Match Trend" description="Job match improvement signals.">
+    <ChartShell
+      title="JD Match Trend"
+      description="Job match improvement signals."
+      summary={chartSummary(data, "JD match trend")}
+    >
       <LineTrend data={data} />
     </ChartShell>
   );
@@ -513,6 +541,7 @@ export function InterviewTrendChart({ data }: { data: ChartPoint[] }) {
     <ChartShell
       title="Interview Performance Trend"
       description="OA and mock interview growth from saved attempts."
+      summary={chartSummary(data, "Interview performance trend")}
     >
       <LineTrend data={data} />
     </ChartShell>
@@ -528,7 +557,7 @@ export function SkillGapCard({
 }) {
   return (
     <Card className={`${forge.card} overflow-hidden`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60">
         <CardTitle className="text-lg">Skills Intelligence</CardTitle>
         <CardDescription className="text-zinc-400">
           Strongest detected skills and recurring gaps.
@@ -640,11 +669,15 @@ function ResumeEvolution({
     added: version.addedKeywords.length,
     removed: version.removedKeywords.length,
   }));
+  const summary = versionData.length
+    ? `Resume evolution chart with ${versionData.length} versions. Latest version ${versionData[versionData.length - 1].name} added ${versionData[versionData.length - 1].added} keywords and removed ${versionData[versionData.length - 1].removed} keywords.`
+    : "Resume evolution chart has no version data yet.";
 
   return (
     <ChartShell
       title="Resume Evolution"
       description="Keyword movement across saved resume versions."
+      summary={summary}
     >
       {versionData.length ? (
         <ResponsiveContainer width="100%" height="100%">
@@ -654,7 +687,7 @@ function ResumeEvolution({
             <YAxis stroke="rgba(255,255,255,0.38)" tickLine={false} axisLine={false} />
             <Tooltip
               contentStyle={{
-                background: "#070B1F",
+                background: "#101827",
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "12px",
                 color: "#fff",
@@ -678,7 +711,7 @@ function WeeklyProgress({
 }) {
   return (
     <Card className={`${forge.card} overflow-hidden`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60">
         <CardTitle className="text-lg">Weekly Progress</CardTitle>
         <CardDescription className="text-zinc-400">
           Activity summary from the last 7 days.
@@ -887,7 +920,7 @@ export function AnalyticsDashboardClient({
       </div>
 
       <Card className={forge.card}>
-        <CardHeader className="border-b border-white/10 bg-[#070B1F]/60">
+        <CardHeader className="border-b border-white/10 bg-[#101827]/60">
           <CardTitle className="text-lg">Connected Data Sources</CardTitle>
           <CardDescription className="text-zinc-400">
             Resume Intelligence, ATS Optimizer, JD Match, OA Assessment, and Career Coach.

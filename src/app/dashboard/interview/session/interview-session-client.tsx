@@ -496,7 +496,7 @@ function EmptyState({
   description: string;
 }) {
   return (
-    <div className={`${forge.card} rounded-3xl p-8 text-center`}>
+    <div className={`${forge.card} p-8 text-center`}>
       <h1 className="text-2xl font-semibold">{title}</h1>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
         {description}

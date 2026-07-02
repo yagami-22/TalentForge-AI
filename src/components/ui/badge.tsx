@@ -5,18 +5,18 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
+  "group/badge inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1.5 overflow-hidden rounded-full border border-transparent px-2.5 py-0.5 text-xs font-medium whitespace-nowrap transition-all duration-200 focus-visible:border-[#00E5FF]/55 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/20 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3.5!",
   {
     variants: {
       variant: {
         default:
-          "border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.14)] [a]:hover:bg-[#00E5FF]/15",
+          "border-[#00E5FF]/14 bg-[#00E5FF]/8 text-cyan-100 shadow-none [a]:hover:bg-[#00E5FF]/12",
         secondary:
-          "border-[#8B5CF6]/25 bg-[#8B5CF6]/12 text-purple-100 [a]:hover:bg-[#8B5CF6]/18",
+          "border-[#8B5CF6]/14 bg-[#8B5CF6]/9 text-purple-100 [a]:hover:bg-[#8B5CF6]/14",
         destructive:
           "bg-destructive/10 text-destructive focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20",
         outline:
-          "border-white/15 bg-white/[0.04] text-white [a]:hover:bg-[#00E5FF]/10 [a]:hover:text-cyan-100",
+          "border-white/[0.08] bg-[#101827]/68 text-white [a]:hover:bg-[#00E5FF]/8 [a]:hover:text-cyan-100",
         ghost:
           "text-slate-300 hover:bg-[#00E5FF]/10 hover:text-cyan-100",
         link: "text-primary underline-offset-4 hover:underline",

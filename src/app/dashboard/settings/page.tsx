@@ -60,9 +60,9 @@ export default async function DashboardSettingsPage() {
         </Button>
       </div>
 
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(0,229,255,0.12),rgba(106,92,255,0.09)_48%,rgba(139,92,246,0.12))] p-6 shadow-[0_0_38px_rgba(0,229,255,0.11),0_0_54px_rgba(106,92,255,0.1)] backdrop-blur-2xl sm:p-7">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/14 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
+      <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.085),rgba(106,92,255,0.065)_48%,rgba(139,92,246,0.085))] p-6 shadow-[0_0_20px_rgba(0,229,255,0.045),0_0_30px_rgba(106,92,255,0.04)] backdrop-blur-2xl sm:p-7">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
         <div className="relative max-w-3xl">
           <p className={forge.badge}>Settings</p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -81,10 +81,10 @@ export default async function DashboardSettingsPage() {
           return (
             <article
               key={section.title}
-              className="rounded-[1.5rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_26px_rgba(0,229,255,0.06)] backdrop-blur-2xl"
+              className="rounded-[1.5rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_16px_rgba(0,229,255,0.035)] backdrop-blur-2xl"
             >
               <div className="flex items-start gap-4">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-cyan-300/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_22px_rgba(0,229,255,0.14)]">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100 shadow-[0_0_12px_rgba(0,229,255,0.08)]">
                   <Icon className="h-5 w-5" />
                 </span>
                 <div>
@@ -98,7 +98,7 @@ export default async function DashboardSettingsPage() {
                 {section.items.map((item) => (
                   <span
                     key={item}
-                    className="rounded-full border border-white/[0.08] bg-[#070B1F]/70 px-3 py-1.5 text-xs text-zinc-300"
+                    className="rounded-full border border-white/[0.08] bg-[#101827]/70 px-3 py-1.5 text-xs text-zinc-300"
                   >
                     {item}
                   </span>
@@ -109,7 +109,7 @@ export default async function DashboardSettingsPage() {
         })}
       </section>
 
-      <section className="rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/58 p-5">
+      <section className="rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-purple-300/20 bg-purple-300/10 text-purple-100">

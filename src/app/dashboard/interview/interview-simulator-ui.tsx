@@ -46,7 +46,7 @@ export function InterviewModeCard({
       className={`group rounded-[1.45rem] border p-4 text-left transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/30 ${
         selected
           ? "border-cyan-300/35 bg-[#00E5FF]/12 shadow-[0_0_28px_rgba(0,229,255,0.14)]"
-          : "border-white/[0.08] bg-[#070B1F]/62 hover:-translate-y-0.5 hover:border-cyan-300/22 hover:bg-[#00E5FF]/8"
+          : "border-white/[0.08] bg-[#101827]/62 hover:-translate-y-0.5 hover:border-cyan-300/22 hover:bg-[#00E5FF]/8"
       }`}
     >
       <span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100">
@@ -133,7 +133,7 @@ export function DifficultySelector({
             className={`rounded-2xl border px-3 py-2 text-sm transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/30 ${
               value === option
                 ? "border-purple-300/30 bg-purple-300/12 text-purple-100"
-                : "border-white/10 bg-[#070B1F]/58 text-zinc-400 hover:border-cyan-300/20 hover:text-zinc-100"
+                : "border-white/10 bg-[#101827]/58 text-zinc-400 hover:border-cyan-300/20 hover:text-zinc-100"
             }`}
           >
             {option}
@@ -157,7 +157,7 @@ export function InterviewSessionCard({
 }) {
   return (
     <section className={forge.cardStrong}>
-      <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
+      <div className="border-b border-white/10 bg-[#101827]/60 px-5 py-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -191,7 +191,7 @@ export function InterviewTimer({
   onReset: () => void;
 }) {
   return (
-    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/62 p-4">
+    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#101827]/62 p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -227,7 +227,7 @@ export function InterviewProgress({
   const progress = total ? Math.round((current / total) * 100) : 0;
 
   return (
-    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/62 p-4">
+    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#101827]/62 p-4">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -295,7 +295,7 @@ export function FeedbackCard({
     <div className={forge.metric}>
       <p className={`text-sm font-semibold ${titleTone}`}>{title}</p>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-400">
-        {(items.length ? items : ["No items available yet."]).map((item) => (
+        {(items.length ? items : ["No feedback has been generated yet."]).map((item) => (
           <li key={item} className="flex gap-2">
             <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-cyan-100" />
             <span>{item}</span>

@@ -182,9 +182,7 @@ export async function evaluateMockInterview(
       status: "success",
       evaluation: evaluateInterviewSession(session, answers),
     };
-  } catch (error) {
-    console.error("Mock interview evaluation failed", error);
-
+  } catch {
     return {
       message: "Could not evaluate this interview session.",
       status: "error",

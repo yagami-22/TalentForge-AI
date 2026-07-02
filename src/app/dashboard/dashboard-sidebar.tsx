@@ -86,9 +86,9 @@ const sidebarGroups: Array<{
 export function Sidebar({ profile }: { profile: UserProfile }) {
   return (
     <aside className="sticky top-5 h-[calc(100vh-2.5rem)]">
-      <div className="flex h-full min-h-0 flex-col rounded-[1.75rem] border border-white/[0.08] bg-white/[0.035] p-4 shadow-[0_0_32px_rgba(0,229,255,0.08),0_0_42px_rgba(106,92,255,0.08)] backdrop-blur-2xl">
+      <div className="flex h-full min-h-0 flex-col rounded-[20px] border border-white/[0.055] bg-[#101827]/62 p-4 shadow-[0_16px_48px_rgba(0,0,0,0.16)] backdrop-blur-xl">
         <Logo />
-        <div className="mt-5 min-h-0 flex-1 space-y-5 overflow-y-auto pr-1 pb-3 overscroll-contain [scrollbar-width:thin] [scrollbar-color:rgba(0,229,255,0.28)_transparent]">
+        <div className="mt-6 min-h-0 flex-1 space-y-7 overflow-y-auto pr-1 pb-3 overscroll-contain [scrollbar-width:thin] [scrollbar-color:rgba(0,229,255,0.24)_transparent]">
           {sidebarGroups.map((group) => (
             <SidebarGroup
               key={group.label}
@@ -106,14 +106,14 @@ export function Sidebar({ profile }: { profile: UserProfile }) {
 
 export function MobileSidebar({ profile }: { profile: UserProfile }) {
   return (
-    <details className="group rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3 shadow-[0_0_32px_rgba(0,229,255,0.08)] backdrop-blur-2xl">
+    <details className="group rounded-[20px] border border-white/[0.055] bg-[#101827]/72 p-3 shadow-[0_16px_48px_rgba(0,0,0,0.16)] backdrop-blur-xl">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
         <Logo compact />
-        <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-[#070b1f]/70 text-cyan-100">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#151E2F]/72 text-cyan-100 ring-1 ring-white/[0.06] transition duration-200 group-open:rotate-90">
           <Menu className="h-5 w-5" />
         </span>
       </summary>
-      <div className="mt-4 space-y-4 border-t border-white/[0.08] pt-4">
+      <div className="mt-4 space-y-6 border-t border-white/[0.06] pt-4">
         {sidebarGroups.map((group) => (
           <SidebarGroup
             key={group.label}
@@ -139,10 +139,10 @@ function SidebarGroup({
 }) {
   return (
     <div>
-      <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-slate-600">
+      <p className="px-3 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-slate-500/90">
         {label}
       </p>
-      <nav className="mt-2 grid gap-1" aria-label={ariaLabel}>
+      <nav className="mt-3 grid gap-1.5" aria-label={ariaLabel}>
         {items.map((item) => (
           <SidebarNavItem key={item.label} item={item} />
         ))}
@@ -153,8 +153,8 @@ function SidebarGroup({
 
 function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <Link href="/" className="flex items-center gap-3 rounded-2xl px-2 py-2">
-      <span className="relative grid h-11 w-11 place-items-center rounded-2xl border border-cyan-300/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_22px_rgba(0,229,255,0.18)]">
+    <Link href="/" className="flex items-center gap-3 rounded-2xl px-2 py-2 outline-none transition focus-visible:ring-2 focus-visible:ring-[#00E5FF]/20">
+      <span className="relative grid h-10 w-10 place-items-center rounded-2xl bg-[#00E5FF]/8 text-cyan-100 ring-1 ring-cyan-300/14">
         <Sparkles className="h-5 w-5" />
       </span>
       {!compact ? (
@@ -186,14 +186,17 @@ function SidebarNavItem({
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
-      className={`group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-slate-400 outline-none transition duration-300 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/30 ${
+      className={`group relative flex items-center gap-3 rounded-2xl px-3 py-3 text-sm text-slate-400 outline-none transition duration-200 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/22 ${
         active
-          ? "border border-cyan-300/20 bg-[#00E5FF]/12 text-cyan-50 shadow-[0_0_24px_rgba(0,229,255,0.12)]"
-          : "hover:bg-white/[0.055] hover:text-slate-100"
+          ? "border border-white/[0.08] bg-white/[0.075] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+          : "hover:-translate-y-0.5 hover:bg-white/[0.035] hover:text-slate-100"
       }`}
     >
+      {active ? (
+        <span className="absolute left-1 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-[#00E5FF]" aria-hidden="true" />
+      ) : null}
       <Icon
-        className={`h-4 w-4 transition duration-300 ${
+        className={`h-4 w-4 transition duration-200 ${
           active ? "text-[#00E5FF]" : "text-slate-600 group-hover:text-cyan-100"
         }`}
       />
@@ -204,9 +207,9 @@ function SidebarNavItem({
 
 function UserProfileCard({ profile }: { profile: UserProfile }) {
   return (
-    <div className="mt-4 shrink-0 rounded-[1.35rem] border border-white/[0.08] bg-[#070b1f]/66 p-3">
+    <div className="mt-5 shrink-0 rounded-2xl border border-white/[0.055] bg-[#151E2F]/58 p-3">
       <div className="flex items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white shadow-[0_0_22px_rgba(0,229,255,0.18)]">
+        <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white shadow-[0_0_12px_rgba(0,229,255,0.1)]">
           {profile.initial}
         </span>
         <div className="min-w-0">

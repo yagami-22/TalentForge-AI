@@ -46,6 +46,17 @@ import {
 } from "@/lib/recruiter-mode";
 import { forge } from "@/lib/talentforge-design";
 
+const RECRUITER_READABLE_EXTENSIONS = [".txt", ".md", ".csv", ".pdf"];
+const RECRUITER_MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+function removeStoredRecruiterReport(key: string) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    return;
+  }
+}
+
 function readReport(key = RECRUITER_REPORT_STORAGE_KEY) {
   if (typeof window === "undefined") return null;
 
@@ -53,7 +64,7 @@ function readReport(key = RECRUITER_REPORT_STORAGE_KEY) {
     const raw = window.localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as RecruiterReport) : null;
   } catch {
-    window.localStorage.removeItem(key);
+    removeStoredRecruiterReport(key);
     return null;
   }
 }
@@ -66,18 +77,24 @@ function readHistory() {
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
     return Array.isArray(parsed) ? (parsed as RecruiterReport[]) : [];
   } catch {
-    window.localStorage.removeItem(RECRUITER_HISTORY_STORAGE_KEY);
+    removeStoredRecruiterReport(RECRUITER_HISTORY_STORAGE_KEY);
     return [];
   }
 }
 
 function storeReport(report: RecruiterReport) {
   const history = readHistory();
-  window.localStorage.setItem(RECRUITER_REPORT_STORAGE_KEY, JSON.stringify(report));
-  window.localStorage.setItem(
-    RECRUITER_HISTORY_STORAGE_KEY,
-    JSON.stringify([report, ...history.filter((item) => item.id !== report.id)].slice(0, 12))
-  );
+
+  try {
+    window.localStorage.setItem(RECRUITER_REPORT_STORAGE_KEY, JSON.stringify(report));
+    window.localStorage.setItem(
+      RECRUITER_HISTORY_STORAGE_KEY,
+      JSON.stringify([report, ...history.filter((item) => item.id !== report.id)].slice(0, 12))
+    );
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function formatDate(value: string) {
@@ -170,7 +187,7 @@ export function RecruiterDashboardClient() {
               {reports.map((report) => (
                 <article
                   key={report.id}
-                  className="group rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/62 p-4 shadow-[0_0_28px_rgba(0,229,255,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.055]"
+                  className="group rounded-[1.5rem] border border-white/[0.07] bg-[#101827]/60 p-4 shadow-[0_0_14px_rgba(0,229,255,0.032)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/16 hover:bg-white/[0.048]"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -213,7 +230,7 @@ export function RecruiterDashboardClient() {
               const percent = latest?.candidates.length ? Math.round((count / latest.candidates.length) * 100) : 0;
 
               return (
-                <div key={stage.label} className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/58 p-3">
+                <div key={stage.label} className="rounded-2xl border border-white/[0.08] bg-[#101827]/58 p-3">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-zinc-300">{stage.label}</p>
                     <p className="text-sm font-semibold text-white">{count}</p>
@@ -312,9 +329,9 @@ const pipelineStages: Array<{
 
 function RecruiterWorkspaceHero() {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(0,229,255,0.13),rgba(106,92,255,0.1)_48%,rgba(139,92,246,0.13))] p-6 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.1)] backdrop-blur-2xl sm:p-8 lg:p-10">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#00E5FF]/16 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 left-10 h-80 w-80 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.09),rgba(106,92,255,0.07)_48%,rgba(139,92,246,0.09))] p-6 shadow-[0_0_24px_rgba(0,229,255,0.055),0_0_34px_rgba(106,92,255,0.045)] backdrop-blur-2xl sm:p-8 lg:p-10">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#00E5FF]/9 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 left-10 h-80 w-80 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
 
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
         <div>
@@ -342,10 +359,10 @@ function RecruiterWorkspaceHero() {
         </div>
 
         <div className="relative hidden min-h-80 lg:block" aria-hidden="true">
-          <div className="absolute inset-0 rounded-[2rem] border border-white/[0.08] bg-[#050816]/45 shadow-[inset_0_0_40px_rgba(0,229,255,0.06)]" />
+          <div className="absolute inset-0 rounded-[2rem] border border-white/[0.07] bg-[#070B16]/45 shadow-[inset_0_0_24px_rgba(0,229,255,0.035)]" />
           <div className="absolute left-8 top-8 h-56 w-56 rounded-full border border-cyan-300/15 bg-[#00E5FF]/8 blur-[1px] motion-safe:animate-pulse" />
           <div className="absolute right-8 top-10 h-40 w-40 rounded-full border border-violet-300/15 bg-[#8B5CF6]/10 motion-safe:animate-pulse" />
-          <div className="absolute left-10 top-10 w-52 rounded-[1.5rem] border border-white/[0.1] bg-white/[0.06] p-4 shadow-[0_0_32px_rgba(0,229,255,0.12)] backdrop-blur-xl">
+          <div className="absolute left-10 top-10 w-52 rounded-[1.5rem] border border-white/[0.08] bg-white/[0.05] p-4 shadow-[0_0_18px_rgba(0,229,255,0.06)] backdrop-blur-xl">
             <div className="flex items-center gap-3">
               <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#00E5FF]/12 text-cyan-100">
                 <UserCheck className="h-5 w-5" />
@@ -367,7 +384,7 @@ function RecruiterWorkspaceHero() {
               </div>
             </div>
           </div>
-          <div className="absolute bottom-8 right-10 w-56 rounded-[1.5rem] border border-[#8B5CF6]/20 bg-[#070B1F]/78 p-4 shadow-[0_0_34px_rgba(139,92,246,0.16)] backdrop-blur-xl">
+          <div className="absolute bottom-8 right-10 w-56 rounded-[1.5rem] border border-[#8B5CF6]/16 bg-[#101827]/76 p-4 shadow-[0_0_18px_rgba(139,92,246,0.08)] backdrop-blur-xl">
             <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-cyan-100">
               <Sparkles className="h-4 w-4" />
               AI Shortlist
@@ -387,7 +404,7 @@ function RecruiterWorkspaceHero() {
               </div>
             </div>
           </div>
-          <div className="absolute right-24 top-24 grid h-20 w-20 place-items-center rounded-full border border-cyan-300/20 bg-[#00E5FF]/10 shadow-[0_0_30px_rgba(0,229,255,0.18)] motion-safe:animate-pulse">
+          <div className="absolute right-24 top-24 grid h-20 w-20 place-items-center rounded-full border border-cyan-300/16 bg-[#00E5FF]/8 shadow-[0_0_18px_rgba(0,229,255,0.09)] motion-safe:animate-pulse">
             <BrainCircuit className="h-8 w-8 text-cyan-100" />
           </div>
         </div>
@@ -410,10 +427,10 @@ function RecruiterFeatureCard({
   return (
     <Link
       href={href}
-      className="group rounded-[1.5rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_28px_rgba(0,229,255,0.06)] transition duration-300 hover:-translate-y-1 hover:border-[#00E5FF]/25 hover:bg-white/[0.06] hover:shadow-[0_0_45px_rgba(0,229,255,0.14)]"
+      className="group rounded-[1.5rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_14px_rgba(0,229,255,0.032)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/18 hover:bg-white/[0.05] hover:shadow-[0_0_22px_rgba(0,229,255,0.08)]"
     >
       <div className="flex items-start justify-between gap-4">
-        <div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#00E5FF]/16 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_22px_rgba(0,229,255,0.1)]">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#00E5FF]/14 bg-[#00E5FF]/8 text-cyan-100 shadow-[0_0_12px_rgba(0,229,255,0.06)]">
           <Icon className="h-5 w-5" />
         </div>
         <ArrowRight className="h-4 w-4 text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-100" />
@@ -443,19 +460,49 @@ export function RecruiterUploadClient() {
   async function handleFiles(files: FileList | null) {
     if (!files?.length) return;
     setError("");
-    const nextCandidates = await Promise.all(
-      Array.from(files).map(async (file) => {
-        const text = await file.text();
-        return {
-          id: `candidate_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          name: file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "),
-          fileName: file.name,
-          resumeText: text,
-        };
-      })
-    );
+    const rejectedFiles: string[] = [];
+    const nextCandidates = (
+      await Promise.all(
+        Array.from(files).map(async (file) => {
+          const fileName = file.name.toLowerCase();
+          const isReadableType =
+            file.type.startsWith("text/") ||
+            RECRUITER_READABLE_EXTENSIONS.some((extension) => fileName.endsWith(extension));
 
-    setCandidateFiles((previous) => [...previous, ...nextCandidates]);
+          if (!isReadableType) {
+            rejectedFiles.push(`${file.name}: unsupported file type`);
+            return null;
+          }
+
+          if (file.size > RECRUITER_MAX_FILE_SIZE) {
+            rejectedFiles.push(`${file.name}: file is over 10 MB`);
+            return null;
+          }
+
+          const text = await file.text();
+
+          if (text.replace(/\s+/g, "").length < 120) {
+            rejectedFiles.push(`${file.name}: no readable resume text found`);
+            return null;
+          }
+
+          return {
+            id: `candidate_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            name: file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "),
+            fileName: file.name,
+            resumeText: text,
+          };
+        })
+      )
+    ).filter((candidate): candidate is RecruiterCandidateInput => Boolean(candidate));
+
+    if (nextCandidates.length) {
+      setCandidateFiles((previous) => [...previous, ...nextCandidates]);
+    }
+
+    if (rejectedFiles.length) {
+      setError(`Some files were skipped. ${rejectedFiles.join(" ")}`);
+    }
   }
 
   function analyzeCandidates() {
@@ -480,7 +527,12 @@ export function RecruiterUploadClient() {
       jobDescription,
       candidates: validCandidates,
     });
-    storeReport(report);
+    if (!storeReport(report)) {
+      setIsAnalyzing(false);
+      setError("Recruiter report could not be saved in this browser. Check storage permissions and try again.");
+      return;
+    }
+
     router.push("/dashboard/recruiter/report");
   }
 
@@ -504,6 +556,7 @@ export function RecruiterUploadClient() {
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
             rows={14}
+            aria-label="Job description"
             className={`min-h-80 p-4 ${forge.input}`}
             placeholder="Paste the role description, responsibilities, requirements, must-have skills, and preferred qualifications..."
           />
@@ -514,7 +567,8 @@ export function RecruiterUploadClient() {
             <input
               type="file"
               multiple
-              accept=".txt,.md,.csv,.pdf,.doc,.docx"
+              accept=".txt,.md,.csv,.pdf,text/plain,text/markdown,text/csv,application/pdf"
+              aria-describedby="candidate-resume-upload-help"
               className="sr-only"
               onChange={(event) => void handleFiles(event.target.files)}
             />
@@ -522,13 +576,13 @@ export function RecruiterUploadClient() {
             <span className="mt-3 block text-sm font-semibold text-white">
               Upload resumes
             </span>
-            <span className="mt-1 block text-xs leading-5 text-zinc-500">
-              Text-based files work best. Scanned PDFs may not contain readable text.
+            <span id="candidate-resume-upload-help" className="mt-1 block text-xs leading-5 text-zinc-500">
+              Text, Markdown, CSV, and text-based PDFs up to 10 MB.
             </span>
           </label>
           <div className="mt-4 space-y-2">
             {candidateFiles.map((candidate) => (
-              <div key={candidate.id} className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/58 p-3">
+              <div key={candidate.id} className="rounded-2xl border border-white/[0.08] bg-[#101827]/58 p-3">
                 <p className="text-sm font-medium text-white">{candidate.name}</p>
                 <p className="mt-1 text-xs text-zinc-500">
                   {candidate.resumeText.length.toLocaleString()} characters extracted
@@ -536,7 +590,11 @@ export function RecruiterUploadClient() {
               </div>
             ))}
           </div>
-          {error ? <p className={`mt-4 ${forge.statusError}`}>{error}</p> : null}
+          {error ? (
+            <p role="alert" className={`mt-4 ${forge.statusError}`}>
+              {error}
+            </p>
+          ) : null}
           <Button
             type="button"
             onClick={analyzeCandidates}
@@ -613,7 +671,7 @@ export function RecruiterReportClient() {
                 className={`w-full rounded-[1.25rem] border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/30 ${
                   selectedCandidate.id === candidate.id
                     ? "border-cyan-300/28 bg-[#00E5FF]/10"
-                    : "border-white/[0.08] bg-[#070B1F]/54 hover:border-cyan-300/18"
+                    : "border-white/[0.08] bg-[#101827]/54 hover:border-cyan-300/18"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -756,7 +814,7 @@ function MetricCard({
   compact?: boolean;
 }) {
   return (
-    <div className="rounded-[1.45rem] border border-white/[0.08] bg-white/[0.04] p-4 shadow-[0_0_24px_rgba(0,229,255,0.06)]">
+    <div className="rounded-[1.45rem] border border-white/[0.07] bg-white/[0.035] p-4 shadow-[0_0_14px_rgba(0,229,255,0.032)]">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
         <Icon className="h-4 w-4 text-cyan-100" />
@@ -776,7 +834,7 @@ function EmptyRecruiterState({
   description?: string;
 }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/58 p-8 text-center">
+    <div className="rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58 p-8 text-center">
       <FileSearch className="mx-auto h-8 w-8 text-cyan-100" />
       <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-400">

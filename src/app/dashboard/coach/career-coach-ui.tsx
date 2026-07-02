@@ -87,9 +87,9 @@ export function CareerHero({
   goalControl: ReactNode;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(0,229,255,0.11),rgba(106,92,255,0.08)_48%,rgba(139,92,246,0.1))] p-5 shadow-[0_0_32px_rgba(0,229,255,0.09),0_0_42px_rgba(106,92,255,0.08)] backdrop-blur-2xl sm:p-7">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/12 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 left-1/2 h-64 w-64 rounded-full bg-[#8B5CF6]/12 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.08),rgba(106,92,255,0.06)_48%,rgba(139,92,246,0.075))] p-5 shadow-[0_0_20px_rgba(0,229,255,0.045),0_0_30px_rgba(106,92,255,0.04)] backdrop-blur-2xl sm:p-7">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 left-1/2 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
       <div className="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-center">
         <div className="max-w-4xl">
           <p className="inline-flex rounded-full border border-[#00E5FF]/18 bg-[#00E5FF]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -106,7 +106,7 @@ export function CareerHero({
             <HeroFact label="Timeline" value={timeline} />
             <HeroFact label="Recent Progress" value={recentProgress} />
           </div>
-          <div className="mt-5 rounded-[1.4rem] border border-white/[0.08] bg-[#070B1F]/58 p-4">
+          <div className="mt-5 rounded-[1.4rem] border border-white/[0.08] bg-[#101827]/58 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               AI Recommendation
             </p>
@@ -116,13 +116,13 @@ export function CareerHero({
             <Button
               type="button"
               onClick={onRefresh}
-              className="rounded-2xl bg-gradient-to-r from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] text-white shadow-[0_0_26px_rgba(0,229,255,0.2)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_34px_rgba(0,229,255,0.28)]"
+              className="rounded-2xl bg-gradient-to-r from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] text-white shadow-[0_0_18px_rgba(0,229,255,0.16)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_26px_rgba(0,229,255,0.22)]"
             >
               Refresh Operating Plan
             </Button>
             <a
               href="#weekly-roadmap"
-              className="inline-flex h-10 items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-4 text-sm font-medium text-white shadow-[0_0_20px_rgba(0,229,255,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-[#00E5FF]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/30"
+              className="inline-flex h-10 items-center gap-2 rounded-2xl border border-white/12 bg-white/[0.035] px-4 text-sm font-medium text-white shadow-[0_0_12px_rgba(0,229,255,0.035)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/20 hover:bg-[#00E5FF]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/20"
             >
               View Roadmap
               <ArrowRight className="h-4 w-4" />
@@ -131,7 +131,7 @@ export function CareerHero({
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-[1.7rem] border border-cyan-300/14 bg-[#070B1F]/64 p-5 shadow-[0_0_28px_rgba(0,229,255,0.1)]">
+          <div className="rounded-[1.7rem] border border-cyan-300/12 bg-[#101827]/64 p-5 shadow-[0_0_16px_rgba(0,229,255,0.045)]">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -170,7 +170,7 @@ export function ReadinessCard({ category }: { category: ReadinessCategory }) {
   const value = category.value ?? 0;
 
   return (
-    <article className="group rounded-[1.55rem] border border-white/[0.08] bg-white/[0.04] p-4 shadow-[0_0_26px_rgba(0,229,255,0.07)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20">
+    <article className="group rounded-[1.55rem] border border-white/[0.07] bg-white/[0.035] p-4 shadow-[0_0_14px_rgba(0,229,255,0.032)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/16">
       <div className="flex items-start justify-between gap-3">
         <span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100">
           <Icon className="h-4 w-4" />
@@ -198,7 +198,7 @@ export function RoadmapCard({
   onToggle: (id: string) => void;
 }) {
   return (
-    <article className="rounded-[1.65rem] border border-white/[0.08] bg-[#070B1F]/58 p-5 shadow-[0_0_28px_rgba(0,229,255,0.07)]">
+    <article className="rounded-[1.65rem] border border-white/[0.08] bg-[#101827]/58 p-5 shadow-[0_0_28px_rgba(0,229,255,0.07)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -278,11 +278,11 @@ export function TimelineCard({ event }: { event: CoachTimelineEvent }) {
       <span
         className={`absolute left-0 top-1 grid h-4 w-4 place-items-center rounded-full border ${
           event.active
-            ? "border-[#00E5FF]/35 bg-[#00E5FF]/18 shadow-[0_0_18px_rgba(0,229,255,0.22)]"
+            ? "border-[#00E5FF]/24 bg-[#00E5FF]/10 shadow-[0_0_12px_rgba(0,229,255,0.1)]"
             : "border-white/15 bg-white/[0.04]"
         }`}
       />
-      <div className="rounded-[1.2rem] border border-white/[0.08] bg-[#070B1F]/50 p-3">
+      <div className="rounded-[1.2rem] border border-white/[0.08] bg-[#101827]/50 p-3">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm font-semibold text-zinc-100">{event.title}</p>
           <span className="text-xs text-zinc-600">{event.time}</span>
@@ -312,12 +312,17 @@ export function ProgressChart({
     .join(" ");
 
   return (
-    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/54 p-4">
+    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#101827]/54 p-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-white">{title}</p>
         <TrendingUp className="h-4 w-4 text-cyan-100" />
       </div>
-      <svg className="mt-4 h-28 w-full" viewBox="0 0 196 100" aria-hidden="true">
+      <svg
+        className="mt-4 h-28 w-full"
+        viewBox="0 0 196 100"
+        role="img"
+        aria-label={`${title} progress chart values: ${normalizedPoints.join(", ")}.`}
+      >
         {[0, 1, 2].map((line) => (
           <line
             key={line}
@@ -343,7 +348,7 @@ export function ProgressChart({
 
 export function LearningCard({ topic }: { topic: LearningTopic }) {
   return (
-    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/54 p-4">
+    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#101827]/54 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-white">{topic.title}</p>
@@ -380,7 +385,7 @@ export function CoachSection({
   return (
     <section
       id={id}
-      className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_30px_rgba(0,229,255,0.07)] backdrop-blur-2xl sm:p-6"
+      className="rounded-[1.75rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_18px_rgba(0,229,255,0.04)] backdrop-blur-2xl sm:p-6"
     >
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -443,7 +448,7 @@ export function ReadinessRing({
       }}
       aria-label={`${clamped}% readiness`}
     >
-      <div className="grid h-full w-full place-items-center rounded-full bg-[#050816] text-center shadow-inner">
+      <div className="grid h-full w-full place-items-center rounded-full bg-[#070B16] text-center shadow-inner">
         <span className={size === "lg" ? "text-2xl font-semibold text-white" : "text-xs font-semibold text-white"}>
           {clamped}
         </span>

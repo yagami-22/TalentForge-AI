@@ -109,13 +109,8 @@ async function findDuplicateResumeForUser(userId: string, fileHash: string) {
       if (existingHash === fileHash) {
         return { id: resume.id };
       }
-    } catch (error) {
-      if (isDevelopment) {
-        console.warn("[resume-upload] Legacy hash backfill skipped", {
-          resumeId: resume.id,
-          error: getErrorMessage(error),
-        });
-      }
+    } catch {
+      continue;
     }
   }
 
@@ -171,14 +166,6 @@ export async function uploadResume(
 
   const existingResume = await findDuplicateResumeForUser(user.id, fileHash);
 
-  if (isDevelopment) {
-    console.log("[resume-upload] Duplicate check", {
-      fileHash,
-      userId: user.id,
-      duplicateFound: Boolean(existingResume),
-    });
-  }
-
   if (existingResume) {
     return {
       message: "This resume has already been uploaded.",
@@ -193,27 +180,12 @@ export async function uploadResume(
   } catch (error) {
     const errorMessage = getErrorMessage(error);
 
-    if (isDevelopment) {
-      console.error("[resume-upload] PDF extraction failed", {
-        fileSize: buffer.length,
-        error: errorMessage,
-      });
-    }
-
     return {
       message: isDevelopment
         ? `We could not read this PDF: ${errorMessage}`
         : "We could not read this PDF. It may be password-protected or corrupted. Please upload a text-based resume PDF.",
       status: "error",
     };
-  }
-
-  if (isDevelopment) {
-    console.log("[resume-upload] PDF extraction result", {
-      fileSize: buffer.length,
-      extractedTextLength: extractedText.length,
-      extractionSource,
-    });
   }
 
   if (!extractedText) {
@@ -226,16 +198,6 @@ export async function uploadResume(
 
   const validation = validateResumeText(extractedText);
 
-  if (isDevelopment) {
-    console.log("[resume-upload] Resume validation", {
-      extractionQuality: validation.extractionQuality,
-      confidence: validation.confidence,
-      signalsFound: validation.signalsFound,
-      warnings: validation.warnings,
-      fileType: validation.fileType,
-    });
-  }
-
   if (!validation.isValid) {
     return {
       message: validation.reason,
@@ -244,24 +206,6 @@ export async function uploadResume(
   }
 
   const atsAnalysis = analyzeResume(extractedText);
-
-  if (isDevelopment) {
-    console.log("[resume-upload] Resume Analyzer v3 result", {
-      overallScore: atsAnalysis.overallScore,
-      grade: atsAnalysis.grade,
-      hiringReadiness: atsAnalysis.hiringReadiness,
-      detectedProfileType: atsAnalysis.detectedProfileType,
-      detectedSeniority: atsAnalysis.detectedSeniority,
-      categoryScores: atsAnalysis.categoryScores.map((category) => ({
-        name: category.name,
-        score: category.score,
-        maxScore: category.maxScore,
-        evidenceFound: category.evidenceFound,
-        missingEvidence: category.missingEvidence,
-      })),
-      redFlags: atsAnalysis.redFlags,
-    });
-  }
 
   await mkdir(userUploadDir, { recursive: true });
   await writeFile(storedPath, buffer);
@@ -353,14 +297,6 @@ export async function deleteResume(
         error.code === "ENOENT";
 
       if (!isMissingFile) {
-        if (isDevelopment) {
-          console.error("[resume-delete] File deletion failed", {
-            resumeId: resume.id,
-            fileUrl: resume.fileUrl,
-            error: getErrorMessage(error),
-          });
-        }
-
         return {
           message: "We could not delete the uploaded PDF. Try again.",
           status: "error",

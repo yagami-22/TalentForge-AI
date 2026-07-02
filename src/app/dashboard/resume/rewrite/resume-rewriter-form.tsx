@@ -152,6 +152,7 @@ function SectionCard({
   tone?: "default" | "good" | "warn";
 }) {
   const [copied, setCopied] = useState(false);
+  const copyResetTimer = useRef<number | null>(null);
   const titleTone =
     tone === "good"
       ? "text-emerald-200"
@@ -159,11 +160,25 @@ function SectionCard({
         ? "text-amber-200"
         : "text-zinc-100";
 
+  useEffect(() => {
+    return () => {
+      if (copyResetTimer.current) {
+        window.clearTimeout(copyResetTimer.current);
+      }
+    };
+  }, []);
+
   async function copySection() {
     try {
       await navigator.clipboard.writeText(copyText);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
+      if (copyResetTimer.current) {
+        window.clearTimeout(copyResetTimer.current);
+      }
+      copyResetTimer.current = window.setTimeout(() => {
+        setCopied(false);
+        copyResetTimer.current = null;
+      }, 1600);
     } catch {
       setCopied(false);
     }
@@ -171,7 +186,7 @@ function SectionCard({
 
   return (
     <Card className={`overflow-hidden ${forge.card} ${forge.hoverCard}`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60 pb-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className={`text-base ${titleTone}`}>{title}</CardTitle>
           <Button
@@ -778,18 +793,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
 
       setExportMessage("PDF export started.");
       setExportStatus("success");
-    } catch (error) {
-      console.error("Resume rewrite PDF export failed", error);
-      console.error("Resume rewrite PDF export debug", {
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined,
-        hasSummary: Boolean(rewrite.professionalSummary.trim()),
-        bulletCount: rewrite.experienceBullets.length,
-        skillCount: rewrite.skillsSection.length,
-        atsKeywordCount: rewrite.atsKeywords.length,
-        hasWindow: typeof window !== "undefined",
-        hasDocument: typeof document !== "undefined",
-      });
+    } catch {
       setExportMessage("PDF export failed. Please try again.");
       setExportStatus("error");
     } finally {
@@ -816,7 +820,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
         </CardHeader>
         <CardContent>
           <form action={submitRewrite} className="space-y-4 pt-5">
-            <div className="rounded-3xl border border-[#00E5FF]/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.08),rgba(255,255,255,0.035)_48%,rgba(106,92,255,0.08))] p-4 shadow-[0_0_30px_rgba(0,229,255,0.08)]">
+            <div className="rounded-[1.5rem] border border-[#00E5FF]/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.07),rgba(255,255,255,0.035)_48%,rgba(106,92,255,0.07))] p-4 shadow-[0_0_20px_rgba(0,229,255,0.055)]">
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-[minmax(260px,1.15fr)_minmax(280px,1fr)_minmax(190px,auto)] lg:items-stretch">
                 <div className={forge.metric}>
                   <p className="text-xs font-medium uppercase text-cyan-100">
@@ -909,6 +913,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
             {state.message ? (
               <p
                 aria-live="polite"
+                role={state.status === "error" ? "alert" : "status"}
                 className={
                   state.status === "error"
                     ? forge.statusError
@@ -959,6 +964,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
           {exportMessage ? (
             <p
               aria-live="polite"
+              role={exportStatus === "error" ? "alert" : "status"}
               className={
                 exportStatus === "error"
                   ? forge.statusError

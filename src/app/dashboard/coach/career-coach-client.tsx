@@ -989,7 +989,7 @@ function GoalSelector({
   onChange: (next: CareerGoalPreference) => void;
 }) {
   return (
-    <div className="rounded-[1.55rem] border border-white/[0.08] bg-[#070B1F]/62 p-4">
+    <div className="rounded-[1.55rem] border border-white/[0.08] bg-[#101827]/62 p-4">
       <label className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
         Career Goal
         <select
@@ -1417,7 +1417,7 @@ function ProgressStatCard({
   detail: string;
 }) {
   return (
-    <div className="rounded-[1.45rem] border border-white/[0.08] bg-[#070B1F]/58 p-4 shadow-[0_0_24px_rgba(0,229,255,0.06)]">
+    <div className="rounded-[1.45rem] border border-white/[0.08] bg-[#101827]/58 p-4 shadow-[0_0_24px_rgba(0,229,255,0.06)]">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           {label}
@@ -1434,7 +1434,7 @@ function ProgressStatCard({
 
 function TargetCompanyCard({ company }: { company: TargetCompany }) {
   return (
-    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/58 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.055]">
+    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#101827]/58 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.055]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="flex items-center gap-2 text-base font-semibold text-white">
@@ -1458,6 +1458,9 @@ function TargetCompanyCard({ company }: { company: TargetCompany }) {
 function SkillRadar({ areas }: { areas: SkillRadarArea[] }) {
   const center = 110;
   const radius = 82;
+  const summary = areas
+    .map((area) => `${area.label} ${area.score}/100`)
+    .join(", ");
   const points = areas
     .map((area, index) => {
       const angle = (Math.PI * 2 * index) / areas.length - Math.PI / 2;
@@ -1468,7 +1471,12 @@ function SkillRadar({ areas }: { areas: SkillRadarArea[] }) {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-center">
-      <svg className="mx-auto h-60 w-60" viewBox="0 0 220 220" aria-hidden="true">
+      <svg
+        className="mx-auto h-60 w-60"
+        viewBox="0 0 220 220"
+        role="img"
+        aria-label={`Skill gap radar: ${summary}.`}
+      >
         {[0.25, 0.5, 0.75, 1].map((scale) => (
           <polygon
             key={scale}
@@ -1517,7 +1525,7 @@ function SkillRadar({ areas }: { areas: SkillRadarArea[] }) {
       </svg>
       <div className="grid gap-2 sm:grid-cols-2">
         {areas.map((area) => (
-          <div key={area.label} className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/54 p-3">
+          <div key={area.label} className="rounded-2xl border border-white/[0.08] bg-[#101827]/54 p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-semibold text-white">{area.label}</p>
               <p className="text-sm font-semibold text-cyan-100">{area.score}%</p>
@@ -1534,7 +1542,7 @@ function LearningResourceCard({ resource }: { resource: LearningResource }) {
   const Icon = resource.icon;
 
   return (
-    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/54 p-4 shadow-[0_0_24px_rgba(0,229,255,0.05)]">
+    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#101827]/54 p-4 shadow-[0_0_24px_rgba(0,229,255,0.05)]">
       <div className="flex items-start gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-purple-300/16 bg-purple-300/10 text-purple-100">
           <Icon className="h-4 w-4" />
@@ -1571,7 +1579,7 @@ function InsightMetric({
   detail: string;
 }) {
   return (
-    <div className="rounded-[1.45rem] border border-white/[0.08] bg-[#070B1F]/58 p-4">
+    <div className="rounded-[1.45rem] border border-white/[0.08] bg-[#101827]/58 p-4">
       <div className="flex items-center gap-3">
         <span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100">
           <Icon className="h-4 w-4" />

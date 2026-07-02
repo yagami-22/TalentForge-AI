@@ -85,7 +85,7 @@ function ListCard({
   title,
   items,
   tone = "default",
-  emptyText = "No items found.",
+  emptyText = "No ATS evidence available yet.",
 }: {
   title: string;
   items: string[];
@@ -101,7 +101,7 @@ function ListCard({
 
   return (
     <Card className={`overflow-hidden ${forge.card} ${forge.hoverCard}`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
+      <CardHeader className="border-b border-white/10 bg-[#101827]/60 pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className={`text-base ${titleTone}`}>{title}</CardTitle>
           <span className="rounded-full border border-[#00E5FF]/15 bg-[#00E5FF]/10 px-2 py-0.5 text-xs text-cyan-100">
@@ -240,7 +240,7 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
         </CardHeader>
         <CardContent>
           <form action={submitATSOptimization} className="space-y-4 pt-5">
-            <div className="rounded-3xl border border-[#00E5FF]/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.08),rgba(255,255,255,0.035)_48%,rgba(106,92,255,0.08))] p-4 shadow-[0_0_30px_rgba(0,229,255,0.08)]">
+            <div className="rounded-[1.5rem] border border-[#00E5FF]/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.07),rgba(255,255,255,0.035)_48%,rgba(106,92,255,0.07))] p-4 shadow-[0_0_20px_rgba(0,229,255,0.055)]">
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-[minmax(260px,1.15fr)_minmax(280px,1fr)_minmax(190px,auto)] lg:items-stretch">
                 <div className={forge.metric}>
                   <p className="text-xs font-medium uppercase text-cyan-100">
@@ -333,6 +333,7 @@ export function ATSOptimizerForm({ resumes }: { resumes: ResumeOption[] }) {
             {state.message ? (
               <p
                 aria-live="polite"
+                role={state.status === "error" ? "alert" : "status"}
                 className={
                   state.status === "error"
                     ? forge.statusError

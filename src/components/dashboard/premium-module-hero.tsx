@@ -16,7 +16,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { forge } from "@/lib/talentforge-design";
+import { designTokens, forge } from "@/lib/talentforge-design";
 
 type HeroLink = {
   href: string;
@@ -80,7 +80,21 @@ export function DashboardGrid({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`grid gap-4 ${className}`}>{children}</div>;
+  return <div className={`grid gap-6 ${className}`}>{children}</div>;
+}
+
+export function DashboardSurface({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`${forge.panel} ${designTokens.spacing.card} ${className}`}>
+      {children}
+    </section>
+  );
 }
 
 export function SectionHeader({
@@ -98,15 +112,15 @@ export function SectionHeader({
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
+          <p className={`${designTokens.typography.eyebrow} text-cyan-100`}>
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="mt-1 text-xl font-semibold tracking-tight text-white">
+        <h2 className={`mt-1 ${designTokens.typography.h2}`}>
           {title}
         </h2>
         {description ? (
-          <p className="mt-2 text-sm leading-6 text-zinc-400">{description}</p>
+          <p className={`mt-2 ${designTokens.typography.body}`}>{description}</p>
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
@@ -137,7 +151,7 @@ export function HeroMetricCard({ metric }: { metric: HeroMetric }) {
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border p-3 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_28px_rgba(0,229,255,0.16)] ${toneClass}`}
+      className={`group relative overflow-hidden rounded-2xl border p-4 transition duration-200 hover:-translate-y-0.5 ${toneClass}`}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-70" />
       <div className="flex items-center justify-between gap-3">
@@ -162,9 +176,9 @@ export function HeroMetricCard({ metric }: { metric: HeroMetric }) {
           </span>
         ) : null}
       </div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10 shadow-inner">
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08] shadow-inner">
         <div
-          className={`h-full rounded-full shadow-[0_0_16px_rgba(0,229,255,0.28)] transition-all duration-700 ${fillClass}`}
+          className={`h-full rounded-full shadow-[0_0_10px_rgba(0,229,255,0.16)] transition-all duration-500 ${fillClass}`}
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -178,21 +192,21 @@ export function QuickActionCard({ action }: { action: HeroQuickAction }) {
   return (
     <Link
       href={action.href}
-      className="group relative flex min-h-28 items-start gap-3 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(255,255,255,0.025)_45%,rgba(0,229,255,0.055))] p-4 shadow-[0_0_28px_rgba(0,229,255,0.08)] outline-none ring-1 ring-white/[0.04] backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:border-[#00E5FF]/30 hover:bg-white/[0.065] hover:shadow-[0_0_42px_rgba(0,229,255,0.18),0_0_60px_rgba(106,92,255,0.12)] focus-visible:border-[#00E5FF]/60 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/25"
+      className="group relative flex min-h-28 items-start gap-3 overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#101827]/82 p-5 shadow-[0_16px_48px_rgba(0,0,0,0.14)] outline-none ring-1 ring-white/[0.04] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:border-[#00E5FF]/18 hover:bg-[#151E2F]/72 focus-visible:border-[#00E5FF]/55 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/20"
     >
       <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF]/60 to-transparent opacity-0 transition group-hover:opacity-100" />
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_22px_rgba(0,229,255,0.12)] transition group-hover:scale-105">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#00E5FF]/8 text-cyan-100 ring-1 ring-[#00E5FF]/14 transition duration-200 group-hover:scale-105">
         <Icon className="h-4 w-4" aria-hidden="true" />
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-semibold text-zinc-100">
+        <span className="block text-sm font-semibold text-white">
           {action.title}
         </span>
-        <span className="mt-1 block text-xs leading-5 text-zinc-500">
+        <span className="mt-1 block text-xs leading-5 text-slate-500">
           {action.subtitle}
         </span>
       </span>
-      <ArrowRight className="ml-auto mt-1 h-4 w-4 shrink-0 text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-100" />
+      <ArrowRight className="ml-auto mt-1 h-4 w-4 shrink-0 text-slate-600 transition duration-200 group-hover:translate-x-0.5 group-hover:text-cyan-100" />
     </Link>
   );
 }
@@ -213,18 +227,17 @@ export function PremiumModuleHero({
   const SecondaryIcon = secondaryCta?.icon;
 
   return (
-    <section className="space-y-4">
-      <div className="relative overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(106,92,255,0.11)_48%,rgba(139,92,246,0.14))] p-5 shadow-[0_0_38px_rgba(0,229,255,0.12),0_0_56px_rgba(106,92,255,0.12)] backdrop-blur-2xl sm:p-6 lg:p-7">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#00E5FF]/16 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/16 blur-3xl" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_24%_24%,rgba(255,255,255,0.16)_0_1px,transparent_2px),radial-gradient(circle_at_76%_30%,rgba(0,229,255,0.2)_0_1px,transparent_2px),radial-gradient(circle_at_58%_80%,rgba(139,92,246,0.22)_0_1px,transparent_2px)] opacity-70" />
+    <section className="space-y-6">
+      <div className="relative overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.06)] bg-[linear-gradient(135deg,rgba(16,24,39,0.92),rgba(21,30,47,0.78)_52%,rgba(106,92,255,0.12))] p-6 shadow-[0_18px_58px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#00E5FF]/7 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/7 blur-3xl" />
         <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center xl:grid-cols-[minmax(0,1fr)_310px]">
           <div className="max-w-3xl">
             <p className={forge.badge}>{badge}</p>
-            <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h1 className={`mt-3 max-w-3xl ${designTokens.typography.h1}`}>
               {title}
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300 sm:text-base">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
               {description}
             </p>
             {(primaryCta || secondaryCta) ? (
@@ -257,7 +270,7 @@ export function PremiumModuleHero({
       </div>
 
       {metrics.length ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
           {metrics.map((metric) => (
             <HeroMetricCard key={metric.label} metric={metric} />
           ))}
@@ -265,7 +278,7 @@ export function PremiumModuleHero({
       ) : null}
 
       {quickActions.length ? (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {quickActions.map((action) => (
             <QuickActionCard key={action.title} action={action} />
           ))}
@@ -285,15 +298,15 @@ function ModuleIllustration({
 
   return (
     <div className="relative ml-auto h-56 w-56 xl:h-64 xl:w-64" aria-hidden="true">
-      <div className={`absolute inset-4 rounded-full border ${config.border} bg-[#070B1F]/62 shadow-[0_0_50px_rgba(0,229,255,0.18)] backdrop-blur-xl`} />
+      <div className={`absolute inset-4 rounded-full border ${config.border} bg-[#101827]/62 shadow-[0_18px_50px_rgba(0,0,0,0.16)] backdrop-blur-xl`} />
       <div className={`absolute inset-16 rounded-full border ${config.border} bg-gradient-to-br ${config.gradient}`} />
-      <div className="absolute left-1/2 top-1/2 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[1.5rem] border border-white/10 bg-white/[0.06] shadow-[0_0_36px_rgba(106,92,255,0.28)]">
+      <div className="absolute left-1/2 top-1/2 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[20px] border border-white/[0.08] bg-white/[0.05] shadow-[0_16px_42px_rgba(0,0,0,0.16)]">
         <Icon className="h-8 w-8 text-cyan-100" />
       </div>
       {config.nodes.map((item) => (
         <span
           key={item}
-          className={`absolute h-2.5 w-2.5 rounded-full ${config.dot} shadow-[0_0_20px_rgba(0,229,255,0.82)]`}
+          className={`absolute h-2.5 w-2.5 rounded-full ${config.dot} shadow-[0_0_12px_rgba(0,229,255,0.5)]`}
           style={{
             left: `${50 + Math.cos((item / config.nodes.length) * Math.PI * 2) * 42}%`,
             top: `${50 + Math.sin((item / config.nodes.length) * Math.PI * 2) * 42}%`,

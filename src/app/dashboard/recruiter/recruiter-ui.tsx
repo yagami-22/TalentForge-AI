@@ -41,8 +41,8 @@ export function RecruiterHero({
   secondaryLabel?: string;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(0,229,255,0.09),rgba(106,92,255,0.07)_48%,rgba(139,92,246,0.08))] p-6 shadow-[0_0_30px_rgba(0,229,255,0.08)] backdrop-blur-2xl sm:p-7">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/10 blur-3xl" />
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.07),rgba(106,92,255,0.055)_48%,rgba(139,92,246,0.065))] p-6 shadow-[0_0_18px_rgba(0,229,255,0.04)] backdrop-blur-2xl sm:p-7">
+      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/7 blur-3xl" />
       <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center">
         <div>
           <p className={forge.badge}>AI Recruiter Mode</p>
@@ -71,7 +71,7 @@ export function RecruiterHero({
         </div>
         <div className="hidden lg:block">
           <div className="relative ml-auto h-52 w-52">
-            <div className="absolute inset-4 rounded-full border border-cyan-300/18 bg-[#070B1F]/62" />
+            <div className="absolute inset-4 rounded-full border border-cyan-300/18 bg-[#101827]/62" />
             <div className="absolute inset-16 rounded-[1.5rem] border border-purple-300/18 bg-white/[0.04]" />
             <Users className="absolute left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/2 text-cyan-100" />
           </div>
@@ -86,7 +86,7 @@ export function HiringScoreCard({ score }: { score: RecruiterScore }) {
   const displayScore = hasNumericScore ? score.score : "Not Provided";
 
   return (
-    <article className="rounded-[1.45rem] border border-white/[0.08] bg-white/[0.04] p-4 shadow-[0_0_24px_rgba(0,229,255,0.06)]">
+    <article className="rounded-[1.45rem] border border-white/[0.07] bg-white/[0.035] p-4 shadow-[0_0_14px_rgba(0,229,255,0.032)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
@@ -104,7 +104,7 @@ export function HiringScoreCard({ score }: { score: RecruiterScore }) {
         {score.score !== null ? (
           <ScoreRing value={score.score} />
         ) : (
-          <div className="grid h-14 w-14 place-items-center rounded-full border border-white/[0.08] bg-[#070B1F]/72 text-xs font-semibold text-zinc-400">
+          <div className="grid h-14 w-14 place-items-center rounded-full border border-white/[0.08] bg-[#101827]/72 text-xs font-semibold text-zinc-400">
             N/A
           </div>
         )}
@@ -138,7 +138,7 @@ export function CandidateCard({
   compact?: boolean;
 }) {
   return (
-    <article className="rounded-[1.65rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_28px_rgba(0,229,255,0.07)]">
+    <article className="rounded-[1.65rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_16px_rgba(0,229,255,0.035)]">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
@@ -274,7 +274,7 @@ export function RecruiterSection({
   action?: ReactNode;
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_28px_rgba(0,229,255,0.06)] backdrop-blur-2xl sm:p-6">
+    <section className="rounded-[1.75rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_18px_rgba(0,229,255,0.04)] backdrop-blur-2xl sm:p-6">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-white">{title}</h2>
@@ -293,7 +293,7 @@ export function RecruiterSection({
 
 function MiniMetric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/58 p-3">
+    <div className="rounded-2xl border border-white/[0.08] bg-[#101827]/58 p-3">
       <p className="text-xs text-zinc-500">{label}</p>
       <p className="mt-1 text-lg font-semibold text-white">{value}</p>
       <div className={`mt-2 h-1.5 ${forge.progressTrack}`}>
@@ -312,7 +312,7 @@ function ScoreRing({ value }: { value: number }) {
       }}
       aria-label={`${value}%`}
     >
-      <div className="grid h-full w-full place-items-center rounded-full bg-[#050816] text-xs font-semibold text-white">
+      <div className="grid h-full w-full place-items-center rounded-full bg-[#070B16] text-xs font-semibold text-white">
         {value}
       </div>
     </div>

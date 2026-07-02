@@ -49,10 +49,13 @@ export function UploadResumeForm() {
           type="file"
           accept="application/pdf,.pdf"
           required
+          aria-describedby="resume-file-help"
           aria-invalid={state.status === "error"}
           className={`mt-2 ${forge.input} file:mr-4 file:rounded-md file:border-0 file:bg-[#00E5FF] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-950 hover:border-[#00E5FF]/30`}
         />
-        <p className="text-xs text-zinc-500">PDF only, up to 8 MB.</p>
+        <p id="resume-file-help" className="text-xs text-zinc-500">
+          PDF only, up to 10 MB.
+        </p>
       </div>
 
       <div className="rounded-2xl border border-[#00E5FF]/15 bg-[#00E5FF]/10 p-3 shadow-[0_0_28px_rgba(0,229,255,0.08)]">
@@ -71,6 +74,7 @@ export function UploadResumeForm() {
       {state.message ? (
         <p
           aria-live="polite"
+          role={state.status === "error" ? "alert" : "status"}
           className={
             state.status === "error"
               ? `${forge.statusError} lg:col-span-3`
@@ -84,6 +88,7 @@ export function UploadResumeForm() {
       {state.warning ? (
         <p
           aria-live="polite"
+          role="status"
           className={`${forge.statusWarning} lg:col-span-3`}
         >
           {state.warning}
