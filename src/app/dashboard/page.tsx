@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   Compass,
   FileText,
+  GitBranch,
   MessageSquareText,
   Sparkles,
   Target,
@@ -92,6 +93,12 @@ const quickActions: QuickActionData[] = [
     subtitle: "Rank candidates and generate reports",
     href: "/dashboard/recruiter",
     icon: BriefcaseBusiness,
+  },
+  {
+    title: "GitHub Analyzer",
+    subtitle: "Turn repos into recruiter proof",
+    href: "/dashboard/github",
+    icon: GitBranch,
   },
 ];
 

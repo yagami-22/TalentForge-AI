@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import {
-  BriefcaseBusiness,
+  BookOpen,
+  Building2,
   ClipboardCheck,
   Code2,
   Compass,
@@ -17,8 +18,10 @@ import {
   Server,
   ShieldCheck,
   Target,
+  TestTube2,
   Trophy,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   INTERVIEW_EVALUATION_STORAGE_KEY,
@@ -100,6 +103,33 @@ type SourceState = {
   oa: boolean;
   interview: boolean;
   versionCount: number;
+};
+
+type TargetCompany = {
+  name: string;
+  readiness: number;
+  reason: string;
+};
+
+type SkillRadarArea = {
+  label: string;
+  score: number;
+  description: string;
+};
+
+type LearningResource = {
+  category: "Courses" | "Documentation" | "Projects" | "Practice Questions";
+  title: string;
+  description: string;
+  items: string[];
+  icon: LucideIcon;
+};
+
+type WeeklyProgress = {
+  streak: number;
+  completedTasks: number;
+  totalTasks: number;
+  careerGrowth: number;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -346,11 +376,53 @@ function clampScore(value: number) {
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 
+function averageScores(values: Array<number | null | undefined>, fallback = 0) {
+  const scores = values.filter((value): value is number => typeof value === "number");
+
+  if (!scores.length) {
+    return fallback;
+  }
+
+  return clampScore(scores.reduce((sum, value) => sum + value, 0) / scores.length);
+}
+
 function scoreFromState(state: string | undefined) {
   if (state === "Advanced") return 84;
   if (state === "Intermediate") return 62;
   if (state === "Basic") return 38;
   return 18;
+}
+
+function scoreFromResumeCategory(
+  resume: CareerCoachResumeSnapshot | null,
+  pattern: RegExp,
+  fallback: number
+) {
+  const category = resume?.analysis?.categoryScores.find((item) =>
+    pattern.test(item.name)
+  );
+
+  if (!category || category.maxScore <= 0) {
+    return fallback;
+  }
+
+  return clampScore((category.score / category.maxScore) * 100);
+}
+
+function resumeText(resume: CareerCoachResumeSnapshot | null) {
+  return [
+    resume?.title,
+    resume?.extractedText,
+    resume?.issues.join(" "),
+    resume?.suggestions.join(" "),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function hasResumeSignal(resume: CareerCoachResumeSnapshot | null, pattern: RegExp) {
+  return pattern.test(resumeText(resume));
 }
 
 function scoreFromGap(report: CareerCoachReport, gapName: string) {
@@ -360,19 +432,27 @@ function scoreFromGap(report: CareerCoachReport, gapName: string) {
   );
 }
 
-function scoreFromMaturity(report: CareerCoachReport) {
-  if (!report.skillMaturity.length) {
-    return 20;
+function scoreForSkillKeywords(
+  report: CareerCoachReport,
+  keywords: RegExp[],
+  fallback: number
+) {
+  const matches = report.skillMaturity.filter((item) =>
+    keywords.some((keyword) => keyword.test(item.skill))
+  );
+
+  if (!matches.length) {
+    return fallback;
   }
 
-  const total = report.skillMaturity.reduce((sum, item) => {
-    if (item.maturity === "Senior Ready") return sum + 94;
-    if (item.maturity === "Advanced") return sum + 82;
-    if (item.maturity === "Intermediate") return sum + 60;
-    return sum + 34;
-  }, 0);
-
-  return clampScore(total / report.skillMaturity.length);
+  return clampScore(
+    matches.reduce((sum, item) => {
+      if (item.maturity === "Senior Ready") return sum + 94;
+      if (item.maturity === "Advanced") return sum + 82;
+      if (item.maturity === "Intermediate") return sum + 60;
+      return sum + 34;
+    }, 0) / matches.length
+  );
 }
 
 function getTargetGoal(goal: CareerGoalPreference) {
@@ -383,7 +463,7 @@ function getTargetGoal(goal: CareerGoalPreference) {
 
 function getTargetCompany(goal: string) {
   const company = goal.split(/\s+/)[0] ?? "";
-  const knownCompanies = ["Google", "Amazon", "Microsoft", "Atlassian", "Uber", "Netflix"];
+  const knownCompanies = ["Google", "Amazon", "Microsoft", "Atlassian", "Uber", "Oracle", "Adobe"];
 
   return knownCompanies.includes(company) ? company : "Open market";
 }
@@ -419,12 +499,29 @@ function buildSourceState(): SourceState {
 
 function buildReadinessCategories(
   report: CareerCoachReport,
-  sourceState: SourceState
+  sourceState: SourceState,
+  resume: CareerCoachResumeSnapshot | null
 ): ReadinessCategory[] {
-  const versionScore =
-    sourceState.versionCount === 0
-      ? 0
-      : clampScore(38 + Math.min(56, sourceState.versionCount * 7));
+  const projectScore = scoreFromGap(report, "Projects");
+  const dsaScore = sourceState.oa
+    ? averageScores([report.scores.interviewReadiness.score], 58)
+    : hasResumeSignal(resume, /dsa|leetcode|algorithm|data structure|graph|dynamic programming|dp\b/)
+      ? 52
+      : 28;
+  const communicationScore = averageScores(
+    [
+      scoreFromResumeCategory(resume, /format|bullet|impact|summary/i, 48),
+      sourceState.interview || sourceState.oa
+        ? report.scores.interviewReadiness.score
+        : null,
+    ],
+    42
+  );
+  const githubScore = hasResumeSignal(resume, /github\.com|gitlab\.com/)
+    ? 82
+    : hasResumeSignal(resume, /github|repository|repo|open source/)
+      ? 58
+      : 24;
 
   return [
     {
@@ -434,49 +531,50 @@ function buildReadinessCategories(
       icon: FileText,
     },
     {
+      label: "DSA",
+      value: dsaScore,
+      description: sourceState.oa
+        ? "OA/interview signals are contributing to DSA readiness."
+        : "Derived from resume algorithm evidence and practice signals.",
+      icon: Code2,
+    },
+    {
+      label: "Projects",
+      value: projectScore,
+      description: "Project proof, depth, deployment, and impact evidence.",
+      icon: Layers3,
+    },
+    {
+      label: "Communication",
+      value: communicationScore,
+      description: "Resume clarity plus interview communication signal.",
+      icon: MessageSquareText,
+    },
+    {
+      label: "Interview",
+      value: report.scores.interviewReadiness.score,
+      description: report.scores.interviewReadiness.reason,
+      icon: Target,
+    },
+    {
+      label: "GitHub",
+      value: githubScore,
+      description: githubScore >= 70
+        ? "Repository link evidence was detected in the uploaded resume."
+        : "Add GitHub links, pinned projects, READMEs, and deployment proof.",
+      icon: GitBranch,
+    },
+    {
       label: "ATS",
       value: report.scores.atsReadiness.score,
       description: report.scores.atsReadiness.reason,
       icon: ClipboardCheck,
     },
     {
-      label: "JD Match",
+      label: "Job Matching",
       value: report.scores.jobMatchReadiness.score,
       description: report.scores.jobMatchReadiness.reason,
       icon: SearchCheck,
-    },
-    {
-      label: "Interview",
-      value: report.scores.interviewReadiness.score,
-      description: report.scores.interviewReadiness.reason,
-      icon: MessageSquareText,
-    },
-    {
-      label: "Projects",
-      value: scoreFromGap(report, "Projects"),
-      description: "Project proof, depth, and portfolio evidence.",
-      icon: Layers3,
-    },
-    {
-      label: "Skills",
-      value: scoreFromMaturity(report),
-      description: "Skill maturity from ATS, JD, and interview signals.",
-      icon: Code2,
-    },
-    {
-      label: "Experience",
-      value: Math.max(
-        scoreFromGap(report, "Resume Evidence"),
-        scoreFromGap(report, "Leadership Signals")
-      ),
-      description: "Ownership, impact, and practical work signals.",
-      icon: BriefcaseBusiness,
-    },
-    {
-      label: "Version History",
-      value: versionScore,
-      description: `${sourceState.versionCount} saved resume version${sourceState.versionCount === 1 ? "" : "s"}.`,
-      icon: GitBranch,
     },
   ];
 }
@@ -600,6 +698,162 @@ function buildLearningTopics(report: CareerCoachReport): LearningTopic[] {
     hours: index < 3 ? 6 : index < 6 ? 4 : 3,
     priority: index < 3 ? "High" : index < 6 ? "Medium" : "Low",
   }));
+}
+
+function buildTargetCompanies(
+  report: CareerCoachReport,
+  categories: ReadinessCategory[],
+  targetGoal: string
+): TargetCompany[] {
+  const base = averageScores([
+    report.careerReadinessScore,
+    report.scores.atsReadiness.score,
+    report.scores.jobMatchReadiness.score,
+    report.scores.interviewReadiness.score,
+    categories.find((category) => category.label === "Projects")?.value,
+  ]);
+  const companyAdjustments = [
+    ["Google", -8, "Strong DSA, system design, and project depth expected."],
+    ["Amazon", -4, "Leadership principles, backend depth, and ownership stories matter."],
+    ["Microsoft", -3, "Balanced fundamentals, communication, and product thinking matter."],
+    ["Uber", -6, "System design, scale, and strong coding speed are important."],
+    ["Atlassian", -5, "Frontend/product craft, collaboration, and testing signal matter."],
+    ["Oracle", 2, "Backend, database, SQL, and enterprise engineering evidence matter."],
+    ["Adobe", -2, "Frontend quality, UX awareness, and creative engineering proof matter."],
+  ] as const;
+
+  return companyAdjustments.map(([name, adjustment, reason]) => ({
+    name,
+    readiness: clampScore(base + adjustment + (targetGoal.includes(name) ? 6 : 0)),
+    reason,
+  }));
+}
+
+function buildSkillGapRadar(
+  report: CareerCoachReport,
+  categories: ReadinessCategory[]
+): SkillRadarArea[] {
+  const jobMatch = categories.find((category) => category.label === "Job Matching")?.value ?? 42;
+  const project = categories.find((category) => category.label === "Projects")?.value ?? 38;
+  const dsa = categories.find((category) => category.label === "DSA")?.value ?? 28;
+
+  return [
+    {
+      label: "Frontend",
+      score: scoreForSkillKeywords(report, [/react/i, /frontend/i, /javascript/i, /typescript/i, /next/i], jobMatch),
+      description: "React, TypeScript, UI quality, and performance evidence.",
+    },
+    {
+      label: "Backend",
+      score: scoreForSkillKeywords(report, [/node/i, /backend/i, /api/i, /express/i], project),
+      description: "APIs, server design, auth, and production backend proof.",
+    },
+    {
+      label: "Database",
+      score: scoreForSkillKeywords(report, [/sql/i, /database/i, /postgres/i, /mongodb/i, /prisma/i], 42),
+      description: "Schema design, queries, indexing, and persistence evidence.",
+    },
+    {
+      label: "Cloud",
+      score: scoreForSkillKeywords(report, [/aws/i, /cloud/i, /vercel/i, /netlify/i, /docker/i], 38),
+      description: "Deployment, hosting, cloud services, and reliability signal.",
+    },
+    {
+      label: "System Design",
+      score: scoreForSkillKeywords(report, [/system design/i, /architecture/i, /scalability/i], averageScores([project, dsa], 36)),
+      description: "Architecture, tradeoffs, scale, and design communication.",
+    },
+    {
+      label: "Testing",
+      score: scoreForSkillKeywords(report, [/test/i, /jest/i, /testing library/i, /cypress/i], 34),
+      description: "Unit tests, integration tests, and quality engineering proof.",
+    },
+    {
+      label: "DevOps",
+      score: scoreForSkillKeywords(report, [/docker/i, /ci/i, /cd/i, /kubernetes/i, /github actions/i], 32),
+      description: "CI/CD, containers, automation, and deployment pipelines.",
+    },
+    {
+      label: "AI",
+      score: scoreForSkillKeywords(report, [/ai/i, /ml/i, /machine learning/i, /llm/i, /python/i], 36),
+      description: "AI tooling, ML fundamentals, and intelligent product evidence.",
+    },
+  ];
+}
+
+function buildLearningResources(
+  report: CareerCoachReport,
+  radar: SkillRadarArea[]
+): LearningResource[] {
+  const weakest = [...radar].sort((a, b) => a.score - b.score).slice(0, 3);
+  const firstWeak = weakest[0]?.label ?? "Docker";
+  const secondWeak = weakest[1]?.label ?? "Testing";
+  const thirdWeak = weakest[2]?.label ?? "System Design";
+
+  return [
+    {
+      category: "Courses",
+      title: `${firstWeak} focused sprint`,
+      description: "Use one structured course to close the weakest skill area.",
+      items: [
+        `Complete a beginner-to-intermediate ${firstWeak} module.`,
+        "Summarize three concepts in your own notes.",
+        "Convert one lesson into resume-ready proof.",
+      ],
+      icon: BookOpen,
+    },
+    {
+      category: "Documentation",
+      title: `${secondWeak} official docs`,
+      description: "Read source documentation instead of scattered tutorials.",
+      items: [
+        `Read official ${secondWeak} setup and best-practices pages.`,
+        "Document commands, examples, and common mistakes.",
+        "Add one implementation note to your project README.",
+      ],
+      icon: FileText,
+    },
+    {
+      category: "Projects",
+      title: `Build a ${thirdWeak} proof project`,
+      description: "Create practical evidence recruiters can inspect.",
+      items: [
+        "Add Docker or CI/CD if deployment proof is weak.",
+        "Include tests, screenshots, architecture notes, and tradeoffs.",
+        "Link GitHub and live deployment in your resume.",
+      ],
+      icon: Layers3,
+    },
+    {
+      category: "Practice Questions",
+      title: "Role-focused practice set",
+      description: "Practice questions should match the company and role target.",
+      items: [
+        "Complete 10 React or frontend questions.",
+        "Complete 10 DSA questions across arrays, graphs, and DP.",
+        report.interviewPracticePlan[0]?.title ?? "Practice one mock interview.",
+      ],
+      icon: TestTube2,
+    },
+  ];
+}
+
+function buildWeeklyProgress(
+  roadmap: RoadmapWeek[],
+  progress: Record<string, boolean>,
+  readinessDelta: number | null
+): WeeklyProgress {
+  const totalTasks = roadmap.reduce((sum, week) => sum + week.items.length, 0);
+  const completedTasks = roadmap.reduce((sum, week) => {
+    return sum + week.items.filter((_, index) => progress[`${week.id}-${index}`]).length;
+  }, 0);
+
+  return {
+    streak: completedTasks ? Math.min(7, Math.max(1, Math.ceil(completedTasks / 2))) : 0,
+    completedTasks,
+    totalTasks,
+    careerGrowth: readinessDelta ?? clampScore((completedTasks / Math.max(1, totalTasks)) * 18),
+  };
 }
 
 function buildTimeline(
@@ -867,17 +1121,25 @@ export function CareerCoachClient({
 
   const targetGoal = getTargetGoal(goalPreference);
   const targetCompany = getTargetCompany(targetGoal);
-  const categories = buildReadinessCategories(report, sourceState);
+  const categories = buildReadinessCategories(report, sourceState, resume);
   const weakestArea = getWeakestArea(categories);
   const strongestArea = getStrongestArea(categories);
   const roadmap = buildWeeklyRoadmap(report, targetGoal);
   const recommendations = buildRecommendations(report);
   const learningTopics = buildLearningTopics(report);
+  const targetCompanies = buildTargetCompanies(report, categories, targetGoal);
+  const skillRadar = buildSkillGapRadar(report, categories);
+  const learningResources = buildLearningResources(report, skillRadar);
   const timeline = buildTimeline(report, resume, sourceState);
   const achievements = buildAchievements(report, resume, sourceState);
   const snapshots = readCoachSnapshots();
   const completion = completionPercent(roadmap, roadmapProgress);
   const progress = report.progressTracking;
+  const weeklyProgress = buildWeeklyProgress(
+    roadmap,
+    roadmapProgress,
+    progress.readinessDelta
+  );
   const hasAnyLocalReport =
     sourceState.ats || sourceState.jdMatch || sourceState.oa || sourceState.interview;
 
@@ -917,9 +1179,36 @@ export function CareerCoachClient({
       ) : null}
 
       <CoachSection
+        eyebrow="Weekly Progress"
+        title="Momentum this week"
+        description="A lightweight progress layer over your personalized roadmap."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <ProgressStatCard
+            icon={Rocket}
+            label="Streak"
+            value={`${weeklyProgress.streak} day${weeklyProgress.streak === 1 ? "" : "s"}`}
+            detail="Roadmap execution rhythm"
+          />
+          <ProgressStatCard
+            icon={ClipboardCheck}
+            label="Completed tasks"
+            value={`${weeklyProgress.completedTasks}/${weeklyProgress.totalTasks}`}
+            detail={`${completion}% weekly completion`}
+          />
+          <ProgressStatCard
+            icon={Trophy}
+            label="Career growth"
+            value={`${weeklyProgress.careerGrowth > 0 ? "+" : ""}${weeklyProgress.careerGrowth}`}
+            detail="Readiness movement this cycle"
+          />
+        </div>
+      </CoachSection>
+
+      <CoachSection
         eyebrow="Readiness Engine"
         title="Where you are right now"
-        description="Overall readiness combines resume, ATS, JD match, interview, projects, skills, experience, and version history."
+        description="Overall readiness combines resume, DSA, projects, communication, interview, GitHub, ATS, and job matching."
       >
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {categories.map((category) => (
@@ -947,6 +1236,28 @@ export function CareerCoachClient({
           />
         </div>
       </CoachSection>
+
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <CoachSection
+          eyebrow="Target Companies"
+          title="Company readiness"
+          description="Readiness is adjusted for company-style expectations and the selected goal."
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            {targetCompanies.map((company) => (
+              <TargetCompanyCard key={company.name} company={company} />
+            ))}
+          </div>
+        </CoachSection>
+
+        <CoachSection
+          eyebrow="Skill Gap Radar"
+          title="Skill coverage map"
+          description="A radar-style breakdown across the core engineering skill surface."
+        >
+          <SkillRadar areas={skillRadar} />
+        </CoachSection>
+      </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
         <CoachSection
@@ -1032,10 +1343,15 @@ export function CareerCoachClient({
         <CoachSection
           eyebrow="Learning Recommendations"
           title="What to study next"
-          description="Topics are inferred from missing role, skill, and interview evidence."
+          description="Courses, documentation, projects, and practice questions based on the weakest signals."
         >
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {learningTopics.map((topic) => (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {learningResources.map((resource) => (
+              <LearningResourceCard key={resource.category} resource={resource} />
+            ))}
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {learningTopics.slice(0, 6).map((topic) => (
               <LearningCard key={topic.title} topic={topic} />
             ))}
           </div>
@@ -1089,13 +1405,167 @@ export function CareerCoachClient({
   );
 }
 
+function ProgressStatCard({
+  icon: Icon,
+  label,
+  value,
+  detail,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-[1.45rem] border border-white/[0.08] bg-[#070B1F]/58 p-4 shadow-[0_0_24px_rgba(0,229,255,0.06)]">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          {label}
+        </p>
+        <span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100">
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <p className="mt-3 text-3xl font-semibold tracking-tight text-white">{value}</p>
+      <p className="mt-2 text-xs leading-5 text-zinc-500">{detail}</p>
+    </div>
+  );
+}
+
+function TargetCompanyCard({ company }: { company: TargetCompany }) {
+  return (
+    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/58 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.055]">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-base font-semibold text-white">
+            <Building2 className="h-4 w-4 text-cyan-100" />
+            {company.name}
+          </p>
+          <p className="mt-2 text-xs leading-5 text-zinc-500">{company.reason}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-2xl font-semibold text-cyan-100">{company.readiness}%</p>
+          <p className="text-[0.68rem] uppercase tracking-wide text-slate-600">Ready</p>
+        </div>
+      </div>
+      <div className={`mt-4 h-1.5 ${forge.progressTrack}`}>
+        <div className={forge.progressFill} style={{ width: `${company.readiness}%` }} />
+      </div>
+    </article>
+  );
+}
+
+function SkillRadar({ areas }: { areas: SkillRadarArea[] }) {
+  const center = 110;
+  const radius = 82;
+  const points = areas
+    .map((area, index) => {
+      const angle = (Math.PI * 2 * index) / areas.length - Math.PI / 2;
+      const scaledRadius = radius * (area.score / 100);
+      return `${center + Math.cos(angle) * scaledRadius},${center + Math.sin(angle) * scaledRadius}`;
+    })
+    .join(" ");
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-center">
+      <svg className="mx-auto h-60 w-60" viewBox="0 0 220 220" aria-hidden="true">
+        {[0.25, 0.5, 0.75, 1].map((scale) => (
+          <polygon
+            key={scale}
+            points={areas
+              .map((_, index) => {
+                const angle = (Math.PI * 2 * index) / areas.length - Math.PI / 2;
+                return `${center + Math.cos(angle) * radius * scale},${center + Math.sin(angle) * radius * scale}`;
+              })
+              .join(" ")}
+            fill="none"
+            stroke="rgba(255,255,255,0.08)"
+          />
+        ))}
+        {areas.map((_, index) => {
+          const angle = (Math.PI * 2 * index) / areas.length - Math.PI / 2;
+          return (
+            <line
+              key={index}
+              x1={center}
+              y1={center}
+              x2={center + Math.cos(angle) * radius}
+              y2={center + Math.sin(angle) * radius}
+              stroke="rgba(255,255,255,0.08)"
+            />
+          );
+        })}
+        <polygon
+          points={points}
+          fill="rgba(0,229,255,0.18)"
+          stroke="#00E5FF"
+          strokeLinejoin="round"
+          strokeWidth="3"
+        />
+        {areas.map((area, index) => {
+          const angle = (Math.PI * 2 * index) / areas.length - Math.PI / 2;
+          return (
+            <circle
+              key={area.label}
+              cx={center + Math.cos(angle) * radius * (area.score / 100)}
+              cy={center + Math.sin(angle) * radius * (area.score / 100)}
+              r="4"
+              fill="#00E5FF"
+            />
+          );
+        })}
+      </svg>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {areas.map((area) => (
+          <div key={area.label} className="rounded-2xl border border-white/[0.08] bg-[#070B1F]/54 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-white">{area.label}</p>
+              <p className="text-sm font-semibold text-cyan-100">{area.score}%</p>
+            </div>
+            <p className="mt-1 text-xs leading-5 text-zinc-500">{area.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LearningResourceCard({ resource }: { resource: LearningResource }) {
+  const Icon = resource.icon;
+
+  return (
+    <article className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/54 p-4 shadow-[0_0_24px_rgba(0,229,255,0.05)]">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-purple-300/16 bg-purple-300/10 text-purple-100">
+          <Icon className="h-4 w-4" />
+        </span>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
+            {resource.category}
+          </p>
+          <h3 className="mt-1 text-base font-semibold text-white">{resource.title}</h3>
+          <p className="mt-1 text-sm leading-6 text-zinc-400">{resource.description}</p>
+        </div>
+      </div>
+      <ul className="mt-4 space-y-2 text-sm leading-6 text-zinc-400">
+        {resource.items.map((item) => (
+          <li key={item} className="flex gap-2">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#00E5FF]" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
 function InsightMetric({
   icon: Icon,
   label,
   value,
   detail,
 }: {
-  icon: typeof Compass;
+  icon: LucideIcon;
   label: string;
   value: string;
   detail: string;

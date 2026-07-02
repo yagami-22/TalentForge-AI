@@ -7,6 +7,7 @@ import type { ResumeDiagnostics } from "@/lib/resume-analyzer";
 export type CareerCoachResumeSnapshot = {
   id: string;
   title: string;
+  extractedText?: string | null;
   uploadedAt: string;
   updatedAt: string;
   atsScore: number | null;

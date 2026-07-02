@@ -26,6 +26,49 @@ npx prisma db push
 npx prisma generate
 ```
 
+## GitHub Profile Analyzer
+
+The GitHub Profile Analyzer uses GitHub's public API to inspect repositories,
+README files, package metadata, languages, and repository structure. It works
+without a token, but unauthenticated GitHub API requests have low rate limits.
+
+### Optional GitHub token
+
+Codex cannot create a GitHub Personal Access Token for you because token
+creation requires your own GitHub account permissions. To unlock higher request
+limits:
+
+1. Open GitHub's Personal Access Token settings.
+2. Create a fine-grained or classic token.
+3. Public repository analysis does not require private repository access.
+4. Add the token to `.env.local`:
+
+```bash
+GITHUB_TOKEN=your_github_token_here
+```
+
+5. Restart the app:
+
+```bash
+npm run dev
+```
+
+The token is read only on the server. It is never exposed to the browser and is
+never logged by the application.
+
+### Troubleshooting GitHub analysis
+
+- `GitHub API Rate Limit Reached`: add `GITHUB_TOKEN` to `.env.local`, then
+  restart the app.
+- `GitHub token needs attention`: check that the token was pasted correctly,
+  has not expired, and starts with a valid GitHub token prefix such as
+  `github_pat_` or `ghp_`.
+- `GitHub profile not found`: verify the username and remove any extra spaces.
+- `GitHub request timed out`: retry after a moment; GitHub may be slow or
+  temporarily unavailable.
+- `No public repositories found`: the profile may not have public repositories
+  available for analysis.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

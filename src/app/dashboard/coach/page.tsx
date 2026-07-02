@@ -47,6 +47,7 @@ export default async function CareerCoachPage() {
       select: {
         id: true,
         title: true,
+        extractedText: true,
         createdAt: true,
         updatedAt: true,
         atsScore: true,
@@ -61,6 +62,7 @@ export default async function CareerCoachPage() {
     ? {
         id: latestResume.id,
         title: latestResume.title,
+        extractedText: latestResume.extractedText,
         uploadedAt: latestResume.createdAt.toISOString(),
         updatedAt: latestResume.updatedAt.toISOString(),
         atsScore: latestResume.atsScore,
