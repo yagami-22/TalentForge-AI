@@ -166,19 +166,6 @@ export default async function ResumeHistoryPage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <p className={forge.badge}>Resume Version History</p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            Track every resume improvement over time.
-          </h1>
-          <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-            Compare original uploads, ATS optimizer snapshots, AI rewrites, and
-            restored versions with score trends and keyword movement.
-          </p>
-        </div>
-
         <ResumeHistoryClient resumes={serializedResumes} />
       </section>
     </main>

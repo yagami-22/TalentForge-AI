@@ -1,11 +1,20 @@
 import Link from "next/link";
+import {
+  BarChart3,
+  FileText,
+  History,
+  MessageSquareText,
+  Mic,
+  Route,
+  Target,
+} from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { InterviewSetupForm } from "@/app/dashboard/interview/interview-setup-form";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
-import { INTERVIEW_MODE_OPTIONS } from "@/lib/interview-prep";
 import { prisma } from "@/lib/prisma";
 import { withRetry } from "@/lib/retry";
 import { forge } from "@/lib/talentforge-design";
@@ -70,39 +79,26 @@ export default async function InterviewPage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <div className="relative">
-            <span className={forge.badge}>
-              Mock Interview Preparation
-            </span>
-            <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              Practice the questions your resume is likely to trigger.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Select a parsed resume, paste a job description, choose an
-              interview mode, and generate focused text-based practice with
-              evaluation feedback.
-            </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {INTERVIEW_MODE_OPTIONS.map((mode) => (
-                <div
-                  key={mode.value}
-                  className={`${forge.metric} ${forge.hoverCard}`}
-                >
-                  <div className="mb-3 grid h-9 w-9 place-items-center rounded-xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-xs font-semibold text-cyan-100 shadow-[0_0_18px_rgba(0,229,255,0.14)]">
-                    {mode.iconPlaceholder}
-                  </div>
-                  <p className="font-semibold text-zinc-100">{mode.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">
-                    {mode.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PremiumModuleHero
+          badge="Mock Interview Preparation"
+          title="Simulate the company interview before the real one."
+          description="Choose mode, company style, difficulty, resume, and target role to generate a realistic adaptive interview session with score breakdowns."
+          variant="interview"
+          primaryCta={{ href: "/dashboard/interview", label: "Generate Questions", icon: MessageSquareText }}
+          secondaryCta={{ href: "/dashboard/interview/history", label: "View History", icon: History }}
+          metrics={[
+            { label: "Resumes", value: String(resumes.length), helper: "Ready for practice", icon: FileText, progress: Math.min(100, resumes.length * 18), trend: "parsed" },
+            { label: "Modes", value: "8", helper: "Company-style rounds", icon: Route, progress: 100, trend: "full" },
+            { label: "Signals", value: "Adaptive", helper: "CV, JD, coach, history", icon: Target, progress: 86, trend: "smart" },
+            { label: "Report", value: "5 Scores", helper: "Technical + communication", icon: BarChart3, tone: "purple", progress: 88, trend: "+score" },
+          ]}
+          quickActions={[
+            { href: "/dashboard/interview", title: "Mock Interview", subtitle: "Generate role questions", icon: MessageSquareText },
+            { href: "/dashboard/interview/report", title: "Latest Report", subtitle: "Review score breakdown", icon: BarChart3 },
+            { href: "/dashboard/resume", title: "Resume Dashboard", subtitle: "Update resume evidence", icon: FileText },
+            { href: "/dashboard/interview/oa/session", title: "OA Session", subtitle: "Continue assessment", icon: Mic },
+          ]}
+        />
       </section>
 
       <section className={`${forge.content} pb-16`}>

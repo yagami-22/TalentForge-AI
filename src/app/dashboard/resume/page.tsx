@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { ClipboardCheck, FileText, History, PenLine, Target, Upload, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { DeleteResumeButton } from "@/app/dashboard/resume/delete-resume-button";
 import { ReanalyzeResumeButton } from "@/app/dashboard/resume/reanalyze-resume-button";
 import { UploadResumeForm } from "@/app/dashboard/resume/upload-resume-form";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -289,63 +291,34 @@ export default async function ResumePage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <p className={forge.badge}>
-            Resume Intelligence
-          </p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            Evidence-based resume diagnostics.
-          </h1>
-          <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-            Upload a PDF resume to generate a criteria-based analysis with
-            explainable scoring, missing evidence, quick wins, and red flags.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button
-              asChild
-              className={forge.primaryButton}
-            >
-              <Link href="/dashboard/resume/match">
-                Match Resume to Job Description
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className={forge.secondaryButton}
-            >
-              <Link href="/dashboard/resume/ats">Optimize Resume for ATS</Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className={forge.secondaryButton}
-            >
-              <Link href="/dashboard/resume/rewrite">AI Resume Rewriter</Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className={forge.secondaryButton}
-            >
-              <Link href="/dashboard/resume/history">Version History</Link>
-            </Button>
-          </div>
-          <div className="mt-6 grid gap-3 text-sm text-zinc-300 sm:grid-cols-3">
-            {["Explainable scoring", "Evidence-backed gaps", "Portfolio-aware review"].map(
-              (item) => (
-                <div
-                  key={item}
-                  className="rounded-full border border-[#00E5FF]/15 bg-[#00E5FF]/10 px-3 py-2 text-cyan-50 shadow-[0_0_18px_rgba(0,229,255,0.08)]"
-                >
-                  {item}
-                </div>
-              )
-            )}
-          </div>
-        </div>
+        <PremiumModuleHero
+          badge="Resume Intelligence"
+          title="Evidence-based resume diagnostics."
+          description="Upload a PDF resume to generate explainable scoring, missing evidence, quick wins, and red flags."
+          primaryCta={{
+            href: "/dashboard/resume/match",
+            label: "Match Resume to JD",
+            icon: Target,
+          }}
+          variant="resume"
+          secondaryCta={{
+            href: "/dashboard/resume/ats",
+            label: "Optimize ATS",
+            icon: ClipboardCheck,
+          }}
+          metrics={[
+            { label: "Uploads", value: String(resumes.length), helper: "Resume reports", icon: Upload, progress: Math.min(100, resumes.length * 18), trend: "active" },
+            { label: "Latest ATS", value: resumes[0]?.atsScore !== null && resumes[0]?.atsScore !== undefined ? String(resumes[0].atsScore) : "--", helper: "Most recent score", icon: Zap, tone: "emerald", progress: resumes[0]?.atsScore ?? 0, trend: resumes[0]?.atsScore ? "+live" : "new" },
+            { label: "Latest JD", value: resumes[0]?.matchScore !== null && resumes[0]?.matchScore !== undefined ? String(resumes[0].matchScore) : "--", helper: "Saved match score", icon: Target, tone: "purple", progress: resumes[0]?.matchScore ?? 0, trend: "fit" },
+            { label: "Analyzer", value: "Live", helper: "Explainable scoring", icon: FileText, progress: 88, trend: "ready" },
+          ]}
+          quickActions={[
+            { href: "/dashboard/resume", title: "Analyze Resume", subtitle: "Upload and score a PDF", icon: FileText },
+            { href: "/dashboard/resume/match", title: "Match JD", subtitle: "Compare role fit", icon: Target },
+            { href: "/dashboard/resume/rewrite", title: "AI Rewrite", subtitle: "Tailor bullets safely", icon: PenLine },
+            { href: "/dashboard/resume/history", title: "Version History", subtitle: "Compare snapshots", icon: History },
+          ]}
+        />
 
         <Card className={forge.cardStrong}>
           <CardHeader className="pb-3">

@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { ClipboardCheck, FileText, History, PenLine, ShieldCheck, Target } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { ResumeRewriterForm } from "@/app/dashboard/resume/rewrite/resume-rewriter-form";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -69,40 +71,26 @@ export default async function ResumeRewritePage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <div className="relative">
-            <span className={forge.badge}>
-              Truthful JD-tailored rewriting
-            </span>
-            <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              AI Resume Rewriter
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Rewrite resume content for a specific job description while
-              preserving evidence. The tool improves wording, highlights ATS
-              keywords, and keeps missing skills separate from claimed skills.
-            </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {[
-                ["Professional summary", "Role-aligned and evidence-safe"],
-                ["Bullet rewrites", "Stronger action verbs and JD language"],
-                ["Skills guidance", "Matched keywords plus missing skills"],
-              ].map(([title, description]) => (
-                <div
-                  key={title}
-                  className={`${forge.metric} ${forge.hoverCard}`}
-                >
-                  <p className="font-semibold text-zinc-100">{title}</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">
-                    {description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PremiumModuleHero
+          badge="Truthful JD-tailored rewriting"
+          title="AI Resume Rewriter"
+          description="Rewrite resume content for a specific job description while preserving evidence and separating missing skills from claimed skills."
+          variant="rewrite"
+          primaryCta={{ href: "/dashboard/resume/rewrite", label: "Rewrite Resume", icon: PenLine }}
+          secondaryCta={{ href: "/dashboard/resume/match", label: "Match JD First", icon: Target }}
+          metrics={[
+            { label: "Resumes", value: String(resumes.length), helper: "Readable uploads", icon: FileText, progress: Math.min(100, resumes.length * 18), trend: "ready" },
+            { label: "Summary", value: "Aligned", helper: "Role-specific", icon: PenLine, tone: "purple", progress: 88, trend: "+tone" },
+            { label: "Bullets", value: "Stronger", helper: "Action verbs", icon: Target, progress: 84, trend: "+impact" },
+            { label: "Claims", value: "Safe", helper: "Evidence-preserved", icon: ShieldCheck, tone: "emerald", progress: 96, trend: "guarded" },
+          ]}
+          quickActions={[
+            { href: "/dashboard/resume/match", title: "JD Match", subtitle: "Find role gaps", icon: Target },
+            { href: "/dashboard/resume/ats", title: "ATS Optimizer", subtitle: "Improve coverage", icon: ClipboardCheck },
+            { href: "/dashboard/resume/history", title: "Version History", subtitle: "Track rewrites", icon: History },
+            { href: "/dashboard/resume", title: "Resume Dashboard", subtitle: "Upload or analyze", icon: FileText },
+          ]}
+        />
       </section>
 
       <section className={`${forge.content} pb-16`}>

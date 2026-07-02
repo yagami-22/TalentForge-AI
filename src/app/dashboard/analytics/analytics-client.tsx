@@ -1,6 +1,4 @@
 "use client";
-
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   Area,
@@ -17,17 +15,20 @@ import {
 } from "recharts";
 import {
   Activity,
+  BarChart3,
   BrainCircuit,
   CheckCircle2,
+  Compass,
   FileText,
   Lightbulb,
+  MessageSquareText,
   Target,
   TriangleAlert,
 } from "lucide-react";
 
 import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { INTERVIEW_HISTORY_STORAGE_KEY } from "@/app/dashboard/interview/interview-storage";
-import { Button } from "@/components/ui/button";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import {
   Card,
   CardContent,
@@ -457,41 +458,26 @@ export function AnalyticsHero({
   totalSignals: number;
 }) {
   return (
-    <section className={forge.hero}>
-      <div className={forge.heroGlowCyan} />
-      <div className={forge.heroGlowPurple} />
-      <div className="relative grid gap-6 lg:grid-cols-[1fr_320px] lg:items-center">
-        <div>
-          <span className={forge.badge}>TalentForge Analytics</span>
-          <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl">
-            Your career growth command center.
-          </h1>
-          <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-            A centralized executive dashboard combining resume health, ATS
-            progress, JD fit, interview performance, and Career Coach readiness.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild className={forge.primaryButton}>
-              <Link href="/dashboard/coach">Open Career Coach</Link>
-            </Button>
-            <Button asChild variant="outline" className={forge.secondaryButton}>
-              <Link href="/dashboard/interview/history">Interview History</Link>
-            </Button>
-          </div>
-        </div>
-        <div className="rounded-3xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 p-6 text-center shadow-[0_0_40px_rgba(0,229,255,0.14)]">
-          <p className="text-xs font-semibold uppercase text-cyan-100">
-            Current Readiness
-          </p>
-          <p className={`mt-3 text-6xl font-semibold ${scoreTone(currentReadiness)}`}>
-            {currentReadiness ?? "--"}
-          </p>
-          <p className="mt-3 text-sm text-zinc-400">
-            {totalSignals} growth signals connected
-          </p>
-        </div>
-      </div>
-    </section>
+    <PremiumModuleHero
+      badge="TalentForge Analytics"
+      title="Your career growth command center."
+      description="A centralized executive dashboard combining resume health, ATS progress, JD fit, interview performance, and Career Coach readiness."
+      variant="analytics"
+      primaryCta={{ href: "/dashboard/coach", label: "Open Career Coach", icon: Compass }}
+      secondaryCta={{ href: "/dashboard/interview/history", label: "Interview History", icon: MessageSquareText }}
+      metrics={[
+        { label: "Readiness", value: currentReadiness !== null ? String(currentReadiness) : "--", helper: "Current score", icon: Activity, tone: "emerald", progress: currentReadiness ?? 0, trend: "+view" },
+        { label: "Signals", value: String(totalSignals), helper: "Connected sources", icon: BarChart3, progress: Math.min(100, totalSignals * 10), trend: "live" },
+        { label: "ATS", value: "Trend", helper: "Resume versions", icon: FileText, tone: "cyan", progress: 78, trend: "chart" },
+        { label: "Interviews", value: "Tracked", helper: "Practice attempts", icon: MessageSquareText, tone: "purple", progress: 72, trend: "history" },
+      ]}
+      quickActions={[
+        { href: "/dashboard/resume", title: "Resume Intelligence", subtitle: "Improve resume health", icon: FileText },
+        { href: "/dashboard/resume/match", title: "JD Match", subtitle: "Track role fit", icon: Target },
+        { href: "/dashboard/interview/history", title: "Interview History", subtitle: "Review performance", icon: MessageSquareText },
+        { href: "/dashboard/coach", title: "Career Coach", subtitle: "Build the roadmap", icon: Compass },
+      ]}
+    />
   );
 }
 

@@ -2,12 +2,25 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import {
+  BrainCircuit,
+  Gauge,
+  MessageSquareText,
+  Sparkles,
+  Target,
+} from "lucide-react";
 
 import {
   INTERVIEW_ANSWERS_STORAGE_KEY,
   INTERVIEW_EVALUATION_STORAGE_KEY,
   INTERVIEW_SESSION_STORAGE_KEY,
+  INTERVIEW_SIMULATOR_CONFIG_STORAGE_KEY,
+  type StoredInterviewSimulatorConfig,
 } from "@/app/dashboard/interview/interview-storage";
+import {
+  FeedbackCard,
+  InterviewReportCard,
+} from "@/app/dashboard/interview/interview-simulator-ui";
 import { Button } from "@/components/ui/button";
 import type {
   InterviewEvaluation,
@@ -69,12 +82,83 @@ function readStoredSession() {
   }
 }
 
+function readSimulatorConfig() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawConfig = window.localStorage.getItem(
+      INTERVIEW_SIMULATOR_CONFIG_STORAGE_KEY
+    );
+    const parsedConfig = rawConfig ? JSON.parse(rawConfig) : null;
+
+    return parsedConfig &&
+      typeof parsedConfig === "object" &&
+      "mode" in parsedConfig &&
+      "company" in parsedConfig
+      ? (parsedConfig as StoredInterviewSimulatorConfig)
+      : null;
+  } catch {
+    window.localStorage.removeItem(INTERVIEW_SIMULATOR_CONFIG_STORAGE_KEY);
+    return null;
+  }
+}
+
+function average(values: number[]) {
+  if (!values.length) return 0;
+  return Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+}
+
+function scoreByQuestionText(
+  evaluation: InterviewEvaluation,
+  session: InterviewSession,
+  pattern: RegExp,
+  fallbackMultiplier: number
+) {
+  const scores = evaluation.answerEvaluations
+    .filter((answer) => {
+      const question = session.questions.find((item) => item.id === answer.questionId);
+      return pattern.test(`${question?.prompt ?? ""} ${question?.focus ?? ""}`);
+    })
+    .map((answer) => answer.score);
+
+  return scores.length
+    ? average(scores)
+    : Math.max(0, Math.min(100, Math.round(evaluation.overallScore * fallbackMultiplier)));
+}
+
+function collectMissedConcepts(evaluation: InterviewEvaluation) {
+  return Array.from(
+    new Set(evaluation.answerEvaluations.flatMap((answer) => answer.missedSignals))
+  ).slice(0, 10);
+}
+
+function nextPracticePlan(
+  evaluation: InterviewEvaluation,
+  session: InterviewSession,
+  config: StoredInterviewSimulatorConfig | null
+) {
+  const missed = collectMissedConcepts(evaluation);
+  const mode = config?.mode ?? getInterviewModeTitle(session.mode);
+
+  return [
+    `Repeat one ${mode} round at ${config?.difficulty ?? "adaptive"} difficulty.`,
+    missed[0] ? `Review ${missed[0]} before the next attempt.` : "Review expected signals for missed questions.",
+    "Practice one answer out loud using a 90-second structure.",
+    "Redo skipped or low-scoring questions without hints.",
+  ];
+}
+
 export function InterviewResultsClient() {
   const [evaluation, setEvaluation] = useState<InterviewEvaluation | null>(() =>
     readStoredEvaluation()
   );
   const [session, setSession] = useState<InterviewSession | null>(() =>
     readStoredSession()
+  );
+  const [config] = useState<StoredInterviewSimulatorConfig | null>(() =>
+    readSimulatorConfig()
   );
 
   function clearSession() {
@@ -88,9 +172,9 @@ export function InterviewResultsClient() {
   if (!evaluation || !session) {
     return (
       <div className={`${forge.card} rounded-3xl p-8 text-center`}>
-        <h1 className="text-2xl font-semibold">No interview results yet</h1>
+        <h1 className="text-2xl font-semibold">No interview report yet</h1>
         <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-zinc-400">
-          Complete a mock interview session to generate answer-by-answer feedback.
+          Complete an interview simulator session to generate score breakdowns, missed concepts, and a next practice plan.
         </p>
         <Button
           asChild
@@ -102,6 +186,30 @@ export function InterviewResultsClient() {
     );
   }
 
+  const technicalScore = scoreByQuestionText(
+    evaluation,
+    session,
+    /technical|api|database|architecture|system|frontend|backend|dsa|complexity|code/i,
+    0.96
+  );
+  const communicationScore = scoreByQuestionText(
+    evaluation,
+    session,
+    /communicat|explain|behavior|team|conflict|leadership|star/i,
+    0.92
+  );
+  const problemSolvingScore = scoreByQuestionText(
+    evaluation,
+    session,
+    /solve|approach|tradeoff|debug|bug|edge|scal/i,
+    0.94
+  );
+  const confidenceScore = Math.round(
+    (evaluation.overallScore + communicationScore + problemSolvingScore) / 3
+  );
+  const missedConcepts = collectMissedConcepts(evaluation);
+  const plan = nextPracticePlan(evaluation, session, config);
+
   return (
     <div className="space-y-6">
       <section className={forge.cardStrong}>
@@ -109,13 +217,13 @@ export function InterviewResultsClient() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase text-cyan-100">
-                Interview Results
+                Advanced Interview Report
               </p>
               <h1 className="mt-2 text-2xl font-semibold">
                 {session.targetRole}
               </h1>
               <p className="mt-2 text-sm leading-6 text-zinc-400">
-                {getInterviewModeTitle(session.mode)} · Resume: {session.resumeTitle}
+                {config?.mode ?? getInterviewModeTitle(session.mode)} · {config?.company ?? session.detectedDomain} · {config?.difficulty ?? "Adaptive"} · Resume: {session.resumeTitle}
               </p>
             </div>
             <div className="rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-5 py-4 text-center shadow-[0_0_28px_rgba(0,229,255,0.12)]">
@@ -128,16 +236,57 @@ export function InterviewResultsClient() {
             </div>
           </div>
         </div>
-        <div className="space-y-4 p-5">
+        <div className="space-y-5 p-5">
           <p className="text-sm leading-7 text-zinc-300">{evaluation.summary}</p>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <ListCard title="Top Strengths" items={evaluation.topStrengths} tone="good" />
-            <ListCard
-              title="Priority Improvements"
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <InterviewReportCard
+              title="Overall"
+              value={String(evaluation.overallScore)}
+              helper="Weighted session score"
+              icon={Sparkles}
+            />
+            <InterviewReportCard
+              title="Technical"
+              value={String(technicalScore)}
+              helper="Technical signal quality"
+              icon={BrainCircuit}
+            />
+            <InterviewReportCard
+              title="Communication"
+              value={String(communicationScore)}
+              helper="Clarity and structure"
+              icon={MessageSquareText}
+            />
+            <InterviewReportCard
+              title="Problem Solving"
+              value={String(problemSolvingScore)}
+              helper="Approach and tradeoffs"
+              icon={Target}
+            />
+            <InterviewReportCard
+              title="Confidence"
+              value={String(confidenceScore)}
+              helper="Readiness under pressure"
+              icon={Gauge}
+            />
+          </div>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <FeedbackCard title="Strengths" items={evaluation.topStrengths} tone="good" />
+            <FeedbackCard
+              title="Weaknesses"
               items={evaluation.priorityImprovements}
               tone="warn"
             />
+            <FeedbackCard
+              title="Missed Concepts"
+              items={missedConcepts}
+              tone="warn"
+            />
           </div>
+          <FeedbackCard
+            title="Next Practice Plan"
+            items={plan}
+          />
         </div>
       </section>
 
@@ -145,10 +294,10 @@ export function InterviewResultsClient() {
         <div className={`${forge.panel} flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between`}>
           <div>
             <p className="text-sm font-semibold uppercase text-cyan-100">
-              Answer Feedback
+              Answer-by-answer feedback
             </p>
             <p className="mt-1 text-sm text-zinc-500">
-              Each answer is scored against expected signals and resume-backed evidence.
+              Each answer is evaluated against expected signals, resume evidence, and role fit.
             </p>
           </div>
           <Button
@@ -186,19 +335,24 @@ export function InterviewResultsClient() {
                   </span>
                 </div>
               </div>
-              <div className="grid gap-4 p-5 lg:grid-cols-3">
-                <ListCard
+              <div className="grid gap-4 p-5 lg:grid-cols-4">
+                <FeedbackCard
                   title="Feedback"
                   items={[answerEvaluation.feedback]}
                 />
-                <ListCard
+                <FeedbackCard
                   title="Strengths"
                   items={answerEvaluation.strengths}
                   tone="good"
                 />
-                <ListCard
+                <FeedbackCard
                   title="Improve"
                   items={answerEvaluation.improvements}
+                  tone="warn"
+                />
+                <FeedbackCard
+                  title="Missed Signals"
+                  items={answerEvaluation.missedSignals}
                   tone="warn"
                 />
               </div>
@@ -206,34 +360,15 @@ export function InterviewResultsClient() {
           );
         })}
       </section>
-    </div>
-  );
-}
 
-function ListCard({
-  title,
-  items,
-  tone = "default",
-}: {
-  title: string;
-  items: string[];
-  tone?: "default" | "good" | "warn";
-}) {
-  const titleTone =
-    tone === "good"
-      ? "text-emerald-200"
-      : tone === "warn"
-        ? "text-amber-200"
-        : "text-zinc-100";
-
-  return (
-    <div className={forge.metric}>
-      <p className={`text-sm font-semibold ${titleTone}`}>{title}</p>
-      <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-400">
-        {(items.length ? items : ["No items available."]).map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+      <div className="flex flex-wrap gap-3">
+        <Button asChild className={forge.primaryButton}>
+          <Link href="/dashboard/interview">Start another simulation</Link>
+        </Button>
+        <Button asChild variant="outline" className={forge.secondaryButton}>
+          <Link href="/dashboard/interview/history">View history</Link>
+        </Button>
+      </div>
     </div>
   );
 }

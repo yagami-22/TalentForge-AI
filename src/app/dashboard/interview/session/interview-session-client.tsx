@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, Lightbulb, MessageSquarePlus, SkipForward } from "lucide-react";
 
 import { evaluateMockInterview } from "@/app/dashboard/interview/actions";
 import {
@@ -10,7 +11,15 @@ import {
   INTERVIEW_EVALUATION_STORAGE_KEY,
   INTERVIEW_HISTORY_STORAGE_KEY,
   INTERVIEW_SESSION_STORAGE_KEY,
+  INTERVIEW_SIMULATOR_CONFIG_STORAGE_KEY,
+  type StoredInterviewSimulatorConfig,
 } from "@/app/dashboard/interview/interview-storage";
+import {
+  InterviewProgress,
+  InterviewSessionCard,
+  InterviewTimer,
+  SessionActionButton,
+} from "@/app/dashboard/interview/interview-simulator-ui";
 import { initialInterviewEvaluationState } from "@/app/dashboard/interview/state";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,18 +110,87 @@ function readHistoryAttempts() {
   }
 }
 
+function readSimulatorConfig() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const rawConfig = window.localStorage.getItem(
+      INTERVIEW_SIMULATOR_CONFIG_STORAGE_KEY
+    );
+    const parsedConfig = rawConfig ? JSON.parse(rawConfig) : null;
+
+    return parsedConfig &&
+      typeof parsedConfig === "object" &&
+      "mode" in parsedConfig &&
+      "company" in parsedConfig
+      ? (parsedConfig as StoredInterviewSimulatorConfig)
+      : null;
+  } catch {
+    window.localStorage.removeItem(INTERVIEW_SIMULATOR_CONFIG_STORAGE_KEY);
+    return null;
+  }
+}
+
+function buildFollowUp(
+  question: NonNullable<InterviewSession["questions"][number]>,
+  config: StoredInterviewSimulatorConfig | null
+) {
+  if (/behavioral|hr/i.test(config?.mode ?? "") || question.mode === "BehavioralHR") {
+    return "Follow-up: answer this again using Situation, Task, Action, and Result, then add what you learned.";
+  }
+
+  if (/project/i.test(config?.mode ?? "") || question.mode === "ProjectDeepDive") {
+    return "Follow-up: explain the architecture tradeoff you would defend if an interviewer challenged this decision.";
+  }
+
+  if (/system design|backend/i.test(config?.mode ?? "")) {
+    return "Follow-up: how would your answer change at 10x traffic, and what would fail first?";
+  }
+
+  return "Follow-up: state the edge cases, complexity, and one alternative approach.";
+}
+
+function buildHint(question: NonNullable<InterviewSession["questions"][number]>) {
+  return [
+    question.focus,
+    ...question.expectedSignals.slice(0, 3),
+    ...question.resumeEvidence.slice(0, 2),
+  ].filter(Boolean);
+}
+
 export function InterviewSessionClient() {
   const router = useRouter();
   const [session] = useState<InterviewSession | null>(() => readStoredSession());
+  const [simulatorConfig] = useState<StoredInterviewSimulatorConfig | null>(() =>
+    readSimulatorConfig()
+  );
   const [answers, setAnswers] = useState<InterviewAnswer[]>(() =>
     readStoredAnswers()
   );
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(true);
+  const [hintVisible, setHintVisible] = useState(false);
+  const [followUpVisible, setFollowUpVisible] = useState(false);
   const [state, formAction, pending] = useActionState(
     evaluateMockInterview,
     initialInterviewEvaluationState
   );
   const savedEvaluationRef = useRef("");
+
+  useEffect(() => {
+    if (!timerRunning) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setElapsedSeconds((seconds) => seconds + 1);
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [timerRunning]);
 
   useEffect(() => {
     if (!answers.length) {
@@ -160,7 +238,7 @@ export function InterviewSessionClient() {
         )
       )
     );
-    router.push("/dashboard/interview/results");
+    router.push("/dashboard/interview/report");
   }, [answers, router, session, state.evaluation, state.status]);
 
   const currentQuestion = session?.questions[currentIndex] ?? null;
@@ -207,11 +285,20 @@ export function InterviewSessionClient() {
       return;
     }
 
+    setHintVisible(false);
+    setFollowUpVisible(false);
     setCurrentIndex((index) => Math.min(session.questions.length - 1, index + 1));
   }
 
   function goPrevious() {
+    setHintVisible(false);
+    setFollowUpVisible(false);
     setCurrentIndex((index) => Math.max(0, index - 1));
+  }
+
+  function skipQuestion() {
+    updateAnswer("[Skipped]");
+    goNext();
   }
 
   if (!session || !currentQuestion) {
@@ -229,25 +316,40 @@ export function InterviewSessionClient() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase text-cyan-100">
-              {getInterviewModeTitle(session.mode)} Session
+              {simulatorConfig?.mode ?? getInterviewModeTitle(session.mode)} Session
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight">
               {session.targetRole}
             </h1>
             <p className="mt-2 text-sm leading-6 text-zinc-400">
-              Resume: {session.resumeTitle} · Domain: {session.detectedDomain}
+              Resume: {session.resumeTitle} · {simulatorConfig?.company ?? session.detectedDomain} · {simulatorConfig?.difficulty ?? "Adaptive"}
             </p>
           </div>
-          <div className="rounded-2xl border border-[#00E5FF]/15 bg-[#00E5FF]/10 px-4 py-3 text-sm text-cyan-50 shadow-[0_0_24px_rgba(0,229,255,0.1)]">
-            {answeredCount}/{session.questions.length} answers saved
+          <div className="flex flex-wrap gap-2">
+            {(simulatorConfig?.smartSignals.length
+              ? simulatorConfig.smartSignals
+              : ["Resume skills", "JD signals", "Previous feedback"]
+            ).slice(0, 4).map((signal) => (
+              <span
+                key={signal}
+                className="rounded-full border border-[#00E5FF]/15 bg-[#00E5FF]/10 px-3 py-1 text-xs text-cyan-50"
+              >
+                {signal}
+              </span>
+            ))}
           </div>
         </div>
-        <div className={`mt-5 h-2 ${forge.progressTrack}`}>
-          <div
-            className={forge.progressFill}
-            style={{
-              width: `${Math.round(((currentIndex + 1) / session.questions.length) * 100)}%`,
-            }}
+        <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <InterviewProgress
+            current={currentIndex + 1}
+            total={session.questions.length}
+            answered={answeredCount}
+          />
+          <InterviewTimer
+            elapsedSeconds={elapsedSeconds}
+            running={timerRunning}
+            onToggle={() => setTimerRunning((running) => !running)}
+            onReset={() => setElapsedSeconds(0)}
           />
         </div>
       </div>
@@ -256,23 +358,11 @@ export function InterviewSessionClient() {
         <input type="hidden" name="session" value={JSON.stringify(session)} />
         <input type="hidden" name="answers" value={JSON.stringify(answers)} />
 
-        <section className={forge.cardStrong}>
-          <div className="border-b border-white/10 bg-[#070B1F]/60 px-5 py-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase text-cyan-100">
-                  Question {currentIndex + 1} of {session.questions.length}
-                </p>
-                <h2 className="mt-2 text-xl font-semibold leading-7">
-                  {currentQuestion.prompt}
-                </h2>
-              </div>
-              <span className="w-fit rounded-full border border-[#8B5CF6]/25 bg-[#8B5CF6]/12 px-3 py-1 text-xs text-purple-100">
-                {currentQuestion.difficulty}
-              </span>
-            </div>
-          </div>
-
+        <InterviewSessionCard
+          eyebrow={`Question ${currentIndex + 1} of ${session.questions.length}`}
+          title={currentQuestion.prompt}
+          badge={currentQuestion.difficulty}
+        >
           <div className="space-y-4 p-5">
             <div className="grid gap-3 lg:grid-cols-3">
               <InfoBlock title="Focus" items={[currentQuestion.focus]} />
@@ -289,6 +379,34 @@ export function InterviewSessionClient() {
                 }
               />
             </div>
+
+            <div className="flex flex-wrap gap-2">
+              <SessionActionButton
+                onClick={() => setHintVisible((visible) => !visible)}
+                icon={Lightbulb}
+              >
+                {hintVisible ? "Hide Hint" : "Show Hint"}
+              </SessionActionButton>
+              <SessionActionButton
+                onClick={() => setFollowUpVisible((visible) => !visible)}
+                icon={MessageSquarePlus}
+              >
+                Follow-up Question
+              </SessionActionButton>
+              <SessionActionButton onClick={skipQuestion} icon={SkipForward}>
+                Skip
+              </SessionActionButton>
+            </div>
+
+            {hintVisible ? (
+              <InfoBlock title="Hint" items={buildHint(currentQuestion)} />
+            ) : null}
+
+            {followUpVisible ? (
+              <div className="rounded-2xl border border-purple-300/20 bg-purple-300/10 p-4 text-sm leading-6 text-purple-100">
+                {buildFollowUp(currentQuestion, simulatorConfig)}
+              </div>
+            ) : null}
 
             <div className="rounded-2xl border border-white/10 bg-black/20 p-4 shadow-inner">
               <label htmlFor="answer" className="text-sm font-medium text-zinc-200">
@@ -307,7 +425,7 @@ export function InterviewSessionClient() {
               />
             </div>
           </div>
-        </section>
+        </InterviewSessionCard>
 
         {state.message ? (
           <p
@@ -341,6 +459,7 @@ export function InterviewSessionClient() {
               className={forge.secondaryButton}
             >
               Next Question
+              <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
           <Button

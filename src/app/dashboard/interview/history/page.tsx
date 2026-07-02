@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { BarChart3, History, MessageSquareText, Target, TrendingUp } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { InterviewHistoryClient } from "@/app/dashboard/interview/history/interview-history-client";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { forge } from "@/lib/talentforge-design";
@@ -32,20 +34,25 @@ export default async function InterviewHistoryPage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <div className="relative">
-            <span className={forge.badge}>Interview History</span>
-            <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl">
-              Track OA and interview progress over time.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Review attempt history, improvement trends, recurring weak areas,
-              and recommendations from your saved TalentForge practice sessions.
-            </p>
-          </div>
-        </div>
+        <PremiumModuleHero
+          badge="Interview History"
+          title="Track OA and interview progress over time."
+          description="Review attempt history, improvement trends, recurring weak areas, and recommendations from saved TalentForge practice sessions."
+          variant="analytics"
+          primaryCta={{ href: "/dashboard/interview", label: "Start Practice", icon: MessageSquareText }}
+          secondaryCta={{ href: "/dashboard/analytics", label: "Open Analytics", icon: BarChart3 }}
+          metrics={[
+            { label: "Trend", value: "Live", helper: "Local attempts", icon: TrendingUp, progress: 76, trend: "+focus" },
+            { label: "OA", value: "Tracked", helper: "Assessment reports", icon: Target, tone: "purple", progress: 70, trend: "ready" },
+            { label: "Feedback", value: "Saved", helper: "Answer history", icon: History, progress: 84, trend: "local" },
+          ]}
+          quickActions={[
+            { href: "/dashboard/interview", title: "New Practice", subtitle: "Generate questions", icon: MessageSquareText },
+            { href: "/dashboard/interview/results", title: "Mock Results", subtitle: "Review latest session", icon: BarChart3 },
+            { href: "/dashboard/interview/oa/results", title: "OA Results", subtitle: "Read assessment report", icon: Target },
+            { href: "/dashboard/analytics", title: "Analytics", subtitle: "View readiness trends", icon: TrendingUp },
+          ]}
+        />
 
         <InterviewHistoryClient />
       </section>

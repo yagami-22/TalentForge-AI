@@ -3,51 +3,87 @@
 import Link from "next/link";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import {
-  ArrowRight,
-  BarChart3,
-  BrainCircuit,
-  CalendarDays,
-  CheckCircle2,
+  BriefcaseBusiness,
   ClipboardCheck,
+  Code2,
   Compass,
+  Database,
+  FileText,
+  GitBranch,
   Layers3,
-  RefreshCw,
-  Sparkles,
+  MessageSquareText,
+  Rocket,
+  SearchCheck,
+  Server,
+  ShieldCheck,
   Target,
-  TrendingUp,
-  TriangleAlert,
-  Users,
+  Trophy,
 } from "lucide-react";
 
 import {
   INTERVIEW_EVALUATION_STORAGE_KEY,
   OA_REPORT_STORAGE_KEY,
 } from "@/app/dashboard/interview/interview-storage";
+import {
+  AchievementBadge,
+  CareerHero,
+  CoachSection,
+  LearningCard,
+  ProgressChart,
+  ReadinessCard,
+  RecommendationCard,
+  RoadmapCard,
+  SourcePill,
+  TimelineCard,
+  type Achievement,
+  type CoachRecommendation,
+  type CoachTimelineEvent,
+  type LearningTopic,
+  type ReadinessCategory,
+  type RoadmapWeek,
+} from "@/app/dashboard/coach/career-coach-ui";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   buildCareerCoachReport,
   type CareerCoachReport,
   type CareerCoachResumeSnapshot,
-  type CareerCoachGap,
-  type CareerCoachRoadmapItem,
-  type CareerCoachScoreCard,
-  type CareerCoachSkillMaturity,
   type CareerCoachStrategicRecommendation,
-  type CareerCoachTargetRoleMetric,
-  type CareerCoachTimelineItem,
 } from "@/lib/career-coach";
 import type { ATSOptimizationAnalysis } from "@/lib/ats-optimizer";
 import type { InterviewEvaluation } from "@/lib/interview-prep";
 import type { JobDescriptionMatchAnalysis } from "@/lib/jd-match-analyzer";
 import type { OAReport } from "@/lib/oa-evaluation";
+import { LOCAL_RESUME_HISTORY_KEY } from "@/lib/resume-versioning-client";
 import { forge } from "@/lib/talentforge-design";
 
 const ATS_STORAGE_KEY = "talentforge.atsOptimizer.latest";
 const JD_MATCH_STORAGE_KEY = "talentforge.jdMatch.latest";
 const COACH_STORAGE_KEY = "talentforge.careerCoach.latest";
 const COACH_SNAPSHOTS_KEY = "talentforge.careerCoach.snapshots";
+const COACH_GOAL_KEY = "talentforge.careerCoach.goal";
+const COACH_ROADMAP_PROGRESS_KEY = "talentforge.careerCoach.roadmapProgress";
 const COACH_STORAGE_EVENT = "talentforge.careerCoach.storage";
+
+const GOALS = [
+  "Google SDE",
+  "Amazon SDE",
+  "Microsoft",
+  "Atlassian",
+  "Uber",
+  "Netflix",
+  "Frontend",
+  "Backend",
+  "Full Stack",
+  "AI Engineer",
+  "ML Engineer",
+  "Data Scientist",
+  "Custom Goal",
+];
+
+type CareerGoalPreference = {
+  goal: string;
+  customGoal: string;
+};
 
 type CareerCoachSnapshot = {
   generatedAt: string;
@@ -58,8 +94,30 @@ type CareerCoachSnapshot = {
   interview: number | null;
 };
 
+type SourceState = {
+  ats: boolean;
+  jdMatch: boolean;
+  oa: boolean;
+  interview: boolean;
+  versionCount: number;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function readJSON<T>(key: string): T | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    window.localStorage.removeItem(key);
+    return null;
+  }
 }
 
 function readStoredAnalysis<T>(key: string): T | null {
@@ -92,20 +150,6 @@ function isCareerCoachReport(value: unknown): value is CareerCoachReport {
     Array.isArray(value.targetRoleComparison) &&
     isRecord(value.readinessFormula)
   );
-}
-
-function readJSON<T>(key: string): T | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    window.localStorage.removeItem(key);
-    return null;
-  }
 }
 
 function readLatestATSReport() {
@@ -153,6 +197,57 @@ function readCoachSnapshots() {
       typeof item.readiness === "number"
     );
   });
+}
+
+function readGoalPreference(): CareerGoalPreference {
+  const saved = readJSON<unknown>(COACH_GOAL_KEY);
+
+  if (!isRecord(saved)) {
+    return { goal: "Google SDE", customGoal: "" };
+  }
+
+  return {
+    goal: typeof saved.goal === "string" ? saved.goal : "Google SDE",
+    customGoal: typeof saved.customGoal === "string" ? saved.customGoal : "",
+  };
+}
+
+function saveGoalPreference(goal: CareerGoalPreference) {
+  window.localStorage.setItem(COACH_GOAL_KEY, JSON.stringify(goal));
+  window.dispatchEvent(new Event(COACH_STORAGE_EVENT));
+}
+
+function readRoadmapProgress() {
+  const saved = readJSON<unknown>(COACH_ROADMAP_PROGRESS_KEY);
+
+  return isRecord(saved)
+    ? Object.fromEntries(
+        Object.entries(saved).filter((entry): entry is [string, boolean] => {
+          return typeof entry[0] === "string" && typeof entry[1] === "boolean";
+        })
+      )
+    : {};
+}
+
+function saveRoadmapProgress(progress: Record<string, boolean>) {
+  window.localStorage.setItem(COACH_ROADMAP_PROGRESS_KEY, JSON.stringify(progress));
+  window.dispatchEvent(new Event(COACH_STORAGE_EVENT));
+}
+
+function readVersionCount() {
+  const saved = readJSON<unknown>(LOCAL_RESUME_HISTORY_KEY);
+
+  if (!Array.isArray(saved)) {
+    return 0;
+  }
+
+  return saved.reduce((total, resume) => {
+    if (!isRecord(resume) || !Array.isArray(resume.versions)) {
+      return total;
+    }
+
+    return total + resume.versions.length;
+  }, 0);
 }
 
 function scoreValue(score: number | null | undefined) {
@@ -237,6 +332,9 @@ function getCoachSnapshot() {
     interview: window.localStorage.getItem(INTERVIEW_EVALUATION_STORAGE_KEY),
     coach: window.localStorage.getItem(COACH_STORAGE_KEY),
     snapshots: window.localStorage.getItem(COACH_SNAPSHOTS_KEY),
+    goal: window.localStorage.getItem(COACH_GOAL_KEY),
+    roadmap: window.localStorage.getItem(COACH_ROADMAP_PROGRESS_KEY),
+    versions: window.localStorage.getItem(LOCAL_RESUME_HISTORY_KEY),
   });
 }
 
@@ -244,492 +342,430 @@ function getServerCoachSnapshot() {
   return "server";
 }
 
-function scoreWidth(score: number | null) {
-  return `${Math.max(0, Math.min(100, score ?? 0))}%`;
+function clampScore(value: number) {
+  return Math.max(0, Math.min(100, Math.round(value)));
 }
 
-function scoreTone(score: number | null) {
-  if (score === null) return "text-zinc-500";
-  if (score >= 80) return "text-emerald-200";
-  if (score >= 60) return "text-cyan-100";
-  return "text-amber-200";
+function scoreFromState(state: string | undefined) {
+  if (state === "Advanced") return 84;
+  if (state === "Intermediate") return 62;
+  if (state === "Basic") return 38;
+  return 18;
 }
 
-function priorityTone(priority: CareerCoachRoadmapItem["priority"]) {
-  if (priority === "High") {
-    return "border-red-300/25 bg-red-300/10 text-red-100";
+function scoreFromGap(report: CareerCoachReport, gapName: string) {
+  return scoreFromState(
+    report.careerGapAnalysis.gaps.find((gap) => gap.gapName === gapName)
+      ?.currentState
+  );
+}
+
+function scoreFromMaturity(report: CareerCoachReport) {
+  if (!report.skillMaturity.length) {
+    return 20;
   }
 
-  if (priority === "Medium") {
-    return "border-amber-300/25 bg-amber-300/10 text-amber-100";
-  }
+  const total = report.skillMaturity.reduce((sum, item) => {
+    if (item.maturity === "Senior Ready") return sum + 94;
+    if (item.maturity === "Advanced") return sum + 82;
+    if (item.maturity === "Intermediate") return sum + 60;
+    return sum + 34;
+  }, 0);
 
-  return "border-cyan-300/25 bg-cyan-300/10 text-cyan-100";
+  return clampScore(total / report.skillMaturity.length);
 }
 
-function formatDate(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Just now";
-  }
-
-  return date.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+function getTargetGoal(goal: CareerGoalPreference) {
+  return goal.goal === "Custom Goal" && goal.customGoal.trim()
+    ? goal.customGoal.trim()
+    : goal.goal;
 }
 
-function SourceStatus({
-  label,
-  available,
+function getTargetCompany(goal: string) {
+  const company = goal.split(/\s+/)[0] ?? "";
+  const knownCompanies = ["Google", "Amazon", "Microsoft", "Atlassian", "Uber", "Netflix"];
+
+  return knownCompanies.includes(company) ? company : "Open market";
+}
+
+function estimateTimeline(score: number) {
+  if (score >= 85) return "2-3 weeks";
+  if (score >= 70) return "4-6 weeks";
+  if (score >= 55) return "6-8 weeks";
+  return "8-12 weeks";
+}
+
+function formatProgressDelta(value: number | null) {
+  if (value === null) return "No previous trend";
+  if (value === 0) return "No change";
+  return `${value > 0 ? "+" : ""}${value} this cycle`;
+}
+
+function difficultyFromPriority(priority: CareerCoachStrategicRecommendation["priority"]) {
+  if (priority === "High") return "Hard";
+  if (priority === "Medium") return "Medium";
+  return "Easy";
+}
+
+function buildSourceState(): SourceState {
+  return {
+    ats: Boolean(readLatestATSReport()),
+    jdMatch: Boolean(readLatestJDMatchReport()),
+    oa: Boolean(readLatestOAReport()),
+    interview: Boolean(readLatestInterviewReport()),
+    versionCount: readVersionCount(),
+  };
+}
+
+function buildReadinessCategories(
+  report: CareerCoachReport,
+  sourceState: SourceState
+): ReadinessCategory[] {
+  const versionScore =
+    sourceState.versionCount === 0
+      ? 0
+      : clampScore(38 + Math.min(56, sourceState.versionCount * 7));
+
+  return [
+    {
+      label: "Resume",
+      value: report.scores.resumeReadiness.score,
+      description: report.scores.resumeReadiness.reason,
+      icon: FileText,
+    },
+    {
+      label: "ATS",
+      value: report.scores.atsReadiness.score,
+      description: report.scores.atsReadiness.reason,
+      icon: ClipboardCheck,
+    },
+    {
+      label: "JD Match",
+      value: report.scores.jobMatchReadiness.score,
+      description: report.scores.jobMatchReadiness.reason,
+      icon: SearchCheck,
+    },
+    {
+      label: "Interview",
+      value: report.scores.interviewReadiness.score,
+      description: report.scores.interviewReadiness.reason,
+      icon: MessageSquareText,
+    },
+    {
+      label: "Projects",
+      value: scoreFromGap(report, "Projects"),
+      description: "Project proof, depth, and portfolio evidence.",
+      icon: Layers3,
+    },
+    {
+      label: "Skills",
+      value: scoreFromMaturity(report),
+      description: "Skill maturity from ATS, JD, and interview signals.",
+      icon: Code2,
+    },
+    {
+      label: "Experience",
+      value: Math.max(
+        scoreFromGap(report, "Resume Evidence"),
+        scoreFromGap(report, "Leadership Signals")
+      ),
+      description: "Ownership, impact, and practical work signals.",
+      icon: BriefcaseBusiness,
+    },
+    {
+      label: "Version History",
+      value: versionScore,
+      description: `${sourceState.versionCount} saved resume version${sourceState.versionCount === 1 ? "" : "s"}.`,
+      icon: GitBranch,
+    },
+  ];
+}
+
+function getStrongestArea(categories: ReadinessCategory[]) {
+  return [...categories]
+    .filter((category) => category.value !== null)
+    .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))[0];
+}
+
+function getWeakestArea(categories: ReadinessCategory[]) {
+  return [...categories]
+    .filter((category) => category.value !== null)
+    .sort((a, b) => (a.value ?? 0) - (b.value ?? 0))[0];
+}
+
+function buildWeeklyRoadmap(
+  report: CareerCoachReport,
+  targetGoal: string
+): RoadmapWeek[] {
+  const topRecommendation = report.strategicRecommendations.nextBestAction;
+  const firstSkill =
+    report.skillGapRoadmap[0]?.title ??
+    report.skillMaturity.find((item) => item.maturity === "Beginner")?.skill ??
+    "target-role fundamentals";
+  const resumeTask =
+    report.resumeImprovementPlan[0]?.title ?? "tighten resume evidence";
+  const interviewTask =
+    report.interviewPracticePlan[0]?.title ?? "complete one mock interview";
+
+  return [
+    {
+      id: "week-1",
+      title: "Week 1",
+      focus: "Fix the highest leverage gap",
+      items: [
+        topRecommendation.title,
+        "Improve ATS signal toward 90+.",
+        `Rewrite resume evidence around ${resumeTask}.`,
+        "Complete one interview or OA session.",
+        `Study ${firstSkill}.`,
+      ],
+    },
+    {
+      id: "week-2",
+      title: "Week 2",
+      focus: "Build target-role proof",
+      items: [
+        `Build or refine one ${targetGoal} proof project.`,
+        "Solve 20 focused DSA or role-specific problems.",
+        "Run JD Match against a real target posting.",
+        "Practice one project deep dive.",
+        "Document tradeoffs, tests, and performance decisions.",
+      ],
+    },
+    {
+      id: "week-3",
+      title: "Week 3",
+      focus: "Raise interview confidence",
+      items: [
+        `Practice ${interviewTask}.`,
+        "Complete one system-design style explanation.",
+        "Review weak concepts from OA/interview feedback.",
+        "Record one behavioral answer using STAR.",
+        "Re-run resume analyzer after edits.",
+      ],
+    },
+    {
+      id: "week-4",
+      title: "Week 4",
+      focus: "Application readiness sprint",
+      items: [
+        "Create final resume version for the target role.",
+        "Confirm ATS and JD Match improvements.",
+        "Complete one full mock interview.",
+        "Prepare recruiter summary and project stories.",
+        "Apply to a shortlist of aligned roles.",
+      ],
+    },
+  ];
+}
+
+function buildRecommendations(
+  report: CareerCoachReport
+): CoachRecommendation[] {
+  return report.strategicRecommendations.recommendations.slice(0, 6).map((item) => ({
+    id: item.id,
+    title: item.title,
+    priority: item.priority,
+    reason: item.reason,
+    impact: `+${item.expectedReadinessGain} readiness`,
+    difficulty: difficultyFromPriority(item.priority),
+  }));
+}
+
+function buildLearningTopics(report: CareerCoachReport): LearningTopic[] {
+  const weakSkills = report.skillMaturity
+    .filter((item) => item.maturity === "Beginner" || item.maturity === "Intermediate")
+    .map((item) => item.skill);
+  const fallback = [
+    "Graphs",
+    "DP",
+    "React",
+    "Node",
+    "Docker",
+    "AWS",
+    "System Design",
+    "SQL",
+    "Behavioral",
+  ];
+  const topics = Array.from(new Set([...weakSkills, ...fallback])).slice(0, 9);
+
+  return topics.map((title, index) => ({
+    title,
+    difficulty:
+      /System Design|AWS|DP/i.test(title)
+        ? "Advanced"
+        : /Docker|Node|SQL|Graphs/i.test(title)
+          ? "Intermediate"
+          : "Beginner",
+    hours: index < 3 ? 6 : index < 6 ? 4 : 3,
+    priority: index < 3 ? "High" : index < 6 ? "Medium" : "Low",
+  }));
+}
+
+function buildTimeline(
+  report: CareerCoachReport,
+  resume: CareerCoachResumeSnapshot | null,
+  sourceState: SourceState
+): CoachTimelineEvent[] {
+  return [
+    {
+      id: "resume-uploaded",
+      title: "Resume uploaded",
+      detail: resume ? resume.title : "Upload a resume to start the operating system.",
+      time: resume ? "Active" : "Pending",
+      active: Boolean(resume),
+    },
+    {
+      id: "ats-improved",
+      title: "ATS improved",
+      detail: report.scores.atsReadiness.score
+        ? `Current ATS readiness is ${report.scores.atsReadiness.score}.`
+        : "Run ATS Optimizer to create this milestone.",
+      time: sourceState.ats ? "Latest" : "Pending",
+      active: sourceState.ats,
+    },
+    {
+      id: "jd-matched",
+      title: "JD matched",
+      detail: report.scores.jobMatchReadiness.score
+        ? `Current JD fit is ${report.scores.jobMatchReadiness.score}.`
+        : "Analyze a job description to unlock role fit.",
+      time: sourceState.jdMatch ? "Latest" : "Pending",
+      active: sourceState.jdMatch,
+    },
+    {
+      id: "interview-completed",
+      title: "Interview completed",
+      detail: report.scores.interviewReadiness.score
+        ? `Interview readiness is ${report.scores.interviewReadiness.score}.`
+        : "Complete one mock interview or OA session.",
+      time: sourceState.oa || sourceState.interview ? "Latest" : "Pending",
+      active: sourceState.oa || sourceState.interview,
+    },
+    {
+      id: "resume-rewritten",
+      title: "Resume rewritten",
+      detail: "Resume Rewriter and Version History signals are tracked here.",
+      time: sourceState.versionCount ? `${sourceState.versionCount} versions` : "Pending",
+      active: sourceState.versionCount > 0,
+    },
+    {
+      id: "milestone-unlocked",
+      title: "Milestone unlocked",
+      detail: report.careerReadinessScore >= 80
+        ? "You are approaching application readiness."
+        : "Complete the next weekly checklist to unlock readiness milestones.",
+      time: report.careerReadinessScore >= 80 ? "Unlocked" : "Next",
+      active: report.careerReadinessScore >= 80,
+    },
+  ];
+}
+
+function buildAchievements(
+  report: CareerCoachReport,
+  resume: CareerCoachResumeSnapshot | null,
+  sourceState: SourceState
+): Achievement[] {
+  return [
+    {
+      id: "first-resume",
+      title: "First Resume",
+      description: "Uploaded a resume baseline.",
+      unlocked: Boolean(resume),
+    },
+    {
+      id: "ats-90",
+      title: "ATS 90+",
+      description: "Reached elite ATS readiness.",
+      unlocked: (report.scores.atsReadiness.score ?? 0) >= 90,
+    },
+    {
+      id: "five-interviews",
+      title: "5 Interviews",
+      description: "Built interview repetition.",
+      unlocked: Boolean(sourceState.oa || sourceState.interview) && (report.scores.interviewReadiness.score ?? 0) >= 75,
+    },
+    {
+      id: "ten-versions",
+      title: "10 Resume Versions",
+      description: "Iterated with version history.",
+      unlocked: sourceState.versionCount >= 10,
+    },
+    {
+      id: "dsa-100",
+      title: "100 DSA Problems",
+      description: "Manual milestone from roadmap practice.",
+      unlocked: false,
+    },
+    {
+      id: "career-ready",
+      title: "Career Ready",
+      description: "Overall readiness reached 85+.",
+      unlocked: report.careerReadinessScore >= 85,
+    },
+  ];
+}
+
+function buildProgressPoints(
+  snapshots: CareerCoachSnapshot[],
+  key: keyof Pick<CareerCoachSnapshot, "readiness" | "resume" | "ats" | "jdMatch" | "interview">,
+  fallback: number
+) {
+  const points = snapshots
+    .map((snapshot) => snapshot[key])
+    .filter((value): value is number => typeof value === "number");
+
+  return points.length ? points : [Math.max(0, fallback - 18), Math.max(0, fallback - 9), fallback];
+}
+
+function completionPercent(roadmap: RoadmapWeek[], progress: Record<string, boolean>) {
+  const total = roadmap.reduce((sum, week) => sum + week.items.length, 0);
+  const complete = roadmap.reduce((sum, week) => {
+    return sum + week.items.filter((_, index) => progress[`${week.id}-${index}`]).length;
+  }, 0);
+
+  return total ? clampScore((complete / total) * 100) : 0;
+}
+
+function GoalSelector({
+  value,
+  onChange,
 }: {
-  label: string;
-  available: boolean;
+  value: CareerGoalPreference;
+  onChange: (next: CareerGoalPreference) => void;
 }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${
-        available
-          ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-100"
-          : "border-amber-300/25 bg-amber-300/10 text-amber-100"
-      }`}
-    >
-      {available ? (
-        <CheckCircle2 className="h-3.5 w-3.5" />
-      ) : (
-        <TriangleAlert className="h-3.5 w-3.5" />
-      )}
-      {label}
-    </span>
-  );
-}
-
-function ScoreCard({ item }: { item: CareerCoachScoreCard }) {
-  return (
-    <Card className={`${forge.card} ${forge.hoverCard}`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <CardTitle className="text-base">{item.name}</CardTitle>
-            <p className="mt-1 text-xs text-zinc-500">{item.status}</p>
-          </div>
-          <span className={`text-2xl font-semibold ${scoreTone(item.score)}`}>
-            {item.score === null ? "--" : item.score}
-          </span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className={`h-2 ${forge.progressTrack}`}>
-          <div className={forge.progressFill} style={{ width: scoreWidth(item.score) }} />
-        </div>
-        <p className="text-sm leading-6 text-zinc-400">{item.reason}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ListPanel({
-  title,
-  items,
-  tone = "default",
-}: {
-  title: string;
-  items: string[];
-  tone?: "default" | "good" | "warn";
-}) {
-  const titleTone =
-    tone === "good"
-      ? "text-emerald-200"
-      : tone === "warn"
-        ? "text-amber-200"
-        : "text-zinc-100";
-
-  return (
-    <Card className={`${forge.card} ${forge.hoverCard}`}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <CardTitle className={`text-base ${titleTone}`}>{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-2 text-sm leading-6 text-zinc-400">
-          {(items.length ? items : ["No items available yet."]).slice(0, 8).map((item) => (
-            <li key={item} className="flex gap-2">
-              <span
-                className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${
-                  tone === "good"
-                    ? "bg-emerald-300"
-                    : tone === "warn"
-                      ? "bg-amber-300"
-                      : "bg-cyan-300"
-                }`}
-              />
-              <span>{item}</span>
-            </li>
+    <div className="rounded-[1.55rem] border border-white/[0.08] bg-[#070B1F]/62 p-4">
+      <label className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
+        Career Goal
+        <select
+          value={value.goal}
+          onChange={(event) =>
+            onChange({ ...value, goal: event.target.value })
+          }
+          className="mt-3 h-11 w-full rounded-2xl border border-white/10 bg-[rgba(5,8,22,0.75)] px-3 text-sm normal-case tracking-normal text-white outline-none transition duration-300 focus:border-[#00E5FF]/50 focus:ring-2 focus:ring-[#00E5FF]/20"
+        >
+          {GOALS.map((goal) => (
+            <option key={goal} value={goal}>
+              {goal}
+            </option>
           ))}
-        </ul>
-      </CardContent>
-    </Card>
-  );
-}
-
-function Timeline({
-  title,
-  items,
-}: {
-  title: string;
-  items: CareerCoachTimelineItem[];
-}) {
-  return (
-    <Card className={forge.card}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <CalendarDays className="h-4 w-4 text-cyan-100" />
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {items.map((item) => (
-            <div key={item.label} className="relative pl-8">
-              <span className="absolute left-2 top-1.5 h-full w-px bg-white/10" />
-              <span className="absolute left-0 top-1 grid h-4 w-4 place-items-center rounded-full border border-[#00E5FF]/30 bg-[#00E5FF]/20 shadow-[0_0_18px_rgba(0,229,255,0.22)]" />
-              <p className="text-xs font-semibold uppercase text-cyan-100">
-                {item.label}
-              </p>
-              <h3 className="mt-1 text-sm font-semibold text-zinc-100">
-                {item.title}
-              </h3>
-              <ul className="mt-2 space-y-1 text-sm leading-6 text-zinc-400">
-                {item.tasks.map((task) => (
-                  <li key={task}>{task}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function GapAnalysisCard({
-  gaps,
-}: {
-  gaps: CareerCoachGap[];
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="flex items-center gap-2 text-sm font-semibold text-cyan-100">
-        <Layers3 className="h-4 w-4" />
-        Gap matrix
-      </p>
-      <div className="grid gap-3 md:grid-cols-2">
-        {gaps.map((gapItem) => (
-          <div
-            key={gapItem.gapName}
-            className="rounded-2xl border border-white/10 bg-[#070B1F]/60 p-3"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-zinc-100">
-                  {gapItem.gapName}
-                </p>
-                <p className="mt-1 text-xs text-zinc-500">
-                  {gapItem.currentState} → {gapItem.expectedState}
-                </p>
-              </div>
-              <span className={`rounded-full border px-2 py-0.5 text-xs ${priorityTone(gapItem.impact)}`}>
-                {gapItem.impact}
-              </span>
-            </div>
-            <p className="mt-3 text-xs leading-5 text-zinc-400">
-              Estimated close time: {gapItem.estimatedTimeToClose}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StrategicRecommendationCard({
-  item,
-}: {
-  item: CareerCoachStrategicRecommendation;
-}) {
-  return (
-    <div className="rounded-3xl border border-white/10 bg-[#070B1F]/60 p-4 shadow-[0_0_28px_rgba(0,229,255,0.08)]">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`rounded-full border px-2.5 py-1 text-xs ${priorityTone(item.priority)}`}>
-              {item.priority}
-            </span>
-            <span className="rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-2.5 py-1 text-xs text-cyan-100">
-              +{item.expectedReadinessGain} readiness
-            </span>
-          </div>
-          <h3 className="mt-3 text-lg font-semibold text-zinc-100">
-            {item.title}
-          </h3>
-          <p className="mt-2 text-sm leading-6 text-zinc-400">{item.reason}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:justify-end">
-          {item.sourceModules.map((module) => (
-            <span
-              key={module}
-              className="rounded-full border border-[#8B5CF6]/25 bg-[#8B5CF6]/10 px-2.5 py-1 text-xs text-purple-100"
-            >
-              {module}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <div>
-          <p className="text-xs font-semibold uppercase text-cyan-100">
-            Evidence
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {(item.evidence.length ? item.evidence : ["No raw evidence yet."])
-              .slice(0, 8)
-              .map((evidence) => (
-                <span
-                  key={evidence}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-zinc-300"
-                >
-                  {evidence}
-                </span>
-              ))}
-          </div>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase text-cyan-100">
-            Action checklist
-          </p>
-          <ul className="mt-2 space-y-2 text-sm leading-6 text-zinc-400">
-            {item.actions.map((action) => (
-              <li key={action} className="flex gap-2">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-cyan-100" />
-                <span>{action}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PrioritizedRecommendationsSection({
-  recommendations,
-}: {
-  recommendations: CareerCoachStrategicRecommendation[];
-}) {
-  return (
-    <Card className={forge.cardStrong}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <TrendingUp className="h-5 w-5 text-cyan-100" />
-          Prioritized Recommendations
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {recommendations.map((item) => (
-          <StrategicRecommendationCard key={item.id} item={item} />
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecruiterPerspectiveCard({
-  report,
-}: {
-  report: CareerCoachReport["recruiterSimulation"];
-}) {
-  return (
-    <Card className={forge.cardStrong}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Users className="h-4 w-4 text-purple-100" />
-          Recruiter Perspective
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className={forge.metric}>
-            <p className="text-xs font-medium uppercase text-zinc-500">
-              Impression Score
-            </p>
-            <p className="mt-2 text-3xl font-semibold text-cyan-100">
-              {report.impressionScore.toFixed(1)} / 10
-            </p>
-          </div>
-          <div className={forge.metric}>
-            <p className="text-xs font-medium uppercase text-zinc-500">
-              Likely Outcome
-            </p>
-            <p className="mt-2 text-xl font-semibold text-zinc-100">
-              {report.likelyOutcome}
-            </p>
-          </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <RecruiterList
-            title="Strengths recruiters notice"
-            items={report.strengthsRecruitersNotice}
-            tone="good"
+        </select>
+      </label>
+      {value.goal === "Custom Goal" ? (
+        <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          Custom Goal
+          <input
+            value={value.customGoal}
+            onChange={(event) =>
+              onChange({ ...value, customGoal: event.target.value })
+            }
+            placeholder="Senior Backend Engineer"
+            className="mt-2 h-11 w-full rounded-2xl border border-white/10 bg-[rgba(5,8,22,0.75)] px-3 text-sm normal-case tracking-normal text-white outline-none placeholder:text-zinc-600 focus:border-[#00E5FF]/50 focus:ring-2 focus:ring-[#00E5FF]/20"
           />
-          <RecruiterList
-            title="Risks recruiters notice"
-            items={report.risksRecruitersNotice}
-            tone="warn"
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function RecruiterList({
-  title,
-  items,
-  tone,
-}: {
-  title: string;
-  items: string[];
-  tone: "good" | "warn";
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-[#070B1F]/60 p-3">
-      <p className={tone === "good" ? "text-sm font-semibold text-emerald-200" : "text-sm font-semibold text-amber-200"}>
-        {title}
-      </p>
-      <ul className="mt-3 space-y-2 text-sm leading-6 text-zinc-400">
-        {(items.length ? items : ["No items available yet."]).slice(0, 5).map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+        </label>
+      ) : null}
     </div>
-  );
-}
-
-function SkillMaturityCard({
-  items,
-}: {
-  items: CareerCoachSkillMaturity[];
-}) {
-  return (
-    <Card className={forge.card}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <BrainCircuit className="h-4 w-4 text-cyan-100" />
-          Skill Maturity
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <div key={item.skill} className={forge.metric}>
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-zinc-100">{item.skill}</p>
-                <span className="rounded-full border border-[#8B5CF6]/25 bg-[#8B5CF6]/10 px-2 py-0.5 text-xs text-purple-100">
-                  {item.maturity}
-                </span>
-              </div>
-              <p className="mt-2 text-xs leading-5 text-zinc-500">{item.evidence}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TargetRoleComparisonCard({
-  items,
-}: {
-  items: CareerCoachTargetRoleMetric[];
-}) {
-  return (
-    <Card className={forge.card}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <BarChart3 className="h-4 w-4 text-cyan-100" />
-          You vs Target Role
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {items.map((item) => (
-            <div key={item.name} className="rounded-2xl border border-white/10 bg-[#070B1F]/60 p-3">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-zinc-100">{item.name}</p>
-                  <p className="mt-1 text-xs text-zinc-500">{item.reason}</p>
-                </div>
-                <span className="text-sm font-semibold text-cyan-100">
-                  {item.currentMatch}%
-                </span>
-              </div>
-              <div className={`mt-3 h-2 ${forge.progressTrack}`}>
-                <div className={forge.progressFill} style={{ width: scoreWidth(item.currentMatch) }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function FormulaCard({ report }: { report: CareerCoachReport }) {
-  const rows = [
-    ["Resume 25%", report.readinessFormula.resumeContribution],
-    ["ATS 20%", report.readinessFormula.atsContribution],
-    ["JD Match 20%", report.readinessFormula.jdContribution],
-    ["Interview 25%", report.readinessFormula.interviewContribution],
-    ["Skill Gaps 10%", report.readinessFormula.skillGapContribution],
-  ] as const;
-  const progress = report.progressTracking;
-  const deltaText =
-    progress.readinessDelta === null
-      ? "No previous snapshot yet"
-      : `${progress.previousReadiness} → ${progress.currentReadiness} (${progress.readinessDelta >= 0 ? "+" : ""}${progress.readinessDelta})`;
-
-  return (
-    <Card className={forge.card}>
-      <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <ClipboardCheck className="h-4 w-4 text-purple-100" />
-          Readiness Formula & Progress
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {rows.map(([label, value]) => (
-            <div key={label} className={forge.metric}>
-              <p className="text-xs font-medium uppercase text-zinc-500">{label}</p>
-              <p className="mt-2 text-2xl font-semibold text-cyan-100">
-                {value}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-2xl border border-[#00E5FF]/15 bg-[#00E5FF]/10 p-3">
-          <p className="text-xs font-medium uppercase text-cyan-100">
-            Previous → Current
-          </p>
-          <p className="mt-2 text-sm leading-6 text-zinc-300">{deltaText}</p>
-          <p className="mt-1 text-xs text-zinc-500">
-            Component deltas: Resume {progress.resumeDelta ?? "--"}, ATS {progress.atsDelta ?? "--"}, JD {progress.jdMatchDelta ?? "--"}, Interview {progress.interviewDelta ?? "--"}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -744,6 +780,11 @@ export function CareerCoachClient({
     getServerCoachSnapshot
   );
   const isHydrated = coachSnapshot !== "server";
+  const goalPreference = isHydrated
+    ? readGoalPreference()
+    : { goal: "Google SDE", customGoal: "" };
+  const roadmapProgress = isHydrated ? readRoadmapProgress() : {};
+
   const sourceState = useMemo(() => {
     if (!isHydrated || coachSnapshot === "server") {
       return {
@@ -751,15 +792,11 @@ export function CareerCoachClient({
         jdMatch: false,
         oa: false,
         interview: false,
+        versionCount: 0,
       };
     }
 
-    return {
-      ats: Boolean(readLatestATSReport()),
-      jdMatch: Boolean(readLatestJDMatchReport()),
-      oa: Boolean(readLatestOAReport()),
-      interview: Boolean(readLatestInterviewReport()),
-    };
+    return buildSourceState();
   }, [isHydrated, coachSnapshot]);
   const report = useMemo(() => {
     if (!isHydrated || coachSnapshot === "server") {
@@ -779,19 +816,28 @@ export function CareerCoachClient({
   }, [isHydrated, coachSnapshot, resume]);
 
   function generateReport() {
-    const atsAnalysis = readLatestATSReport();
-    const jdMatchAnalysis = readLatestJDMatchReport();
-    const oaReport = readLatestOAReport();
-    const interviewEvaluation = readLatestInterviewReport();
     const nextReport = buildCareerCoachReport({
       resume,
-      atsAnalysis,
-      jdMatchAnalysis,
-      oaReport,
-      interviewEvaluation,
+      atsAnalysis: readLatestATSReport(),
+      jdMatchAnalysis: readLatestJDMatchReport(),
+      oaReport: readLatestOAReport(),
+      interviewEvaluation: readLatestInterviewReport(),
     });
 
     storeCoachReport(nextReport);
+  }
+
+  function updateGoal(nextGoal: CareerGoalPreference) {
+    saveGoalPreference(nextGoal);
+  }
+
+  function toggleRoadmapItem(id: string) {
+    const nextProgress = {
+      ...roadmapProgress,
+      [id]: !roadmapProgress[id],
+    };
+
+    saveRoadmapProgress(nextProgress);
   }
 
   useEffect(() => {
@@ -803,385 +849,271 @@ export function CareerCoachClient({
   if (!report) {
     return (
       <div className={forge.section}>
-        <Card className={forge.cardStrong}>
-          <CardContent className="py-10 text-center">
-            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.16)]">
-              <Compass className="h-7 w-7" />
-            </div>
-            <p className="mt-5 text-sm font-semibold uppercase text-cyan-100">
-              AI Career Coach
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold">
-              Preparing your roadmap...
-            </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
-              Reading your latest TalentForge reports from this browser.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-[2rem] border border-white/[0.08] bg-white/[0.04] p-10 text-center shadow-[0_0_30px_rgba(0,229,255,0.08)] backdrop-blur-2xl">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100">
+            <Compass className="h-7 w-7" />
+          </div>
+          <p className="mt-5 text-sm font-semibold uppercase text-cyan-100">
+            AI Career Coach
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold">Preparing your operating system...</h1>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
+            Reading your latest TalentForge signals from this browser.
+          </p>
+        </div>
       </div>
     );
   }
 
-  const activeReport = report;
-  const scores = activeReport.scores;
-  const strategicNextBestAction =
-    activeReport.strategicRecommendations.nextBestAction;
+  const targetGoal = getTargetGoal(goalPreference);
+  const targetCompany = getTargetCompany(targetGoal);
+  const categories = buildReadinessCategories(report, sourceState);
+  const weakestArea = getWeakestArea(categories);
+  const strongestArea = getStrongestArea(categories);
+  const roadmap = buildWeeklyRoadmap(report, targetGoal);
+  const recommendations = buildRecommendations(report);
+  const learningTopics = buildLearningTopics(report);
+  const timeline = buildTimeline(report, resume, sourceState);
+  const achievements = buildAchievements(report, resume, sourceState);
+  const snapshots = readCoachSnapshots();
+  const completion = completionPercent(roadmap, roadmapProgress);
+  const progress = report.progressTracking;
   const hasAnyLocalReport =
     sourceState.ats || sourceState.jdMatch || sourceState.oa || sourceState.interview;
 
   return (
     <div className={forge.section}>
-      <section className={forge.hero}>
-        <div className={forge.heroGlowCyan} />
-        <div className={forge.heroGlowPurple} />
-        <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_380px] lg:items-center">
-          <div>
-            <p className={forge.badge}>AI Career Coach</p>
-            <h1 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-              Your career roadmap, connected.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Combines your latest resume diagnostics, ATS optimizer, JD match,
-              and interview performance into one focused action plan.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <SourceStatus label="Resume" available={Boolean(resume)} />
-              <SourceStatus label="ATS" available={sourceState.ats} />
-              <SourceStatus label="JD Match" available={sourceState.jdMatch} />
-              <SourceStatus
-                label="Interview/OA"
-                available={sourceState.oa || sourceState.interview}
-              />
-            </div>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button type="button" onClick={generateReport} className={forge.primaryButton}>
-                <RefreshCw className="h-4 w-4" />
-                Refresh Roadmap
-              </Button>
-              <Button asChild variant="outline" className={forge.secondaryButton}>
-                <Link href={activeReport.nextBestAction.href}>
-                  {activeReport.nextBestAction.label}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-[#00E5FF]/20 bg-[#070B1F]/70 p-5 shadow-[0_0_42px_rgba(0,229,255,0.16)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold uppercase text-cyan-100">
-                  Career Readiness
-                </p>
-                <p className="mt-1 text-xs text-zinc-500">
-                  Updated {formatDate(activeReport.generatedAt)}
-                </p>
-              </div>
-              <Compass className="h-6 w-6 text-cyan-100" />
-            </div>
-            <div
-              className="mx-auto mt-6 grid h-44 w-44 place-items-center rounded-full p-2"
-              style={{
-                background: `conic-gradient(#00E5FF ${activeReport.careerReadinessScore}%, rgba(255,255,255,0.1) 0)`,
-              }}
-            >
-              <div className="grid h-full w-full place-items-center rounded-full bg-[#050816] text-center">
-                <div>
-                  <p className="text-5xl font-semibold text-white">
-                    {activeReport.careerReadinessScore}
-                  </p>
-                  <p className="mt-1 text-xs uppercase text-zinc-400">
-                    {activeReport.readinessLabel}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <p className="mt-5 text-center text-sm leading-6 text-zinc-400">
-              {activeReport.nextBestAction.reason}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {!hasAnyLocalReport || activeReport.missingData.length ? (
-        <Card className={forge.card}>
-          <CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-amber-100">
-                Some signals are missing
-              </p>
-              <p className="mt-1 text-sm leading-6 text-zinc-400">
-                {activeReport.missingData.length
-                  ? activeReport.missingData.join(" · ")
-                  : "Run more TalentForge tools to sharpen this roadmap."}
-              </p>
-            </div>
-            <Button asChild variant="outline" className={forge.secondaryButton}>
-              <Link href="/dashboard/resume">Open Resume Intelligence</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : null}
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <ScoreCard item={scores.resumeReadiness} />
-        <ScoreCard item={scores.atsReadiness} />
-        <ScoreCard item={scores.jobMatchReadiness} />
-        <ScoreCard item={scores.interviewReadiness} />
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
-        <Card className={forge.cardStrong}>
-          <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Target className="h-5 w-5 text-cyan-100" />
-              Target Role Fit
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Target Role
-                </p>
-                <p className="mt-2 text-lg font-semibold text-zinc-100">
-                  {activeReport.targetRole}
-                </p>
-              </div>
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Seniority
-                </p>
-                <p className="mt-2 text-lg font-semibold text-zinc-100">
-                  {activeReport.detectedSeniority}
-                </p>
-              </div>
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Data Completeness
-                </p>
-                <p className="mt-2 text-lg font-semibold text-cyan-100">
-                  {activeReport.dataCompleteness}%
-                </p>
-              </div>
-            </div>
-            <p className="text-sm leading-7 text-zinc-300">
-              {activeReport.targetRoleFit}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className={forge.cardStrong}>
-          <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Sparkles className="h-5 w-5 text-purple-100" />
-              Next Best Action
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold text-zinc-100">
-              {strategicNextBestAction.title}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-zinc-400">
-              {strategicNextBestAction.reason}
-            </p>
-            <p className="mt-3 w-fit rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-              Expected gain: +{strategicNextBestAction.expectedReadinessGain} readiness
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {strategicNextBestAction.sourceModules.map((module) => (
-                <span
-                  key={module}
-                  className="rounded-full border border-[#8B5CF6]/25 bg-[#8B5CF6]/10 px-2.5 py-1 text-xs text-purple-100"
-                >
-                  {module}
-                </span>
-              ))}
-            </div>
-            <ol className="mt-4 space-y-2 text-sm leading-6 text-zinc-400">
-              {strategicNextBestAction.actions.slice(0, 3).map((action, index) => (
-                <li key={action} className="flex gap-2">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-xs text-cyan-100">
-                    {index + 1}
-                  </span>
-                  <span>{action}</span>
-                </li>
-              ))}
-            </ol>
-            <Button asChild className={`mt-5 ${forge.primaryButton}`}>
-              <Link href={activeReport.nextBestAction.href}>
-                Continue
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
-
-      {!hasAnyLocalReport && !resume ? (
-        <Card className={forge.cardStrong}>
-          <CardContent className="py-6">
-            <p className="text-lg font-semibold text-zinc-100">
-              Run Resume Intelligence, ATS, JD Match, and OA Assessment to unlock a personalized strategy.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Button asChild className={forge.primaryButton}>
-                <Link href="/dashboard/resume">Upload a resume</Link>
-              </Button>
-              <Button asChild variant="outline" className={forge.secondaryButton}>
-                <Link href="/dashboard/resume/ats">Run ATS analysis</Link>
-              </Button>
-              <Button asChild variant="outline" className={forge.secondaryButton}>
-                <Link href="/dashboard/interview">Complete one OA session</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : null}
-
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-        <Card className={forge.cardStrong}>
-          <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Compass className="h-5 w-5 text-cyan-100" />
-              Career Gap Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-4">
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Current Role Level
-                </p>
-                <p className="mt-2 text-sm font-semibold text-zinc-100">
-                  {activeReport.careerGapAnalysis.currentRoleLevel}
-                </p>
-              </div>
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Target Role Level
-                </p>
-                <p className="mt-2 text-sm font-semibold text-zinc-100">
-                  {activeReport.careerGapAnalysis.targetRoleLevel}
-                </p>
-              </div>
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Target Company Tier
-                </p>
-                <p className="mt-2 text-sm font-semibold text-zinc-100">
-                  {activeReport.careerGapAnalysis.targetCompanyTier}
-                </p>
-              </div>
-              <div className={forge.metric}>
-                <p className="text-xs font-medium uppercase text-zinc-500">
-                  Readiness
-                </p>
-                <p className="mt-2 text-sm font-semibold text-cyan-100">
-                  {activeReport.careerGapAnalysis.readiness}%
-                </p>
-              </div>
-            </div>
-            <GapAnalysisCard gaps={activeReport.careerGapAnalysis.gaps} />
-          </CardContent>
-        </Card>
-        <Card className={forge.cardStrong}>
-          <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Sparkles className="h-5 w-5 text-purple-100" />
-              Top 3 High-Impact Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {activeReport.strategicRecommendations.recommendations
-              .slice(0, 3)
-              .map((item) => (
-                <div key={item.id} className={forge.metric}>
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-zinc-100">
-                      {item.title}
-                    </p>
-                    <span className="text-sm font-semibold text-cyan-100">
-                      +{item.expectedReadinessGain}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-zinc-500">
-                    {item.reason}
-                  </p>
-                </div>
-              ))}
-          </CardContent>
-        </Card>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)]">
-        <RecruiterPerspectiveCard report={activeReport.recruiterSimulation} />
-        <FormulaCard report={activeReport} />
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <SkillMaturityCard items={activeReport.skillMaturity} />
-        <TargetRoleComparisonCard items={activeReport.targetRoleComparison} />
-      </section>
-
-      <Card className={forge.card}>
-        <CardHeader className="border-b border-white/10 bg-[#070B1F]/60 pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <BrainCircuit className="h-4 w-4 text-cyan-100" />
-            Interview Root Cause Analysis
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {(activeReport.interviewRootCauseAnalysis.length
-              ? activeReport.interviewRootCauseAnalysis
-              : [
-                  {
-                    category: "Interview/OA",
-                    rootCause: "No weak interview categories detected yet.",
-                    evidence: "Complete an OA or interview report for deeper root-cause analysis.",
-                    fix: "Run an OA Assessment or interview session.",
-                  },
-                ]
-            ).map((item) => (
-              <div key={`${item.category}-${item.rootCause}`} className={forge.metric}>
-                <p className="text-sm font-semibold text-zinc-100">
-                  {item.category}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-zinc-400">
-                  {item.rootCause}
-                </p>
-                <p className="mt-2 text-xs text-amber-100">{item.evidence}</p>
-                <p className="mt-2 text-xs leading-5 text-cyan-100">{item.fix}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <ListPanel
-          title="Strongest Areas"
-          items={activeReport.strongestAreas}
-          tone="good"
-        />
-        <ListPanel
-          title="Weakest Areas"
-          items={activeReport.weakestAreas}
-          tone="warn"
-        />
-      </section>
-
-      <PrioritizedRecommendationsSection
-        recommendations={activeReport.strategicRecommendations.recommendations}
+      <CareerHero
+        goal={targetGoal}
+        readiness={report.careerReadinessScore}
+        timeline={estimateTimeline(report.careerReadinessScore)}
+        nextMilestone={report.strategicRecommendations.nextBestAction.title}
+        recommendation={report.strategicRecommendations.nextBestAction.reason}
+        recentProgress={formatProgressDelta(progress.readinessDelta)}
+        targetCompany={targetCompany}
+        onRefresh={generateReport}
+        goalControl={
+          <GoalSelector value={goalPreference} onChange={updateGoal} />
+        }
       />
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Timeline title="7-Day Action Plan" items={activeReport.sevenDayActionPlan} />
-        <Timeline title="30-Day Roadmap" items={activeReport.thirtyDayRoadmap} />
+      <div className="flex flex-wrap gap-2">
+        <SourcePill label="Resume" available={Boolean(resume)} />
+        <SourcePill label="ATS" available={sourceState.ats} />
+        <SourcePill label="JD Match" available={sourceState.jdMatch} />
+        <SourcePill label="Interview/OA" available={sourceState.oa || sourceState.interview} />
+        <SourcePill label="Version History" available={sourceState.versionCount > 0} />
+      </div>
+
+      {!hasAnyLocalReport || report.missingData.length ? (
+        <div className="rounded-[1.5rem] border border-amber-300/18 bg-amber-300/8 p-4">
+          <p className="text-sm font-semibold text-amber-100">Some career signals are missing</p>
+          <p className="mt-1 text-sm leading-6 text-zinc-400">
+            {report.missingData.length
+              ? report.missingData.join(" · ")
+              : "Run more TalentForge modules to sharpen the operating plan."}
+          </p>
+        </div>
+      ) : null}
+
+      <CoachSection
+        eyebrow="Readiness Engine"
+        title="Where you are right now"
+        description="Overall readiness combines resume, ATS, JD match, interview, projects, skills, experience, and version history."
+      >
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {categories.map((category) => (
+            <ReadinessCard key={category.label} category={category} />
+          ))}
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <InsightMetric
+            icon={ShieldCheck}
+            label="Weakest Area"
+            value={weakestArea?.label ?? "Unknown"}
+            detail={`${weakestArea?.value ?? 0}% readiness`}
+          />
+          <InsightMetric
+            icon={Trophy}
+            label="Strongest Area"
+            value={strongestArea?.label ?? "Unknown"}
+            detail={`${strongestArea?.value ?? 0}% readiness`}
+          />
+          <InsightMetric
+            icon={Target}
+            label="Completion"
+            value={`${completion}%`}
+            detail="Weekly roadmap progress"
+          />
+        </div>
+      </CoachSection>
+
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+        <CoachSection
+          id="weekly-roadmap"
+          eyebrow="Weekly AI Roadmap"
+          title="How to reach the goal"
+          description="A four-week execution plan generated from the weakest signals."
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            {roadmap.map((week) => (
+              <RoadmapCard
+                key={week.id}
+                week={week}
+                checked={roadmapProgress}
+                onToggle={toggleRoadmapItem}
+              />
+            ))}
+          </div>
+        </CoachSection>
+
+        <CoachSection
+          eyebrow="AI Recommendations"
+          title="Highest-impact moves"
+          description="Prioritized by readiness gain, reason, impact, and difficulty."
+        >
+          <div className="grid gap-3">
+            {recommendations.map((item) => (
+              <RecommendationCard key={item.id} item={item} />
+            ))}
+          </div>
+        </CoachSection>
       </section>
 
+      <CoachSection
+        eyebrow="Progress Tracking"
+        title="Career readiness trend"
+        description="Local trend snapshots from the coach, ATS, JD match, interview, and resume signals."
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <ProgressChart
+            title="Career readiness"
+            points={buildProgressPoints(snapshots, "readiness", report.careerReadinessScore)}
+          />
+          <ProgressChart
+            title="ATS trend"
+            points={buildProgressPoints(snapshots, "ats", report.scores.atsReadiness.score ?? 0)}
+            accent="#34D399"
+          />
+          <ProgressChart
+            title="Interview trend"
+            points={buildProgressPoints(
+              snapshots,
+              "interview",
+              report.scores.interviewReadiness.score ?? 0
+            )}
+            accent="#8B5CF6"
+          />
+          <ProgressChart
+            title="Resume trend"
+            points={buildProgressPoints(
+              snapshots,
+              "resume",
+              report.scores.resumeReadiness.score ?? 0
+            )}
+            accent="#FBBF24"
+          />
+        </div>
+      </CoachSection>
+
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <CoachSection
+          eyebrow="Career Timeline"
+          title="Milestones unlocked"
+          description="A compact path through the TalentForge operating system."
+        >
+          <div className="space-y-4">
+            {timeline.map((event) => (
+              <TimelineCard key={event.id} event={event} />
+            ))}
+          </div>
+        </CoachSection>
+
+        <CoachSection
+          eyebrow="Learning Recommendations"
+          title="What to study next"
+          description="Topics are inferred from missing role, skill, and interview evidence."
+        >
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {learningTopics.map((topic) => (
+              <LearningCard key={topic.title} topic={topic} />
+            ))}
+          </div>
+        </CoachSection>
+      </section>
+
+      <CoachSection
+        eyebrow="Achievements"
+        title="Career milestones"
+        description="Badges unlock as TalentForge detects stronger evidence across modules."
+      >
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {achievements.map((achievement) => (
+            <AchievementBadge key={achievement.id} achievement={achievement} />
+          ))}
+        </div>
+      </CoachSection>
+
+      <CoachSection
+        eyebrow="Operating Context"
+        title="Where the plan is coming from"
+        description="The coach remains deterministic and module-driven. It is not a chatbot."
+        action={
+          <Button asChild variant="outline" className={forge.secondaryButton}>
+            <Link href="/dashboard/resume">Update source data</Link>
+          </Button>
+        }
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <InsightMetric
+            icon={Rocket}
+            label="Current Goal"
+            value={targetGoal}
+            detail={`Target: ${targetCompany}`}
+          />
+          <InsightMetric
+            icon={Server}
+            label="Next Milestone"
+            value={report.nextBestAction.label}
+            detail={report.nextBestAction.reason}
+          />
+          <InsightMetric
+            icon={Database}
+            label="Data Completeness"
+            value={`${report.dataCompleteness}%`}
+            detail={`${report.missingData.length} missing source${report.missingData.length === 1 ? "" : "s"}`}
+          />
+        </div>
+      </CoachSection>
+    </div>
+  );
+}
+
+function InsightMetric({
+  icon: Icon,
+  label,
+  value,
+  detail,
+}: {
+  icon: typeof Compass;
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-[1.45rem] border border-white/[0.08] bg-[#070B1F]/58 p-4">
+      <div className="flex items-center gap-3">
+        <span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100">
+          <Icon className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {label}
+          </p>
+          <p className="mt-1 truncate text-base font-semibold text-white">{value}</p>
+        </div>
+      </div>
+      <p className="mt-3 text-xs leading-5 text-zinc-500">{detail}</p>
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { ClipboardCheck, FileText, History, PenLine, Target, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { ATSOptimizerForm } from "@/app/dashboard/resume/ats/ats-optimizer-form";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -69,40 +71,26 @@ export default async function ATSOptimizerPage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <div className="relative">
-            <span className={forge.badge}>
-              ATS Optimization Engine v0.4
-            </span>
-            <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              Tune your resume for the job description.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Select an uploaded resume, paste a complete JD, and receive an
-              ATS-focused report with missing keywords, warnings, weak bullets,
-              improved bullet rewrites, strengths, and quick wins.
-            </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {[
-                ["100-point ATS score", "Weighted by required JD evidence"],
-                ["Keyword coverage", "Matched and missing terms from the JD"],
-                ["Bullet rewrites", "Practical edits without invented claims"],
-              ].map(([title, description]) => (
-                <div
-                  key={title}
-                  className={`${forge.metric} ${forge.hoverCard}`}
-                >
-                  <p className="font-semibold text-zinc-100">{title}</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">
-                    {description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PremiumModuleHero
+          badge="ATS Optimization Engine v0.4"
+          title="Tune your resume for the job description."
+          description="Select an uploaded resume, paste a complete JD, and receive an ATS-focused report with missing keywords, warnings, and bullet rewrites."
+          variant="ats"
+          primaryCta={{ href: "/dashboard/resume/ats", label: "Optimize ATS", icon: ClipboardCheck }}
+          secondaryCta={{ href: "/dashboard/resume/match", label: "Open JD Match", icon: Target }}
+          metrics={[
+            { label: "ATS", value: "100 pt", helper: "Weighted scoring", icon: Zap, tone: "emerald", progress: 94, trend: "+8" },
+            { label: "Resumes", value: String(resumes.length), helper: "Readable uploads", icon: FileText, progress: Math.min(100, resumes.length * 18), trend: "ready" },
+            { label: "Keywords", value: "Heatmap", helper: "Coverage report", icon: Target, progress: 82, trend: "scan" },
+            { label: "Rewrites", value: "Safe", helper: "No invented claims", icon: PenLine, progress: 76, trend: "guarded" },
+          ]}
+          quickActions={[
+            { href: "/dashboard/resume/match", title: "Match JD", subtitle: "Compare resume fit", icon: Target },
+            { href: "/dashboard/resume/rewrite", title: "AI Rewrite", subtitle: "Improve bullets", icon: PenLine },
+            { href: "/dashboard/resume/history", title: "Version History", subtitle: "Track changes", icon: History },
+            { href: "/dashboard/resume", title: "Resume Dashboard", subtitle: "Upload or review", icon: FileText },
+          ]}
+        />
       </section>
 
       <section className={`${forge.content} pb-16`}>

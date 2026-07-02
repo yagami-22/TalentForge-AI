@@ -2,48 +2,41 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import {
+  ArrowRight,
   Bell,
-  CheckCircle2,
+  BriefcaseBusiness,
   ClipboardCheck,
   Compass,
-  FileSearch,
   FileText,
-  Home,
-  Menu,
   MessageSquareText,
-  PenLine,
-  Search,
-  Settings,
   Sparkles,
   Target,
   Upload,
-  Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { MobileSidebar, Sidebar } from "@/app/dashboard/dashboard-sidebar";
 import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { withRetry } from "@/lib/retry";
 
-type NavItem = {
+type KpiCardData = {
   label: string;
-  href: string;
+  value: string;
+  subtitle: string;
+  status: string;
+  delta: string;
+  progress: number;
+  tone: "cyan" | "purple" | "emerald" | "amber";
   icon: LucideIcon;
-};
-
-type FeatureCardData = {
-  title: string;
-  description: string;
-  features: string[];
-  href: string;
-  buttonLabel: string;
-  icon: LucideIcon;
+  trend: number[];
 };
 
 type QuickActionData = {
-  label: string;
+  title: string;
+  subtitle: string;
   href: string;
   icon: LucideIcon;
 };
@@ -51,6 +44,7 @@ type QuickActionData = {
 type ActivityData = {
   label: string;
   detail: string;
+  time: string;
 };
 
 type ResumeSnapshotData = {
@@ -68,60 +62,60 @@ type UserProfile = {
   initial: string;
 };
 
-const sidebarItems: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: Home },
-  { label: "Resume Intelligence", href: "/dashboard/resume", icon: FileText },
-  { label: "AI Mock Interviews", href: "/dashboard/interview", icon: MessageSquareText },
-  { label: "AI Career Coach", href: "/dashboard/coach", icon: Compass },
-  { label: "Job Matcher", href: "/dashboard/resume/match", icon: Target },
-  { label: "ATS Optimizer", href: "/dashboard/resume/ats", icon: ClipboardCheck },
-  { label: "Resume Rewriter", href: "/dashboard/resume/rewrite", icon: PenLine },
-  { label: "Reports", href: "/dashboard/resume", icon: FileSearch },
-  { label: "Settings", href: "/dashboard", icon: Settings },
-];
-
-const featureCards: FeatureCardData[] = [
+const quickActions: QuickActionData[] = [
   {
-    title: "Resume Intelligence",
-    description:
-      "Upload, analyze, and optimize your resume to beat ATS and impress recruiters.",
-    features: ["ATS Analysis", "Resume Match", "Resume Rewriter"],
+    title: "Upload Resume",
+    subtitle: "Start with a fresh baseline",
     href: "/dashboard/resume",
-    buttonLabel: "Open Dashboard",
-    icon: FileSearch,
+    icon: Upload,
   },
   {
-    title: "AI Mock Interviews",
-    description:
-      "Practice realistic interviews with AI feedback across OA, technical, project, and behavioral rounds.",
-    features: ["OA Assessment", "Technical Interview", "Project Deep Dive", "Behavioral / HR"],
+    title: "Match a Job",
+    subtitle: "Compare against a target JD",
+    href: "/dashboard/resume/match",
+    icon: Target,
+  },
+  {
+    title: "Practice Interview",
+    subtitle: "Run a focused mock round",
     href: "/dashboard/interview",
-    buttonLabel: "Start Practice",
     icon: MessageSquareText,
   },
   {
-    title: "AI Career Coach",
-    description:
-      "Get a personalized roadmap based on your goals, skills, and market trends.",
-    features: ["Career Roadmap", "Skill Gap Analysis", "Personalized Guidance"],
+    title: "Open Coach",
+    subtitle: "Turn signals into a roadmap",
     href: "/dashboard/coach",
-    buttonLabel: "Explore Coach",
     icon: Compass,
+  },
+  {
+    title: "AI Recruiter Mode",
+    subtitle: "Rank candidates and generate reports",
+    href: "/dashboard/recruiter",
+    icon: BriefcaseBusiness,
   },
 ];
 
-const quickActions: QuickActionData[] = [
-  { label: "Upload Resume", href: "/dashboard/resume", icon: Upload },
-  { label: "Match Job", href: "/dashboard/resume/match", icon: Target },
-  { label: "Start Interview", href: "/dashboard/interview", icon: MessageSquareText },
-  { label: "ATS Check", href: "/dashboard/resume/ats", icon: ClipboardCheck },
-];
-
 const recentActivity: ActivityData[] = [
-  { label: "Resume scanned", detail: "Resume Intelligence completed" },
-  { label: "ATS improved", detail: "Optimization checklist updated" },
-  { label: "Job matched", detail: "JD match report generated" },
-  { label: "Mock interview completed", detail: "Practice feedback saved" },
+  {
+    label: "Resume intelligence ready",
+    detail: "Latest resume signal is available.",
+    time: "Now",
+  },
+  {
+    label: "ATS checklist refreshed",
+    detail: "Optimization guidance is queued.",
+    time: "Today",
+  },
+  {
+    label: "Job match workspace active",
+    detail: "Compare the next role from JD Match.",
+    time: "1d",
+  },
+  {
+    label: "Interview practice available",
+    detail: "Mock interview feedback is ready when you are.",
+    time: "2d",
+  },
 ];
 
 function buildResumeSnapshot(
@@ -219,9 +213,11 @@ export default async function DashboardPage() {
     })
   );
   const snapshot = buildResumeSnapshot(latestResume);
+  const readiness = getCareerReadiness(snapshot);
+  const kpis = buildKpis(snapshot, readiness);
 
   return (
-    <PremiumBackground contentClassName="mx-auto flex w-full max-w-[1540px] flex-col gap-5 px-4 py-4 sm:px-6 xl:flex-row xl:px-7">
+    <PremiumBackground contentClassName="mx-auto flex w-full max-w-[1500px] flex-col gap-6 px-4 py-5 sm:px-6 xl:flex-row xl:px-7">
       <div className="xl:hidden">
         <MobileSidebar profile={profile} />
       </div>
@@ -230,25 +226,20 @@ export default async function DashboardPage() {
         <Sidebar profile={profile} />
       </div>
 
-      <section className="min-w-0 flex-1 space-y-5">
+      <section className="min-w-0 flex-1 space-y-6">
         <TopHeader profile={profile} />
+        <ExecutiveHero profile={profile} snapshot={snapshot} readiness={readiness} />
+        <KpiGrid cards={kpis} />
 
-        <div className="grid gap-5 2xl:grid-cols-[1fr_370px]">
-          <div className="space-y-5">
-            <HeroBanner />
-            <ResumeSnapshotCard snapshot={snapshot} />
-
-            <section className="grid gap-5 lg:grid-cols-3">
-              {featureCards.map((feature) => (
-                <FeatureCard key={feature.title} feature={feature} />
-              ))}
-            </section>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.48fr)_390px]">
+          <div className="space-y-6">
+            <CareerInsights snapshot={snapshot} />
+            <AnalyticsSection snapshot={snapshot} readiness={readiness} />
           </div>
 
-          <aside className="grid gap-5 lg:grid-cols-3 2xl:block 2xl:space-y-5">
-            <ActivityPanel />
+          <aside className="space-y-6">
             <QuickActions />
-            <MotivationCard />
+            <ActivityTimeline />
           </aside>
         </div>
       </section>
@@ -256,112 +247,102 @@ export default async function DashboardPage() {
   );
 }
 
-function Sidebar({ profile }: { profile: UserProfile }) {
-  return (
-    <aside className="sticky top-4 h-[calc(100vh-2rem)]">
-      <div className="flex h-full flex-col rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.12)] backdrop-blur-2xl">
-        <Logo />
-        <nav className="mt-7 grid gap-1.5">
-          {sidebarItems.map((item) => (
-            <SidebarNavItem key={item.label} item={item} />
-          ))}
-        </nav>
-        <UserProfileCard profile={profile} />
-      </div>
-    </aside>
+function getCareerReadiness(snapshot: ResumeSnapshotData) {
+  const signals = [snapshot.atsScore, snapshot.matchScore].filter(
+    (score): score is number => typeof score === "number"
   );
+
+  if (!signals.length) {
+    return null;
+  }
+
+  return Math.round(signals.reduce((total, score) => total + score, 0) / signals.length);
 }
 
-function MobileSidebar({ profile }: { profile: UserProfile }) {
-  return (
-    <details className="group rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-3 shadow-[0_0_40px_rgba(0,229,255,0.1)] backdrop-blur-2xl">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-        <Logo compact />
-        <span className="grid h-10 w-10 place-items-center rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 text-cyan-100">
-          <Menu className="h-5 w-5" />
-        </span>
-      </summary>
-      <nav className="mt-4 grid gap-1.5 border-t border-[rgba(255,255,255,0.08)] pt-4">
-        {sidebarItems.map((item) => (
-          <SidebarNavItem key={item.label} item={item} />
-        ))}
-      </nav>
-      <UserProfileCard profile={profile} />
-    </details>
-  );
+function buildKpis(
+  snapshot: ResumeSnapshotData,
+  readiness: number | null
+): KpiCardData[] {
+  const atsScore = snapshot.atsScore ?? 0;
+  const matchScore = snapshot.matchScore ?? 0;
+  const interviewProgress = readiness === null ? 18 : Math.min(100, Math.round(readiness * 0.72));
+  const healthProgress = snapshot.atsScore ?? (snapshot.resumeTitle ? 52 : 18);
+
+  return [
+    {
+      label: "ATS Score",
+      value: snapshot.atsScore === null ? "--" : String(snapshot.atsScore),
+      subtitle: "Recruiter systems fit",
+      status: getStatusLabel(snapshot.atsScore),
+      delta: snapshot.atsScore === null ? "Upload resume" : "+8 potential",
+      progress: atsScore,
+      tone: "emerald",
+      icon: ClipboardCheck,
+      trend: [42, 48, 53, 57, 64, Math.max(atsScore, 68)],
+    },
+    {
+      label: "Job Match",
+      value: snapshot.matchScore === null ? "--" : `${snapshot.matchScore}%`,
+      subtitle: "Target role alignment",
+      status: getStatusLabel(snapshot.matchScore),
+      delta: snapshot.matchScore === null ? "Run JD Match" : "+12 keywords",
+      progress: matchScore,
+      tone: "purple",
+      icon: Target,
+      trend: [36, 44, 49, 58, 61, Math.max(matchScore, 64)],
+    },
+    {
+      label: "Interview Readiness",
+      value: readiness === null ? "--" : `${interviewProgress}%`,
+      subtitle: "Practice coverage",
+      status: readiness === null ? "Not started" : "Recommended",
+      delta: "1 round next",
+      progress: interviewProgress,
+      tone: "cyan",
+      icon: MessageSquareText,
+      trend: [22, 26, 30, 38, 42, interviewProgress],
+    },
+    {
+      label: "Resume Health",
+      value: snapshot.health,
+      subtitle: snapshot.resumeTitle ? "Latest resume" : "No resume yet",
+      status: snapshot.resumeTitle ? "Active" : "Setup needed",
+      delta: snapshot.lastAnalysis,
+      progress: healthProgress,
+      tone: "amber",
+      icon: FileText,
+      trend: [28, 36, 42, 50, 58, healthProgress],
+    },
+  ];
 }
 
-function Logo({ compact = false }: { compact?: boolean }) {
-  return (
-    <Link href="/" className="flex items-center gap-3 rounded-2xl px-2 py-2">
-      <span className="relative grid h-11 w-11 place-items-center rounded-2xl border border-cyan-300/25 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.24)]">
-        <Sparkles className="h-5 w-5" />
-        <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-[#8B5CF6] shadow-[0_0_18px_rgba(139,92,246,0.8)]" />
-      </span>
-      {!compact ? (
-        <span>
-          <span className="block text-base font-semibold tracking-tight">
-            TalentForge AI
-          </span>
-          <span className="text-xs text-slate-500">Career Intelligence</span>
-        </span>
-      ) : (
-        <span className="text-base font-semibold tracking-tight">TalentForge AI</span>
-      )}
-    </Link>
-  );
-}
-
-function SidebarNavItem({ item }: { item: NavItem }) {
-  const Icon = item.icon;
-
-  return (
-    <Link
-      href={item.href}
-      className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm text-slate-400 transition duration-300 hover:-translate-y-0.5 hover:bg-[#00E5FF]/10 hover:text-cyan-50 hover:shadow-[0_0_28px_rgba(0,229,255,0.12)]"
-    >
-      <Icon className="h-4 w-4 text-slate-500 transition duration-300 group-hover:text-[#00E5FF]" />
-      <span>{item.label}</span>
-    </Link>
-  );
-}
-
-function UserProfileCard({ profile }: { profile: UserProfile }) {
-  return (
-    <div className="mt-auto rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 p-4 shadow-[0_0_40px_rgba(106,92,255,0.12)]">
-      <div className="flex items-center gap-3">
-        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] text-sm font-bold text-white shadow-[0_0_30px_rgba(0,229,255,0.26)]">
-          {profile.initial}
-        </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-white">{profile.email}</p>
-          <p className="text-xs capitalize text-slate-500">{profile.role.toLowerCase()}</p>
-        </div>
-      </div>
-    </div>
-  );
+function getStatusLabel(score: number | null) {
+  if (score === null) return "Needs signal";
+  if (score >= 80) return "Strong";
+  if (score >= 65) return "Improving";
+  return "Needs focus";
 }
 
 function TopHeader({ profile }: { profile: UserProfile }) {
   return (
-    <header className="flex flex-col gap-3 rounded-[1.5rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-4 shadow-[0_0_40px_rgba(0,229,255,0.1)] backdrop-blur-2xl md:flex-row md:items-center md:justify-between">
-      <div className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 px-4 py-3">
-        <Search className="h-4 w-4 text-[#00E5FF]" />
-        <span className="text-sm text-slate-500">Search anything...</span>
+    <header className="flex items-center justify-between gap-4 rounded-[1.35rem] border border-white/[0.08] bg-white/[0.035] px-4 py-3 shadow-[0_0_28px_rgba(0,229,255,0.07)] backdrop-blur-2xl">
+      <div>
+        <p className="text-xs uppercase tracking-wide text-slate-600">Overview</p>
+        <p className="mt-1 text-sm text-slate-300">Executive dashboard</p>
       </div>
-      <div className="flex items-center justify-between gap-3 md:justify-end">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           aria-label="Notifications"
-          className="grid h-11 w-11 place-items-center rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 text-slate-300 transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-[#00E5FF]/10 hover:text-cyan-50 hover:shadow-[0_0_28px_rgba(0,229,255,0.18)]"
+          className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.08] bg-[#070b1f]/70 text-slate-400 transition duration-300 hover:border-cyan-300/25 hover:bg-[#00E5FF]/10 hover:text-cyan-50"
         >
           <Bell className="h-4 w-4" />
         </button>
-        <div className="flex items-center gap-3 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 px-3 py-2">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white">
+        <div className="hidden items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#070b1f]/70 px-3 py-2 sm:flex">
+          <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-xs font-bold text-white">
             {profile.initial}
           </span>
-          <span className="hidden max-w-[220px] truncate text-sm text-slate-300 sm:block">
+          <span className="max-w-[220px] truncate text-sm text-slate-300">
             {profile.email}
           </span>
         </div>
@@ -370,303 +351,475 @@ function TopHeader({ profile }: { profile: UserProfile }) {
   );
 }
 
-function HeroBanner() {
-  return (
-    <section className="relative min-h-[500px] overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.16),rgba(106,92,255,0.14)_48%,rgba(139,92,246,0.18))] p-7 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.12)] sm:p-10 lg:p-12">
-      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-[#00E5FF]/20 blur-3xl" />
-      <div className="pointer-events-none absolute -right-24 bottom-8 h-96 w-96 rounded-full bg-[#6A5CFF]/24 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_24%_22%,rgba(255,255,255,0.18)_0_1px,transparent_2px),radial-gradient(circle_at_72%_30%,rgba(0,229,255,0.28)_0_1px,transparent_2px),radial-gradient(circle_at_52%_78%,rgba(139,92,246,0.32)_0_1px,transparent_2px)]" />
-      <div className="relative grid gap-8 lg:grid-cols-[1fr_360px] lg:items-center">
-        <div className="max-w-3xl">
-          <span className="inline-flex rounded-full border border-cyan-300/25 bg-[#00E5FF]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.16)]">
-            Premium AI Career OS
-          </span>
-          <h1 className="mt-6 text-5xl font-semibold leading-[0.96] tracking-tight sm:text-7xl">
-            Stand out.
-            <br />
-            <span className="bg-gradient-to-r from-[#00E5FF] via-white to-[#8B5CF6] bg-clip-text text-transparent">
-              Get hired.
-            </span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-            AI-powered tools to analyze, optimize, and accelerate your career.
-          </p>
-          <Button
-            asChild
-            className="group relative mt-8 h-12 overflow-hidden rounded-2xl bg-gradient-to-r from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] px-6 text-white shadow-[0_0_32px_rgba(0,229,255,0.25)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_46px_rgba(0,229,255,0.36)]"
-          >
-            <Link href="/dashboard/resume">
-              <span className="absolute inset-y-0 -left-10 w-10 skew-x-12 bg-white/30 transition duration-300 group-hover:left-full" />
-              <span className="relative">Start Your Journey</span>
-            </Link>
-          </Button>
-        </div>
-
-        <AiIllustration />
-      </div>
-    </section>
-  );
-}
-
-function ResumeSnapshotCard({ snapshot }: { snapshot: ResumeSnapshotData }) {
-  const atsScore = snapshot.atsScore ?? 0;
-  const matchScore = snapshot.matchScore ?? 0;
-  const scoreLabel = snapshot.atsScore === null ? "--" : String(snapshot.atsScore);
-  const matchLabel = snapshot.matchScore === null ? "--" : `${snapshot.matchScore}%`;
-
-  return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-cyan-300/15 bg-[rgba(255,255,255,0.04)] p-6 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.12)] backdrop-blur-2xl sm:p-7">
-      <div className="pointer-events-none absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-[#00E5FF]/14 blur-3xl" />
-      <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-[#8B5CF6]/18 blur-3xl" />
-      <div className="relative grid gap-6 xl:grid-cols-[260px_1fr] xl:items-center">
-        <div>
-          <span className="inline-flex rounded-full border border-[#00E5FF]/20 bg-[#00E5FF]/10 px-3 py-1 text-xs font-medium text-cyan-100">
-            Resume command center
-          </span>
-          <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-            Resume Intelligence Snapshot
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            Latest insights from your uploaded resume.
-          </p>
-          {snapshot.resumeTitle ? (
-            <p className="mt-4 truncate rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 px-3 py-2 text-xs text-slate-400">
-              Latest resume: <span className="text-slate-200">{snapshot.resumeTitle}</span>
-            </p>
-          ) : null}
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-[190px_1fr]">
-          <div className="rounded-[1.5rem] border border-cyan-300/15 bg-[#070b1f]/72 p-5 shadow-[0_0_34px_rgba(0,229,255,0.12)]">
-            <div
-              className="mx-auto grid h-36 w-36 place-items-center rounded-full p-2"
-              style={{
-                background: `conic-gradient(#00E5FF ${atsScore}%, rgba(255,255,255,0.08) 0)`,
-              }}
-            >
-              <div className="grid h-full w-full place-items-center rounded-full bg-[#050816] text-center shadow-inner">
-                <div>
-                  <p className="text-4xl font-semibold tracking-tight text-white">{scoreLabel}</p>
-                  <p className="text-xs uppercase tracking-[0.25em] text-slate-500">/ 100</p>
-                </div>
-              </div>
-            </div>
-            <p className="mt-4 text-center text-sm font-medium text-cyan-100">
-              Latest ATS Score
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <SnapshotMetric
-              label="Job Match Score"
-              value={matchLabel}
-              helper="Latest JD comparison"
-              progress={matchScore}
-            />
-            <SnapshotMetric
-              label="Resume Health"
-              value={snapshot.health}
-              helper="Evidence-based readiness"
-              badge
-            />
-            <SnapshotMetric
-              label="Detected Role"
-              value={snapshot.detectedRole}
-              helper="From resume signals"
-              badge
-            />
-            <SnapshotMetric
-              label="Last Analysis"
-              value={snapshot.lastAnalysis}
-              helper="Most recent resume update"
-              badge
-            />
-          </div>
-        </div>
-
-        <div className="xl:col-start-2">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <SnapshotAction href="/dashboard/resume" label="Open Resume Dashboard" />
-            <SnapshotAction href="/dashboard/resume/ats" label="Re-run ATS Analysis" />
-            <SnapshotAction href="/dashboard/resume/match" label="Match Against New Job" />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SnapshotMetric({
-  label,
-  value,
-  helper,
-  progress,
-  badge = false,
+function ExecutiveHero({
+  profile,
+  snapshot,
+  readiness,
 }: {
-  label: string;
-  value: string;
-  helper: string;
-  progress?: number;
-  badge?: boolean;
+  profile: UserProfile;
+  snapshot: ResumeSnapshotData;
+  readiness: number | null;
 }) {
+  const name = profile.email.split("@")[0] || "there";
+  const readinessLabel = readiness === null ? "Start" : String(readiness);
+  const readinessProgress = readiness ?? 18;
+
   return (
-    <div className="rounded-[1.4rem] border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 p-4">
-      <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{label}</p>
-      {badge ? (
-        <span className="mt-3 inline-flex max-w-full rounded-full border border-[#8B5CF6]/25 bg-[#8B5CF6]/12 px-3 py-1.5 text-sm font-semibold text-purple-100">
-          <span className="truncate">{value}</span>
-        </span>
-      ) : (
-        <p className="mt-3 text-2xl font-semibold text-white">{value}</p>
-      )}
-      <p className="mt-2 text-xs text-slate-500">{helper}</p>
-      {typeof progress === "number" ? (
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.06]">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[#00E5FF] to-[#8B5CF6] shadow-[0_0_18px_rgba(0,229,255,0.35)]"
-            style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
-          />
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(0,229,255,0.11),rgba(106,92,255,0.08)_46%,rgba(139,92,246,0.1))] p-5 shadow-[0_0_32px_rgba(0,229,255,0.09),0_0_42px_rgba(106,92,255,0.09)] backdrop-blur-2xl sm:p-7">
+      <div className="pointer-events-none absolute -right-20 -top-28 h-64 w-64 rounded-full bg-[#00E5FF]/12 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 left-1/2 h-56 w-56 rounded-full bg-[#8B5CF6]/12 blur-3xl" />
+      <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-center">
+        <div className="max-w-3xl">
+          <p className="inline-flex rounded-full border border-[#00E5FF]/18 bg-[#00E5FF]/8 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-100">
+            Welcome back, {name}
+          </p>
+          <h1 className="mt-4 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
+            Your hiring command center.
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
+            Focus on the next move: improve your resume signal, match the right role,
+            and practice with intent.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button asChild className="rounded-2xl bg-gradient-to-r from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] text-white shadow-[0_0_26px_rgba(0,229,255,0.2)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_34px_rgba(0,229,255,0.28)]">
+              <Link href="/dashboard/resume">
+                <Upload className="h-4 w-4" />
+                Improve Resume
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-2xl border-white/15 bg-white/[0.04] text-white shadow-[0_0_20px_rgba(0,229,255,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-[#00E5FF]/10">
+              <Link href="/dashboard/analytics">
+                View Analytics
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
-      ) : null}
-    </div>
-  );
-}
 
-function SnapshotAction({ href, label }: { href: string; label: string }) {
-  return (
-    <Button
-      asChild
-      className="h-11 rounded-2xl border border-cyan-300/15 bg-[#00E5FF]/10 text-cyan-50 shadow-[0_0_24px_rgba(0,229,255,0.12)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#00E5FF]/18 hover:shadow-[0_0_34px_rgba(0,229,255,0.24)]"
-    >
-      <Link href={href}>{label}</Link>
-    </Button>
-  );
-}
-
-function AiIllustration() {
-  return (
-    <div className="relative mx-auto hidden h-80 w-80 lg:block">
-      <div className="absolute inset-8 rounded-full border border-cyan-300/20 bg-[#070b1f]/60 shadow-[0_0_60px_rgba(0,229,255,0.18)] backdrop-blur-xl" />
-      <div className="absolute inset-20 rounded-full border border-purple-300/20 bg-gradient-to-br from-[#00E5FF]/16 to-[#8B5CF6]/20" />
-      <div className="absolute left-1/2 top-1/2 grid h-24 w-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-3xl border border-white/10 bg-white/[0.06] shadow-[0_0_40px_rgba(106,92,255,0.28)]">
-        <Sparkles className="h-9 w-9 text-cyan-100" />
+        <div className="relative overflow-hidden rounded-[1.6rem] border border-cyan-300/14 bg-[#070B1F]/62 p-5 shadow-[0_0_28px_rgba(0,229,255,0.1)]">
+          <div className="absolute right-5 top-5">
+            <HeroIllustration />
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
+            Career Readiness
+          </p>
+          <div className="mt-5 flex items-end gap-4">
+            <ProgressRing value={readinessProgress} label={readinessLabel} size="lg" />
+            <div className="pb-2">
+              <p className="text-sm font-medium text-white">
+                {readiness === null ? "No resume analyzed" : getStatusLabel(readiness)}
+              </p>
+              <p className="mt-1 max-w-40 text-xs leading-5 text-slate-500">
+                {snapshot.resumeTitle
+                  ? `Updated ${snapshot.lastAnalysis}`
+                  : "Upload a resume to unlock scoring."}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      {[0, 1, 2, 3, 4, 5].map((item) => (
+    </section>
+  );
+}
+
+function HeroIllustration() {
+  return (
+    <div className="relative h-20 w-20 opacity-80" aria-hidden="true">
+      <div className="absolute inset-2 rounded-full border border-cyan-300/18" />
+      <div className="absolute inset-6 rounded-2xl border border-purple-300/20 bg-white/[0.04]" />
+      <Sparkles className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-cyan-100" />
+      {[0, 1, 2].map((item) => (
         <span
           key={item}
-          className="absolute h-3 w-3 rounded-full bg-[#00E5FF] shadow-[0_0_22px_rgba(0,229,255,0.85)]"
+          className="absolute h-1.5 w-1.5 rounded-full bg-[#00E5FF] shadow-[0_0_12px_rgba(0,229,255,0.65)]"
           style={{
-            left: `${50 + Math.cos((item / 6) * Math.PI * 2) * 42}%`,
-            top: `${50 + Math.sin((item / 6) * Math.PI * 2) * 42}%`,
+            left: `${50 + Math.cos((item / 3) * Math.PI * 2) * 38}%`,
+            top: `${50 + Math.sin((item / 3) * Math.PI * 2) * 38}%`,
           }}
         />
       ))}
-      <svg
-        className="absolute inset-0 h-full w-full opacity-70"
-        viewBox="0 0 320 320"
-        aria-hidden="true"
-      >
-        <circle cx="160" cy="160" r="118" fill="none" stroke="rgba(0,229,255,0.18)" />
-        <circle cx="160" cy="160" r="82" fill="none" stroke="rgba(139,92,246,0.2)" />
-        <path
-          d="M83 160h234M160 40v240M76 103c65 40 126 40 188 0M76 217c65-40 126-40 188 0"
-          fill="none"
-          stroke="rgba(255,255,255,0.12)"
-          strokeLinecap="round"
+    </div>
+  );
+}
+
+function KpiGrid({ cards }: { cards: KpiCardData[] }) {
+  return (
+    <section className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4" aria-label="Key metrics">
+      {cards.map((card) => (
+        <KpiCard key={card.label} card={card} />
+      ))}
+    </section>
+  );
+}
+
+function KpiCard({ card }: { card: KpiCardData }) {
+  const Icon = card.icon;
+  const tone = getTone(card.tone);
+
+  return (
+    <article className="group rounded-[1.6rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_28px_rgba(0,229,255,0.07)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:shadow-[0_0_34px_rgba(0,229,255,0.12)]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {card.label}
+          </p>
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+            {card.value}
+          </p>
+        </div>
+        <span className={`grid h-10 w-10 place-items-center rounded-2xl border ${tone.icon}`}>
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <div className="mt-4 flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-sm text-slate-400">{card.subtitle}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className={`rounded-full border px-2.5 py-1 text-[0.7rem] font-semibold ${tone.badge}`}>
+              {card.status}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[0.7rem] font-semibold text-slate-400">
+              {card.delta}
+            </span>
+          </div>
+        </div>
+        <ProgressRing value={card.progress} label={`${card.progress}`} />
+      </div>
+      <MiniSparkline values={card.trend} tone={card.tone} />
+    </article>
+  );
+}
+
+function ProgressRing({
+  value,
+  label,
+  size = "sm",
+}: {
+  value: number;
+  label: string;
+  size?: "sm" | "lg";
+}) {
+  const clampedValue = Math.max(0, Math.min(100, value));
+
+  return (
+    <div
+      className={`grid shrink-0 place-items-center rounded-full p-1 ${
+        size === "lg" ? "h-28 w-28" : "h-16 w-16"
+      }`}
+      style={{
+        background: `conic-gradient(#00E5FF ${clampedValue}%, rgba(255,255,255,0.1) 0)`,
+      }}
+      aria-label={`${clampedValue}%`}
+    >
+      <div className="grid h-full w-full place-items-center rounded-full bg-[#050816] text-center shadow-inner">
+        <span className={size === "lg" ? "text-3xl font-semibold" : "text-sm font-semibold"}>
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function MiniSparkline({
+  values,
+  tone,
+}: {
+  values: number[];
+  tone: KpiCardData["tone"];
+}) {
+  const points = values
+    .map((value, index) => {
+      const x = (index / Math.max(1, values.length - 1)) * 120;
+      const y = 34 - (Math.max(0, Math.min(100, value)) / 100) * 28;
+      return `${x},${y}`;
+    })
+    .join(" ");
+  const stroke =
+    tone === "purple"
+      ? "#8B5CF6"
+      : tone === "emerald"
+        ? "#34D399"
+        : tone === "amber"
+          ? "#FBBF24"
+          : "#00E5FF";
+
+  return (
+    <svg className="mt-5 h-10 w-full overflow-visible" viewBox="0 0 120 40" aria-hidden="true">
+      <polyline
+        points={points}
+        fill="none"
+        stroke={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="3"
+      />
+      <path d={`M0 38 L${points} L120 38 Z`} fill={stroke} opacity="0.08" />
+    </svg>
+  );
+}
+
+function CareerInsights({ snapshot }: { snapshot: ResumeSnapshotData }) {
+  const recommendedAction = getRecommendedAction(snapshot);
+
+  return (
+    <DashboardPanel
+      eyebrow="Career Insights"
+      title="The next signal that matters"
+      description="A single read on strengths, gaps, and the highest-leverage action."
+    >
+      <div className="grid gap-5 lg:grid-cols-[1fr_1fr_1.2fr]">
+        <InsightColumn
+          title="Top Skills"
+          items={["Resume structure", "Role targeting", snapshot.detectedRole]}
+          tone="cyan"
         />
-      </svg>
-    </div>
+        <InsightColumn
+          title="Skill Gaps"
+          items={getSkillGaps(snapshot)}
+          tone="purple"
+        />
+        <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/64 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Recommended Action
+          </p>
+          <h3 className="mt-3 text-lg font-semibold text-white">
+            {recommendedAction.title}
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            {recommendedAction.description}
+          </p>
+          <Button asChild className="mt-5 rounded-2xl bg-[#00E5FF]/12 text-cyan-50 ring-1 ring-cyan-300/20 transition duration-300 hover:bg-[#00E5FF]/18">
+            <Link href={recommendedAction.href}>
+              Continue
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </DashboardPanel>
   );
 }
 
-function FeatureCard({ feature }: { feature: FeatureCardData }) {
-  const Icon = feature.icon;
+function getRecommendedAction(snapshot: ResumeSnapshotData) {
+  if (!snapshot.resumeTitle) {
+    return {
+      title: "Upload your resume",
+      description: "Create the baseline that powers ATS, JD match, and coach insights.",
+      href: "/dashboard/resume",
+    };
+  }
 
+  if ((snapshot.atsScore ?? 0) < 75) {
+    return {
+      title: "Improve ATS signal",
+      description: "Tighten formatting, keywords, and recruiter-friendly evidence.",
+      href: "/dashboard/resume/ats",
+    };
+  }
+
+  if ((snapshot.matchScore ?? 0) < 75) {
+    return {
+      title: "Match the next role",
+      description: "Compare your resume against a target job description before applying.",
+      href: "/dashboard/resume/match",
+    };
+  }
+
+  return {
+    title: "Practice the interview",
+    description: "Convert strong document signals into confident interview performance.",
+    href: "/dashboard/interview",
+  };
+}
+
+function getSkillGaps(snapshot: ResumeSnapshotData) {
+  const gaps = [];
+
+  if ((snapshot.atsScore ?? 0) < 80) gaps.push("ATS keyword coverage");
+  if ((snapshot.matchScore ?? 0) < 80) gaps.push("JD alignment");
+  gaps.push("Interview evidence");
+
+  return gaps;
+}
+
+function InsightColumn({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: "cyan" | "purple";
+}) {
   return (
-    <div className="group flex min-h-[390px] flex-col rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-6 shadow-[0_0_40px_rgba(0,229,255,0.09),0_0_60px_rgba(106,92,255,0.08)] transition duration-300 hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-white/[0.055] hover:shadow-[0_0_52px_rgba(0,229,255,0.16),0_0_70px_rgba(106,92,255,0.15)]">
-      <span className="grid h-14 w-14 place-items-center rounded-2xl border border-cyan-300/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.12)]">
-        <Icon className="h-7 w-7" />
-      </span>
-      <h3 className="mt-6 text-2xl font-semibold tracking-tight">{feature.title}</h3>
-      <p className="mt-4 text-sm leading-7 text-slate-400">{feature.description}</p>
-      <ul className="mt-6 space-y-3 text-sm text-slate-300">
-        {feature.features.map((item) => (
-          <li key={item} className="flex items-center gap-2.5">
-            <CheckCircle2 className="h-4 w-4 text-[#00E5FF]" />
+    <div className="rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/54 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {title}
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {items.map((item) => (
+          <span
+            key={item}
+            className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+              tone === "cyan"
+                ? "border-cyan-300/18 bg-cyan-300/8 text-cyan-100"
+                : "border-purple-300/18 bg-purple-300/8 text-purple-100"
+            }`}
+          >
             {item}
-          </li>
-        ))}
-      </ul>
-      <Button
-        asChild
-        className="mt-auto h-11 rounded-2xl bg-[#00E5FF]/12 text-cyan-50 shadow-[0_0_24px_rgba(0,229,255,0.12)] ring-1 ring-cyan-300/20 transition duration-300 hover:bg-[#00E5FF]/20 hover:shadow-[0_0_34px_rgba(0,229,255,0.24)]"
-      >
-        <Link href={feature.href}>{feature.buttonLabel}</Link>
-      </Button>
-    </div>
-  );
-}
-
-function ActivityPanel() {
-  return (
-    <Panel title="Activity Overview">
-      <div className="relative space-y-5">
-        <div className="absolute bottom-3 left-[15px] top-3 w-px bg-gradient-to-b from-[#00E5FF] via-[#6A5CFF] to-transparent" />
-        {recentActivity.map((activity) => (
-          <ActivityItem key={activity.label} activity={activity} />
+          </span>
         ))}
       </div>
-    </Panel>
+    </div>
+  );
+}
+
+function AnalyticsSection({
+  snapshot,
+  readiness,
+}: {
+  snapshot: ResumeSnapshotData;
+  readiness: number | null;
+}) {
+  const ats = snapshot.atsScore ?? 0;
+  const match = snapshot.matchScore ?? 0;
+  const interview = readiness === null ? 18 : Math.min(100, Math.round(readiness * 0.72));
+
+  return (
+    <DashboardPanel
+      eyebrow="Analytics"
+      title="Performance trends"
+      description="One consolidated analytics workspace for the core dashboard signals."
+      action={
+        <Button asChild variant="outline" className="rounded-2xl border-white/15 bg-white/[0.04] text-white hover:border-[#00E5FF]/25 hover:bg-[#00E5FF]/10">
+          <Link href="/dashboard/analytics">Open full analytics</Link>
+        </Button>
+      }
+    >
+      <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
+        {["ATS trend", "Interview trend", "JD trend", "Resume versions"].map((tab, index) => (
+          <span
+            key={tab}
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${
+              index === 0
+                ? "border-cyan-300/24 bg-[#00E5FF]/12 text-cyan-100"
+                : "border-white/10 bg-white/[0.035] text-slate-500"
+            }`}
+          >
+            {tab}
+          </span>
+        ))}
+      </div>
+      <div className="grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+        <div className="rounded-[1.5rem] border border-white/[0.08] bg-[#070B1F]/60 p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-white">ATS trend</p>
+              <p className="mt-1 text-xs text-slate-500">Latest resume signal</p>
+            </div>
+            <span className="text-2xl font-semibold text-cyan-100">
+              {snapshot.atsScore === null ? "--" : snapshot.atsScore}
+            </span>
+          </div>
+          <LargeTrendChart
+            series={[
+              [28, 36, 44, 52, 60, Math.max(ats, 64)],
+              [20, 30, 38, 48, 54, Math.max(match, 58)],
+              [18, 24, 31, 38, 44, interview],
+            ]}
+          />
+        </div>
+        <div className="grid gap-3">
+          <AnalyticsMini label="JD trend" value={snapshot.matchScore === null ? "--" : `${snapshot.matchScore}%`} progress={match} />
+          <AnalyticsMini label="Interview trend" value={readiness === null ? "--" : `${interview}%`} progress={interview} />
+          <AnalyticsMini label="Resume versions" value={snapshot.resumeTitle ? "Active" : "0"} progress={snapshot.resumeTitle ? 72 : 8} />
+        </div>
+      </div>
+    </DashboardPanel>
+  );
+}
+
+function LargeTrendChart({ series }: { series: number[][] }) {
+  const colors = ["#00E5FF", "#8B5CF6", "#34D399"];
+
+  return (
+    <svg className="mt-6 h-56 w-full" viewBox="0 0 420 210" aria-hidden="true">
+      {[0, 1, 2, 3].map((line) => (
+        <line
+          key={line}
+          x1="0"
+          x2="420"
+          y1={36 + line * 44}
+          y2={36 + line * 44}
+          stroke="rgba(255,255,255,0.06)"
+        />
+      ))}
+      {series.map((values, index) => {
+        const points = values
+          .map((value, valueIndex) => {
+            const x = (valueIndex / Math.max(1, values.length - 1)) * 400 + 10;
+            const y = 188 - (Math.max(0, Math.min(100, value)) / 100) * 150;
+            return `${x},${y}`;
+          })
+          .join(" ");
+
+        return (
+          <polyline
+            key={colors[index]}
+            points={points}
+            fill="none"
+            stroke={colors[index]}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="4"
+            opacity={index === 0 ? 1 : 0.55}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
+function AnalyticsMini({
+  label,
+  value,
+  progress,
+}: {
+  label: string;
+  value: string;
+  progress: number;
+}) {
+  return (
+    <div className="rounded-[1.25rem] border border-white/[0.08] bg-white/[0.035] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-slate-300">{label}</p>
+        <p className="text-sm font-semibold text-white">{value}</p>
+      </div>
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-[#00E5FF] to-[#8B5CF6]"
+          style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
+        />
+      </div>
+    </div>
   );
 }
 
 function QuickActions() {
   return (
-    <Panel title="Quick Actions">
+    <DashboardPanel eyebrow="Actions" title="Next moves">
       <div className="grid gap-3">
         {quickActions.map((action) => (
-          <QuickActionItem key={action.label} action={action} />
+          <QuickActionItem key={action.title} action={action} />
         ))}
       </div>
-    </Panel>
-  );
-}
-
-function MotivationCard() {
-  return (
-    <div className="relative overflow-hidden rounded-[1.75rem] border border-purple-300/20 bg-[rgba(255,255,255,0.04)] p-6 shadow-[0_0_60px_rgba(106,92,255,0.16)]">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#8B5CF6]/24 blur-3xl" />
-      <div className="relative">
-        <Sparkles className="h-6 w-6 text-[#8B5CF6]" />
-        <p className="mt-5 text-xl font-semibold leading-8 text-white">
-          &quot;The best way to predict your future is to create it.&quot;
-        </p>
-        <p className="mt-4 text-sm font-medium text-purple-200">- TalentForge AI</p>
-      </div>
-    </div>
-  );
-}
-
-function Panel({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_40px_rgba(0,229,255,0.1)] backdrop-blur-xl">
-      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-      <div className="mt-5">{children}</div>
-    </section>
-  );
-}
-
-function ActivityItem({ activity }: { activity: ActivityData }) {
-  return (
-    <div className="relative flex gap-4 pl-11">
-      <span className="absolute left-0 top-1 grid h-8 w-8 place-items-center rounded-full border border-cyan-300/25 bg-[#070b1f] text-[#00E5FF] shadow-[0_0_18px_rgba(0,229,255,0.28)]">
-        <Zap className="h-3.5 w-3.5" />
-      </span>
-      <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/60 px-4 py-3">
-        <p className="text-sm font-medium text-slate-100">{activity.label}</p>
-        <p className="mt-1 text-xs leading-5 text-slate-500">{activity.detail}</p>
-      </div>
-    </div>
+      <Button asChild variant="outline" className="mt-4 w-full rounded-2xl border-white/15 bg-white/[0.035] text-white hover:border-[#00E5FF]/25 hover:bg-[#00E5FF]/10">
+        <Link href="/dashboard/resume">
+          View All Tools
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </Button>
+    </DashboardPanel>
   );
 }
 
@@ -676,15 +829,109 @@ function QuickActionItem({ action }: { action: QuickActionData }) {
   return (
     <Link
       href={action.href}
-      className="group flex items-center justify-between rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#070b1f]/70 px-4 py-3 text-sm text-slate-300 transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-[#00E5FF]/10 hover:text-cyan-50 hover:shadow-[0_0_28px_rgba(0,229,255,0.14)]"
+      className="group flex items-center gap-4 rounded-[1.35rem] border border-white/[0.08] bg-[#070B1F]/64 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-[#00E5FF]/8 hover:shadow-[0_0_26px_rgba(0,229,255,0.1)]"
     >
-      <span className="flex items-center gap-3">
-        <Icon className="h-4 w-4 text-[#00E5FF]" />
-        {action.label}
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 text-cyan-100">
+        <Icon className="h-5 w-5" />
       </span>
-      <span className="text-xs text-slate-600 transition group-hover:text-cyan-200">
-        Open
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold text-white">{action.title}</span>
+        <span className="mt-1 block text-xs leading-5 text-slate-500">
+          {action.subtitle}
+        </span>
       </span>
+      <ArrowRight className="h-4 w-4 text-slate-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-100" />
     </Link>
   );
+}
+
+function ActivityTimeline() {
+  return (
+    <DashboardPanel eyebrow="Activity" title="Latest events">
+      <div className="space-y-3">
+        {recentActivity.slice(0, 4).map((activity) => (
+          <ActivityItem key={activity.label} activity={activity} />
+        ))}
+      </div>
+    </DashboardPanel>
+  );
+}
+
+function ActivityItem({ activity }: { activity: ActivityData }) {
+  return (
+    <div className="flex gap-3 rounded-[1.2rem] border border-white/[0.07] bg-[#070B1F]/48 px-3 py-3">
+      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#00E5FF] shadow-[0_0_12px_rgba(0,229,255,0.65)]" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-3">
+          <p className="truncate text-sm font-medium text-slate-100">{activity.label}</p>
+          <span className="shrink-0 text-xs text-slate-600">{activity.time}</span>
+        </div>
+        <p className="mt-1 text-xs leading-5 text-slate-500">{activity.detail}</p>
+      </div>
+    </div>
+  );
+}
+
+function DashboardPanel({
+  eyebrow,
+  title,
+  description,
+  action,
+  children,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-[1.75rem] border border-white/[0.08] bg-white/[0.04] p-5 shadow-[0_0_30px_rgba(0,229,255,0.07)] backdrop-blur-2xl sm:p-6">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          {eyebrow ? (
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
+              {eyebrow}
+            </p>
+          ) : null}
+          <h2 className="mt-1 text-xl font-semibold tracking-tight text-white">{title}</h2>
+          {description ? (
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function getTone(tone: KpiCardData["tone"]) {
+  if (tone === "purple") {
+    return {
+      icon: "border-purple-300/20 bg-purple-300/10 text-purple-100",
+      badge: "border-purple-300/20 bg-purple-300/10 text-purple-100",
+    };
+  }
+
+  if (tone === "emerald") {
+    return {
+      icon: "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
+      badge: "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
+    };
+  }
+
+  if (tone === "amber") {
+    return {
+      icon: "border-amber-300/20 bg-amber-300/10 text-amber-100",
+      badge: "border-amber-300/20 bg-amber-300/10 text-amber-100",
+    };
+  }
+
+  return {
+    icon: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
+    badge: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
+  };
 }

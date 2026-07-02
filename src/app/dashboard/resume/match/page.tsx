@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { ClipboardCheck, FileText, History, PenLine, SearchCheck, Target } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { DashboardEmptyState } from "@/app/dashboard/dashboard-production";
 import { MatchAnalyzerForm } from "@/app/dashboard/resume/match/match-analyzer-form";
+import { PremiumModuleHero } from "@/components/dashboard/premium-module-hero";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -76,40 +78,26 @@ export default async function ResumeMatchPage() {
       </div>
 
       <section className={forge.section}>
-        <div className={forge.hero}>
-          <div className={forge.heroGlowCyan} />
-          <div className={forge.heroGlowPurple} />
-          <div className="relative">
-            <span className={forge.badge}>
-              Evidence-based resume intelligence
-            </span>
-            <h1 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              See exactly how your resume matches the role.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-zinc-300">
-              Paste a job description, choose one uploaded resume, and get a
-              structured match report across skills, tools, responsibilities,
-              seniority, and proof.
-            </p>
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {[
-                ["100-point score", "Weighted by job-critical evidence"],
-                ["Evidence table", "See what matched and what is missing"],
-                ["Gap analysis", "Prioritized edits for faster tailoring"],
-              ].map(([title, description]) => (
-                <div
-                  key={title}
-                  className={`${forge.metric} ${forge.hoverCard}`}
-                >
-                  <p className="font-semibold text-zinc-100">{title}</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">
-                    {description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <PremiumModuleHero
+          badge="Evidence-based resume intelligence"
+          title="See exactly how your resume matches the role."
+          description="Paste a job description, choose one uploaded resume, and get a structured match report across skills, tools, seniority, and proof."
+          variant="match"
+          primaryCta={{ href: "/dashboard/resume/match", label: "Analyze Match", icon: Target }}
+          secondaryCta={{ href: "/dashboard/resume/ats", label: "Optimize ATS", icon: ClipboardCheck }}
+          metrics={[
+            { label: "Match", value: "100 pt", helper: "Role fit score", icon: Target, tone: "purple", progress: 91, trend: "+fit" },
+            { label: "Resumes", value: String(resumes.length), helper: "Readable uploads", icon: FileText, progress: Math.min(100, resumes.length * 18), trend: "ready" },
+            { label: "Evidence", value: "Mapped", helper: "Skills and proof", icon: SearchCheck, progress: 86, trend: "linked" },
+            { label: "Gaps", value: "Ranked", helper: "Prioritized edits", icon: ClipboardCheck, tone: "amber", progress: 64, trend: "focus" },
+          ]}
+          quickActions={[
+            { href: "/dashboard/resume/ats", title: "ATS Optimizer", subtitle: "Tune keyword coverage", icon: ClipboardCheck },
+            { href: "/dashboard/resume/rewrite", title: "AI Rewrite", subtitle: "Tailor bullets safely", icon: PenLine },
+            { href: "/dashboard/resume/history", title: "Version History", subtitle: "Compare improvements", icon: History },
+            { href: "/dashboard/resume", title: "Resume Dashboard", subtitle: "Manage uploads", icon: FileText },
+          ]}
+        />
       </section>
 
       <section className={`${forge.content} pb-16`}>
