@@ -1237,7 +1237,7 @@ export function CareerCoachClient({
         </div>
       </CoachSection>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <CoachSection
           eyebrow="Target Companies"
           title="Company readiness"
@@ -1259,7 +1259,7 @@ export function CareerCoachClient({
         </CoachSection>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
         <CoachSection
           id="weekly-roadmap"
           eyebrow="Weekly AI Roadmap"
@@ -1327,7 +1327,7 @@ export function CareerCoachClient({
         </div>
       </CoachSection>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <CoachSection
           eyebrow="Career Timeline"
           title="Milestones unlocked"

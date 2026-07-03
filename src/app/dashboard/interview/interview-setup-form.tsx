@@ -382,7 +382,7 @@ export function InterviewSetupForm({ resumes }: { resumes: ResumeOption[] }) {
               rows={9}
               aria-invalid={state.status === "error"}
               placeholder="Paste the job description or describe the role you want to practice for..."
-              className={`mt-3 max-h-[52vh] min-h-60 resize-y overflow-y-auto p-4 ${forge.input}`}
+              className={`mt-3 max-h-[46vh] min-h-52 resize-y overflow-y-auto p-4 ${forge.input}`}
             />
           </div>
         </div>

@@ -5,16 +5,16 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-2xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all duration-200 outline-none select-none focus-visible:border-[#00E5FF]/55 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/20 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-2xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all duration-300 outline-none select-none focus-visible:border-[#00E5FF]/55 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/22 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] text-white shadow-[0_0_16px_rgba(0,229,255,0.14)] hover:-translate-y-0.5 hover:shadow-[0_0_22px_rgba(0,229,255,0.18)]",
+          "bg-gradient-to-r from-[#00E5FF] via-[#6A5CFF] to-[#8B5CF6] text-white shadow-[0_0_24px_rgba(0,229,255,0.18),0_0_32px_rgba(139,92,246,0.14)] hover:-translate-y-0.5 hover:shadow-[0_0_32px_rgba(0,229,255,0.24),0_0_42px_rgba(139,92,246,0.18)]",
         outline:
-          "border-white/[0.08] bg-[#101827]/72 text-white shadow-none hover:-translate-y-0.5 hover:border-[#00E5FF]/20 hover:bg-[#00E5FF]/7 hover:text-white aria-expanded:bg-[#00E5FF]/8 aria-expanded:text-white",
+          "border-white/[0.1] bg-[#071024]/72 text-white shadow-[0_0_18px_rgba(0,229,255,0.035)] backdrop-blur-xl hover:-translate-y-0.5 hover:border-[#00E5FF]/24 hover:bg-[#00E5FF]/8 hover:text-white aria-expanded:bg-[#00E5FF]/8 aria-expanded:text-white",
         secondary:
-          "border border-white/[0.08] bg-[#151E2F]/72 text-white hover:-translate-y-0.5 hover:bg-[#00E5FF]/7 aria-expanded:bg-[#00E5FF]/8 aria-expanded:text-white",
+          "border border-white/[0.1] bg-[#071024]/72 text-white shadow-[0_0_18px_rgba(0,229,255,0.035)] backdrop-blur-xl hover:-translate-y-0.5 hover:border-[#00E5FF]/24 hover:bg-[#00E5FF]/8 aria-expanded:bg-[#00E5FF]/8 aria-expanded:text-white",
         ghost:
           "text-slate-300 hover:bg-white/[0.045] hover:text-white aria-expanded:bg-[#00E5FF]/8 aria-expanded:text-white",
         destructive:

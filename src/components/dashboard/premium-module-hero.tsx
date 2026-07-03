@@ -80,7 +80,7 @@ export function DashboardGrid({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={`grid gap-6 ${className}`}>{children}</div>;
+  return <div className={`grid gap-5 ${className}`}>{children}</div>;
 }
 
 export function DashboardSurface({
@@ -92,6 +92,9 @@ export function DashboardSurface({
 }) {
   return (
     <section className={`${forge.panel} ${designTokens.spacing.card} ${className}`}>
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/60 to-transparent" />
+      <div className="pointer-events-none absolute -left-16 top-0 h-56 w-56 rounded-full bg-[#00E5FF]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 h-56 w-56 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
       {children}
     </section>
   );
@@ -150,9 +153,7 @@ export function HeroMetricCard({ metric }: { metric: HeroMetric }) {
           : "bg-gradient-to-r from-[#00E5FF] to-[#6A5CFF]";
 
   return (
-    <div
-      className={`group relative overflow-hidden rounded-2xl border p-4 transition duration-200 hover:-translate-y-0.5 ${toneClass}`}
-    >
+    <div className={`group relative overflow-hidden rounded-[22px] border p-4 shadow-[0_16px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 ${toneClass}`}>
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-70" />
       <div className="flex items-center justify-between gap-3">
         <p className="text-[0.68rem] font-semibold uppercase tracking-wide text-white/55">
@@ -195,7 +196,7 @@ export function QuickActionCard({ action }: { action: HeroQuickAction }) {
       className="group relative flex min-h-28 items-start gap-3 overflow-hidden rounded-[20px] border border-white/[0.06] bg-[#101827]/82 p-5 shadow-[0_16px_48px_rgba(0,0,0,0.14)] outline-none ring-1 ring-white/[0.04] backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:border-[#00E5FF]/18 hover:bg-[#151E2F]/72 focus-visible:border-[#00E5FF]/55 focus-visible:ring-2 focus-visible:ring-[#00E5FF]/20"
     >
       <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#00E5FF]/60 to-transparent opacity-0 transition group-hover:opacity-100" />
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[#00E5FF]/8 text-cyan-100 ring-1 ring-[#00E5FF]/14 transition duration-200 group-hover:scale-105">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#00E5FF]/18 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.12)] ring-1 ring-[#00E5FF]/14 transition duration-300 group-hover:scale-110">
         <Icon className="h-4 w-4" aria-hidden="true" />
       </span>
       <span className="min-w-0">
@@ -227,10 +228,12 @@ export function PremiumModuleHero({
   const SecondaryIcon = secondaryCta?.icon;
 
   return (
-    <section className="space-y-6">
-      <div className="relative overflow-hidden rounded-[20px] border border-[rgba(255,255,255,0.06)] bg-[linear-gradient(135deg,rgba(16,24,39,0.92),rgba(21,30,47,0.78)_52%,rgba(106,92,255,0.12))] p-6 shadow-[0_18px_58px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#00E5FF]/7 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/7 blur-3xl" />
+    <section className="space-y-5">
+      <div className={forge.hero}>
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/14 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-28 left-20 h-72 w-72 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.1),transparent_24%,rgba(255,255,255,0.04)_54%,transparent_74%)] opacity-80" />
+        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/60 to-transparent" />
         <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center xl:grid-cols-[minmax(0,1fr)_310px]">
           <div className="max-w-3xl">
             <p className={forge.badge}>{badge}</p>
@@ -298,10 +301,11 @@ function ModuleIllustration({
 
   return (
     <div className="relative ml-auto h-56 w-56 xl:h-64 xl:w-64" aria-hidden="true">
-      <div className={`absolute inset-4 rounded-full border ${config.border} bg-[#101827]/62 shadow-[0_18px_50px_rgba(0,0,0,0.16)] backdrop-blur-xl`} />
-      <div className={`absolute inset-16 rounded-full border ${config.border} bg-gradient-to-br ${config.gradient}`} />
-      <div className="absolute left-1/2 top-1/2 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[20px] border border-white/[0.08] bg-white/[0.05] shadow-[0_16px_42px_rgba(0,0,0,0.16)]">
-        <Icon className="h-8 w-8 text-cyan-100" />
+      <div className="absolute inset-0 rounded-full bg-[#8B5CF6]/18 blur-3xl" />
+      <div className={`absolute inset-4 rounded-full border ${config.border} bg-[#071024]/62 shadow-[0_0_44px_rgba(0,229,255,0.12)] backdrop-blur-xl`} />
+      <div className={`absolute inset-16 rounded-full border ${config.border} bg-gradient-to-br ${config.gradient} shadow-[0_0_52px_rgba(139,92,246,0.24)]`} />
+      <div className="absolute left-1/2 top-1/2 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/[0.12] bg-[#070B16]/72 shadow-[inset_0_0_24px_rgba(0,229,255,0.08),0_0_34px_rgba(0,229,255,0.14)]">
+        <Icon className="h-8 w-8 text-cyan-100 drop-shadow-[0_0_14px_rgba(0,229,255,0.85)]" />
       </div>
       {config.nodes.map((item) => (
         <span

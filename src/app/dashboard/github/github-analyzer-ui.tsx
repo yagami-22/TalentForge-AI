@@ -615,8 +615,8 @@ export function GitHubSection({
   action?: ReactNode;
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_18px_rgba(0,229,255,0.04)] backdrop-blur-2xl sm:p-6">
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <section className="rounded-[1.75rem] border border-white/[0.07] bg-white/[0.035] p-5 shadow-[0_0_18px_rgba(0,229,255,0.04)] backdrop-blur-2xl">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-cyan-100">
             GitHub Analyzer
@@ -650,7 +650,7 @@ export function AnalyzerEmptyState({
     <div
       role={statusRole}
       aria-live={statusRole ? "polite" : undefined}
-      className="rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58 p-8 text-center"
+      className="rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58 p-6 text-center"
     >
       <BookOpen className="mx-auto h-8 w-8 text-cyan-100" />
       <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>

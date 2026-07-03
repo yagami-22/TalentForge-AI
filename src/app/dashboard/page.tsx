@@ -5,23 +5,32 @@ import {
   Activity,
   ArrowRight,
   Bell,
+  Brain,
   BriefcaseBusiness,
+  BarChart3,
   ClipboardCheck,
   Compass,
   FileText,
   GitBranch,
   Home,
+  Link2,
   Menu,
   MessageSquareText,
   PenLine,
-  Search,
   Settings,
   Sparkles,
+  UserRound,
   Target,
   Upload,
+  WandSparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import {
+  DashboardMotionGrid,
+  DashboardMotionItem,
+  DashboardMotionSection,
+} from "@/components/dashboard/dashboard-motion";
 import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
@@ -30,20 +39,6 @@ import { withRetry } from "@/lib/retry";
 
 type Tone = "cyan" | "purple" | "emerald" | "amber" | "blue";
 
-type KpiCardData = {
-  label: string;
-  value: string;
-  suffix?: string;
-  subtitle: string;
-  status: string;
-  delta: string;
-  progress: number | null;
-  tone: Tone;
-  icon: LucideIcon;
-  trend?: number[];
-  href?: string;
-};
-
 type QuickActionData = {
   title: string;
   subtitle: string;
@@ -51,6 +46,14 @@ type QuickActionData = {
   icon: LucideIcon;
   cta: string;
   accent: Tone;
+};
+
+type CommandCenterCardData = {
+  title: string;
+  subtitle: string;
+  href: string;
+  icon: LucideIcon;
+  tone: Tone;
 };
 
 type ActivityData = {
@@ -93,20 +96,22 @@ const dashboardNav: NavGroup[] = [
   {
     label: "Career Intelligence",
     items: [
-      { label: "Resume Intelligence", href: "/dashboard/resume", icon: FileText },
+      { label: "Resume Hub", href: "/dashboard/resume", icon: FileText },
       { label: "ATS Optimizer", href: "/dashboard/resume/ats", icon: ClipboardCheck },
-      { label: "JD Match", href: "/dashboard/resume/match", icon: Target },
-      { label: "Resume Rewriter", href: "/dashboard/resume/rewrite", icon: PenLine },
-      { label: "Resume History", href: "/dashboard/resume/history", icon: Activity },
+      { label: "JD Matcher", href: "/dashboard/resume/match", icon: Target },
+      { label: "AI Rewriter", href: "/dashboard/resume/rewrite", icon: PenLine },
       { label: "GitHub Analyzer", href: "/dashboard/github", icon: GitBranch },
     ],
   },
   {
     label: "Interview & Growth",
     items: [
-      { label: "AI Mock Interviews", href: "/dashboard/interview", icon: MessageSquareText },
+      { label: "Interview Prep", href: "/dashboard/interview", icon: MessageSquareText },
+      { label: "OA Practice", href: "/dashboard/interview/oa/session", icon: Brain },
       { label: "AI Recruiter Mode", href: "/dashboard/recruiter", icon: BriefcaseBusiness },
       { label: "Career Coach", href: "/dashboard/coach", icon: Compass },
+      { label: "Career Insights", href: "/dashboard/analytics", icon: BarChart3 },
+      { label: "History", href: "/dashboard/resume/history", icon: Activity },
     ],
   },
   {
@@ -117,36 +122,81 @@ const dashboardNav: NavGroup[] = [
 
 const quickActions: QuickActionData[] = [
   {
-    title: "Improve ATS Score",
-    subtitle: "Optimize keywords and sections",
+    title: "Improve Resume Impact",
+    subtitle: "Add metrics and strong keywords",
     href: "/dashboard/resume/ats",
     icon: ClipboardCheck,
     cta: "Start",
     accent: "purple",
   },
   {
-    title: "Add Project Metrics",
-    subtitle: "Increase recruiter impact score",
-    href: "/dashboard/resume/rewrite",
-    icon: FileText,
+    title: "Practice DSA",
+    subtitle: "Solve 3 problems today",
+    href: "/dashboard/interview/oa/session",
+    icon: ClipboardCheck,
     cta: "Open",
     accent: "blue",
   },
   {
-    title: "Practice Interviews",
-    subtitle: "Build confidence with one round",
-    href: "/dashboard/interview",
-    icon: MessageSquareText,
-    cta: "Practice",
-    accent: "cyan",
-  },
-  {
-    title: "Update GitHub",
-    subtitle: "Keep portfolio evidence fresh",
+    title: "Review Projects",
+    subtitle: "Keep your portfolio updated",
     href: "/dashboard/github",
     icon: GitBranch,
-    cta: "Analyze",
+    cta: "Practice",
     accent: "emerald",
+  },
+  {
+    title: "Mock Interview",
+    subtitle: "Boost your confidence",
+    href: "/dashboard/interview",
+    icon: MessageSquareText,
+    cta: "Analyze",
+    accent: "amber",
+  },
+];
+
+const commandCenterCards: CommandCenterCardData[] = [
+  {
+    title: "Resume Hub",
+    subtitle: "Optimize and enhance your resume",
+    href: "/dashboard/resume",
+    icon: FileText,
+    tone: "cyan",
+  },
+  {
+    title: "ATS Optimizer",
+    subtitle: "Make your resume ATS-friendly",
+    href: "/dashboard/resume/ats",
+    icon: ClipboardCheck,
+    tone: "blue",
+  },
+  {
+    title: "JD Matcher",
+    subtitle: "Match your resume with any job",
+    href: "/dashboard/resume/match",
+    icon: Link2,
+    tone: "emerald",
+  },
+  {
+    title: "AI Rewriter",
+    subtitle: "Rewrite for impact and clarity",
+    href: "/dashboard/resume/rewrite",
+    icon: WandSparkles,
+    tone: "amber",
+  },
+  {
+    title: "Interview Prep",
+    subtitle: "Prepare with AI for any interview",
+    href: "/dashboard/interview",
+    icon: UserRound,
+    tone: "purple",
+  },
+  {
+    title: "OA Practice",
+    subtitle: "Sharpen your skills with practice",
+    href: "/dashboard/interview/oa/session",
+    icon: Brain,
+    tone: "purple",
   },
 ];
 
@@ -267,10 +317,9 @@ export default async function DashboardPage() {
   );
   const snapshot = buildResumeSnapshot(latestResume);
   const readiness = getCareerReadiness(snapshot);
-  const kpis = buildKpis(snapshot, readiness);
 
   return (
-    <PremiumBackground contentClassName="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col px-0 py-0 xl:flex-row">
+    <PremiumBackground contentClassName="mx-auto flex min-h-screen w-full max-w-[1536px] flex-col px-0 py-0 xl:flex-row">
       <div className="xl:hidden">
         <MobileExecutiveNav profile={profile} />
       </div>
@@ -279,23 +328,33 @@ export default async function DashboardPage() {
         <ExecutiveSidebar profile={profile} />
       </div>
 
-      <main className="min-w-0 flex-1 px-4 py-4 sm:px-5 lg:px-7">
-        <TopBar profile={profile} />
+      <main className="relative min-w-0 flex-1 px-4 py-6 sm:px-5 lg:px-6 lg:py-7">
+        <DashboardAmbient />
+        <DashboardHeader profile={profile} />
 
-        <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <WelcomeHero profile={profile} snapshot={snapshot} readiness={readiness} />
-          <ReadinessPanel snapshot={snapshot} readiness={readiness} />
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <DashboardMotionSection>
+            <WelcomeHero snapshot={snapshot} readiness={readiness} />
+          </DashboardMotionSection>
+          <DashboardMotionSection delay={0.08}>
+            <ReadinessPanel snapshot={snapshot} readiness={readiness} />
+          </DashboardMotionSection>
         </div>
 
-        <KpiGrid cards={kpis} />
-
-        <div className="mt-4 grid gap-4 2xl:grid-cols-[minmax(0,1.1fr)_minmax(380px,0.9fr)]">
-          <CareerOverview snapshot={snapshot} readiness={readiness} />
+        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="space-y-5">
+            <CareerCommandCenter />
+            <RoadmapBanner />
+          </div>
           <TodaysFocus snapshot={snapshot} />
         </div>
 
-        <div className="mt-4 grid gap-4 2xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
+        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
+          <CareerOverview snapshot={snapshot} readiness={readiness} />
           <ActivityTimeline />
+        </div>
+
+        <div className="mt-5">
           <RecommendationPath snapshot={snapshot} />
         </div>
       </main>
@@ -315,127 +374,52 @@ function getCareerReadiness(snapshot: ResumeSnapshotData) {
   return Math.round(signals.reduce((total, score) => total + score, 0) / signals.length);
 }
 
-function buildKpis(
-  snapshot: ResumeSnapshotData,
-  readiness: number | null
-): KpiCardData[] {
-  const atsScore = snapshot.atsScore;
-  const resumeProgress = snapshot.resumeTitle ? snapshot.atsScore ?? 52 : null;
-  const interviewProgress =
-    readiness === null ? null : Math.min(100, Math.round(readiness * 0.72));
-  const recruiterConfidence =
-    readiness === null
-      ? null
-      : Math.min(
-          100,
-          Math.round(readiness * 0.82 + (snapshot.matchScore ?? readiness) * 0.18)
-        );
-
-  return [
-    {
-      label: "ATS Score",
-      value: atsScore === null ? "--" : String(atsScore),
-      suffix: atsScore === null ? undefined : "/100",
-      subtitle: "Recruiter systems fit",
-      status: getStatusLabel(atsScore),
-      delta: atsScore === null ? "Upload resume" : "Evidence based",
-      progress: atsScore,
-      tone: "blue",
-      icon: ClipboardCheck,
-      trend: atsScore === null ? undefined : makeTrend(atsScore, 18),
-      href: "/dashboard/resume/ats",
-    },
-    {
-      label: "Resume Score",
-      value: snapshot.resumeTitle ? snapshot.health : "--",
-      suffix: resumeProgress === null ? undefined : `${resumeProgress}/100`,
-      subtitle: "Latest resume quality",
-      status: snapshot.resumeTitle ? "Tracked" : "Missing",
-      delta: snapshot.lastAnalysis,
-      progress: resumeProgress,
-      tone: "purple",
-      icon: FileText,
-      trend: resumeProgress === null ? undefined : makeTrend(resumeProgress, 16),
-      href: "/dashboard/resume",
-    },
-    {
-      label: "GitHub Score",
-      value: "--",
-      subtitle: "Repository proof",
-      status: "Connect GitHub",
-      delta: "Analyzer ready",
-      progress: null,
-      tone: "emerald",
-      icon: GitBranch,
-      href: "/dashboard/github",
-    },
-    {
-      label: "Interview Readiness",
-      value: interviewProgress === null ? "--" : `${interviewProgress}%`,
-      subtitle: "Practice coverage",
-      status: interviewProgress === null ? "Not started" : "Recommended",
-      delta: interviewProgress === null ? "Start session" : "Next round",
-      progress: interviewProgress,
-      tone: "amber",
-      icon: MessageSquareText,
-      trend: interviewProgress === null ? undefined : makeTrend(interviewProgress, 22),
-      href: "/dashboard/interview",
-    },
-    {
-      label: "Recruiter Confidence",
-      value: recruiterConfidence === null ? "--" : `${recruiterConfidence}%`,
-      subtitle: "Evidence quality",
-      status:
-        recruiterConfidence === null
-          ? "Pending"
-          : recruiterConfidence >= 70
-            ? "Promising"
-            : "Developing",
-      delta: snapshot.resumeTitle ? "Evidence based" : "Needs resume",
-      progress: recruiterConfidence,
-      tone: "purple",
-      icon: BriefcaseBusiness,
-      trend: recruiterConfidence === null ? undefined : makeTrend(recruiterConfidence, 20),
-      href: "/dashboard/recruiter",
-    },
-  ];
-}
-
-function makeTrend(score: number, spread: number) {
-  const base = Math.max(8, score - spread);
-  return [base, base + 5, base + 9, base + 13, Math.max(base + 14, score - 4), score].map(
-    (value) => Math.max(0, Math.min(100, value))
+function DashboardAmbient() {
+  return (
+    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <span className="absolute left-[8%] top-24 h-72 w-72 rounded-full bg-[#00E5FF]/5 blur-3xl" />
+      <span className="absolute right-[10%] top-10 h-80 w-80 rounded-full bg-[#8B5CF6]/6 blur-3xl" />
+      <span className="absolute bottom-32 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#3BA8FF]/4 blur-3xl" />
+      {[12, 24, 36, 48, 60, 72].map((offset, index) => (
+        <span
+          key={offset}
+          className="absolute h-1 w-1 rounded-full bg-cyan-100/55 shadow-[0_0_8px_rgba(0,229,255,0.72)]"
+          style={{
+            left: `${offset}%`,
+            top: `${18 + ((index * 17) % 54)}%`,
+          }}
+        />
+      ))}
+    </div>
   );
-}
-
-function getStatusLabel(score: number | null) {
-  if (score === null) return "Needs signal";
-  if (score >= 80) return "Strong";
-  if (score >= 65) return "Improving";
-  return "Needs focus";
 }
 
 function ExecutiveSidebar({ profile }: { profile: UserProfile }) {
   return (
-    <aside className="sticky top-0 flex h-screen flex-col border-r border-white/[0.08] bg-[#050914]/70 px-4 py-5 shadow-[18px_0_70px_rgba(0,0,0,0.24)] backdrop-blur-2xl">
+    <aside className="sticky top-0 flex h-screen flex-col p-3">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[26px] border border-cyan-200/10 bg-[#071024]/72 px-4 py-5 shadow-[0_24px_90px_rgba(0,0,0,0.28),0_0_42px_rgba(0,229,255,0.08)] backdrop-blur-2xl">
+        <span className="pointer-events-none absolute -left-24 top-20 h-56 w-56 rounded-full bg-[#00E5FF]/10 blur-3xl" />
+        <span className="pointer-events-none absolute -right-24 bottom-20 h-56 w-56 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
       <Link
         href="/dashboard"
-        className="flex items-center gap-3 rounded-2xl px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
+        className="relative flex shrink-0 items-center gap-3 rounded-2xl px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
       >
-        <span className="relative grid h-8 w-8 place-items-center">
-          <span className="absolute h-7 w-7 rotate-45 rounded-[0.55rem] bg-gradient-to-br from-[#00E5FF] via-[#6A5CFF] to-[#FF3DFE]" />
-          <Sparkles className="relative h-4 w-4 text-white" />
+        <span className="relative grid h-11 w-11 place-items-center">
+          <span className="absolute h-8 w-11 rounded-[0.65rem] bg-gradient-to-br from-[#00E5FF] via-[#6A5CFF] to-[#FF3DFE] opacity-85 shadow-[0_0_24px_rgba(139,92,246,0.28)] [clip-path:polygon(8%_10%,100%_10%,78%_38%,59%_38%,45%_90%,27%_90%,43%_38%,0_38%)]" />
+          <span className="relative text-[0.72rem] font-black tracking-tighter text-white drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]">
+            TF
+          </span>
         </span>
         <span className="text-lg font-semibold tracking-tight text-white">TalentForge AI</span>
       </Link>
 
-      <nav className="mt-7 min-h-0 flex-1 space-y-6 overflow-y-auto pr-1" aria-label="Dashboard navigation">
+      <nav className="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pb-2 pr-1 [scrollbar-color:rgba(0,229,255,0.24)_transparent] [scrollbar-width:thin]" aria-label="Dashboard navigation">
         {dashboardNav.map((group) => (
-          <div key={group.label}>
-            <p className="px-3 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+          <div key={group.label} className="space-y-2">
+            <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500/75">
               {group.label}
             </p>
-            <div className="mt-2 space-y-1">
+            <div className="grid gap-1">
               {group.items.map((item) => (
                 <SidebarLink key={item.href} item={item} />
               ))}
@@ -444,16 +428,19 @@ function ExecutiveSidebar({ profile }: { profile: UserProfile }) {
         ))}
       </nav>
 
-      <div className="mt-5 rounded-[1.35rem] border border-white/[0.08] bg-white/[0.035] p-3">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white">
-            {profile.initial}
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{getDisplayName(profile.email)}</p>
-            <p className="truncate text-xs text-slate-500">{profile.role}</p>
+      <div className="mt-auto shrink-0 pt-3">
+        <div className="relative rounded-[1.25rem] border border-white/[0.08] bg-white/[0.035] p-3">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white">
+              {profile.initial}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-white">{getDisplayName(profile.email)}</p>
+              <p className="truncate text-xs text-slate-500">{profile.role}</p>
+            </div>
           </div>
         </div>
+      </div>
       </div>
     </aside>
   );
@@ -502,66 +489,68 @@ function SidebarLink({
     <Link
       href={item.href}
       aria-current={item.active ? "page" : undefined}
-      className={`group flex items-center gap-3 rounded-2xl border px-3 py-3 text-sm transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35 ${
+      className={`group relative flex h-10 items-center gap-3.5 rounded-2xl border px-3.5 text-sm transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35 ${
         item.active
-          ? "border-cyan-300/24 bg-[linear-gradient(135deg,rgba(0,229,255,0.16),rgba(106,92,255,0.2))] text-white shadow-[0_0_26px_rgba(0,229,255,0.12)]"
-          : "border-transparent text-slate-400 hover:border-white/[0.08] hover:bg-white/[0.04] hover:text-slate-100"
+          ? "border-cyan-300/38 bg-[linear-gradient(135deg,rgba(0,229,255,0.22),rgba(106,92,255,0.24))] text-white shadow-[0_0_34px_rgba(0,229,255,0.24),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_0_20px_rgba(0,229,255,0.055)]"
+          : "border-transparent text-slate-400 hover:-translate-y-0.5 hover:border-white/[0.1] hover:bg-white/[0.055] hover:text-slate-100"
       }`}
     >
-      <Icon className={`h-4 w-4 ${item.active ? "text-cyan-100" : "text-slate-500 group-hover:text-cyan-100"}`} />
+      {item.active ? (
+        <span className="pointer-events-none absolute inset-y-2 left-1 w-0.5 rounded-full bg-cyan-200 shadow-[0_0_16px_rgba(0,229,255,0.8)]" />
+      ) : null}
+      <span
+        className={`grid h-7 w-7 shrink-0 place-items-center rounded-xl transition duration-300 ${
+          item.active
+            ? "bg-cyan-300/10 text-cyan-50 shadow-[0_0_18px_rgba(0,229,255,0.22)]"
+            : "text-slate-500 group-hover:bg-cyan-300/8 group-hover:text-cyan-100 group-hover:shadow-[0_0_16px_rgba(0,229,255,0.12)]"
+        }`}
+      >
+        <Icon className="h-4 w-4" />
+      </span>
       <span>{item.label}</span>
     </Link>
   );
 }
 
-function TopBar({ profile }: { profile: UserProfile }) {
+function DashboardHeader({ profile }: { profile: UserProfile }) {
+  const name = getDisplayName(profile.email);
+
   return (
-    <header className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_minmax(320px,0.72fr)_auto] lg:items-center">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          aria-label="Open dashboard menu"
-          className="hidden h-10 w-10 place-items-center rounded-2xl border border-white/[0.08] bg-white/[0.04] text-slate-300 xl:grid"
-        >
-          <Menu className="h-4 w-4" />
-        </button>
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight text-white">Executive Dashboard</h1>
-          <p className="mt-1 text-xs text-slate-400">Your AI-powered career command center</p>
-        </div>
+    <header className="relative flex flex-col gap-4 py-2 lg:flex-row lg:items-start lg:justify-between">
+      <div>
+        <p className="text-xl font-medium tracking-tight text-slate-300">Good evening,</p>
+        <h1 className="mt-2 bg-gradient-to-r from-[#39C8FF] via-[#7C5CFF] to-[#FF3DFE] bg-clip-text text-4xl font-semibold tracking-tight text-transparent sm:text-5xl">
+          {name}
+          <span className="ml-2 text-white drop-shadow-[0_0_16px_rgba(139,92,246,0.7)]">
+            ✦
+          </span>
+        </h1>
+        <p className="mt-3 text-base text-slate-400">
+          Let&apos;s accelerate your career journey.
+        </p>
       </div>
 
-      <label className="relative block">
-        <span className="sr-only">Search dashboard modules</span>
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-        <input
-          type="search"
-          placeholder="Search anything..."
-          className="h-11 w-full rounded-2xl border border-white/[0.08] bg-[#080D1D]/80 pl-11 pr-14 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-cyan-300/35 focus:ring-2 focus:ring-cyan-300/15"
-        />
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-lg border border-white/10 bg-white/[0.05] px-2 py-1 text-[0.65rem] font-semibold text-slate-500">
-          /K
-        </span>
-      </label>
-
-      <div className="flex items-center justify-between gap-3 lg:justify-end">
+      <div className="flex items-center gap-3 lg:pt-2">
+        <Link
+          href="/dashboard/coach"
+          className="group inline-flex h-12 items-center gap-2 rounded-[1.35rem] border border-purple-300/22 bg-[#0B1024]/78 px-5 text-sm font-semibold text-white shadow-[0_0_28px_rgba(139,92,246,0.12)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-purple-200/38 hover:bg-purple-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/40"
+        >
+          <Sparkles className="h-4 w-4 text-purple-100" />
+          AI Assistant
+          <ArrowRight className="h-4 w-4 text-slate-500 transition duration-300 group-hover:translate-x-0.5 group-hover:text-cyan-100" />
+        </Link>
         <button
           type="button"
           aria-label="Notifications"
-          className="grid h-11 w-11 place-items-center rounded-2xl border border-white/[0.08] bg-[#080D1D]/80 text-slate-300 transition hover:border-cyan-300/25 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+          className="relative grid h-12 w-12 place-items-center rounded-full border border-white/[0.08] bg-[#080D1D]/76 text-slate-300 shadow-[0_0_22px_rgba(0,0,0,0.22)] backdrop-blur-2xl transition hover:border-cyan-300/25 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
         >
+          <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#8B5CF6] shadow-[0_0_12px_rgba(139,92,246,0.9)]" />
           <Bell className="h-4 w-4" />
         </button>
-        <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#080D1D]/80 px-3 py-2">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white">
+        <div className="grid h-[3.25rem] w-[3.25rem] place-items-center rounded-full bg-gradient-to-br from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] p-px shadow-[0_0_26px_rgba(59,168,255,0.26)]">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-[#3BA8FF] to-[#6A5CFF] text-base font-bold text-white">
             {profile.initial}
           </span>
-          <div className="hidden min-w-0 sm:block">
-            <p className="max-w-[150px] truncate text-sm font-semibold text-white">
-              {getDisplayName(profile.email)}
-            </p>
-            <p className="truncate text-xs text-slate-500">{profile.role}</p>
-          </div>
         </div>
       </div>
     </header>
@@ -569,38 +558,41 @@ function TopBar({ profile }: { profile: UserProfile }) {
 }
 
 function WelcomeHero({
-  profile,
   snapshot,
   readiness,
 }: {
-  profile: UserProfile;
   snapshot: ResumeSnapshotData;
   readiness: number | null;
 }) {
-  const name = getDisplayName(profile.email);
   const insight = getAiInsight(snapshot, readiness);
+  const suggestion = getRecommendedAction(snapshot);
 
   return (
-    <section className="relative min-h-[252px] overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-[radial-gradient(circle_at_78%_25%,rgba(106,92,255,0.22),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.05),rgba(0,229,255,0.035)_46%,rgba(139,92,246,0.055))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)] backdrop-blur-2xl sm:p-7">
-      <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-[#00E5FF]/10 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 right-12 h-44 w-44 rounded-full bg-[#8B5CF6]/12 blur-3xl" />
-      <div className="relative grid h-full gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-center">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-            Good evening, {name}
+    <section className="relative min-h-[305px] overflow-hidden rounded-[26px] border border-white/[0.105] bg-[radial-gradient(circle_at_74%_28%,rgba(139,92,246,0.22),transparent_28%),radial-gradient(circle_at_75%_74%,rgba(0,229,255,0.12),transparent_24%),linear-gradient(135deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_50%,rgba(3,7,18,0.95))] p-7 shadow-[0_26px_86px_rgba(0,0,0,0.34),0_0_34px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-7">
+      <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
+      <div className="pointer-events-none absolute right-24 top-20 h-56 w-56 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+      <div className="pointer-events-none absolute right-24 bottom-8 h-20 w-72 rounded-[50%] border border-cyan-200/14 bg-[#3BA8FF]/8 blur-sm" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.075),transparent_22%,rgba(255,255,255,0.025)_54%,transparent_74%)] opacity-70" />
+      <div className="relative grid h-full gap-6 lg:grid-cols-[minmax(0,0.78fr)_minmax(360px,0.9fr)] lg:items-center">
+        <div className="max-w-xl">
+          <span className="inline-flex items-center gap-2 rounded-full border border-purple-300/18 bg-purple-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-purple-100 shadow-[0_0_18px_rgba(139,92,246,0.14)]">
+            <Sparkles className="h-3.5 w-3.5" />
+            AI Insight
+          </span>
+          <h2 className="mt-5 max-w-[390px] text-3xl font-semibold leading-tight tracking-tight text-white sm:text-[2.05rem]">
+            You&apos;re building something{" "}
+            <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-transparent">
+              great.
+            </span>
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Track your progress, improve your profile, and get hired faster.
-          </p>
-          <div className="mt-7 max-w-2xl rounded-2xl border border-cyan-300/16 bg-[#00E5FF]/8 px-4 py-3">
-            <p className="flex flex-wrap items-center gap-3 text-sm text-slate-300">
-              <span className="inline-flex items-center gap-2 font-semibold text-cyan-100">
-                <Sparkles className="h-4 w-4" />
-                AI Insight
-              </span>
-              <span>{insight}</span>
-            </p>
-          </div>
+          <p className="mt-4 max-w-md text-sm leading-6 text-slate-400">{insight}</p>
+          <Link
+            href={suggestion.href}
+            className="group mt-7 inline-flex h-11 items-center gap-3 rounded-full border border-cyan-300/26 bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(139,92,246,0.14))] px-6 text-sm font-semibold text-white shadow-[0_0_28px_rgba(0,229,255,0.14)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/45 hover:shadow-[0_0_36px_rgba(139,92,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+          >
+            Get AI Recommendations
+            <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-1" />
+          </Link>
         </div>
 
         <HeroIllustration />
@@ -611,17 +603,42 @@ function WelcomeHero({
 
 function HeroIllustration() {
   return (
-    <div className="relative mx-auto hidden h-52 w-72 place-items-center lg:grid" aria-hidden="true">
-      <div className="absolute bottom-4 h-20 w-56 rounded-[50%] bg-[#00E5FF]/10 blur-2xl" />
-      <div className="absolute bottom-8 h-16 w-52 rotate-[-10deg] rounded-[1.4rem] border border-cyan-300/20 bg-[#08142B]/80 shadow-[0_0_38px_rgba(0,229,255,0.18)]" />
-      <div className="absolute bottom-12 h-16 w-44 rotate-[8deg] rounded-[1.25rem] border border-purple-300/20 bg-[#111236]/80 shadow-[0_0_38px_rgba(139,92,246,0.22)]" />
-      <div className="relative grid h-36 w-28 place-items-center rounded-[1.4rem] border border-cyan-200/25 bg-[linear-gradient(160deg,rgba(0,229,255,0.16),rgba(106,92,255,0.24))] shadow-[0_0_34px_rgba(0,229,255,0.18),0_0_48px_rgba(139,92,246,0.2)]">
-        <div className="h-24 w-16 rounded-xl border border-white/15 bg-[#050914]/70 p-3">
-          <div className="h-2 w-10 rounded-full bg-cyan-200/50" />
-          <div className="mt-4 h-12 rounded-lg border border-white/10 bg-gradient-to-tr from-cyan-400/20 to-purple-500/20" />
-          <div className="mt-3 h-2 w-12 rounded-full bg-purple-200/40" />
+    <div className="relative mx-auto hidden h-[282px] w-[390px] place-items-center lg:grid" aria-hidden="true">
+      <div className="absolute inset-12 rounded-full bg-[#8B5CF6]/16 blur-2xl" />
+      <div className="absolute h-64 w-64 rounded-full border border-purple-300/42 shadow-[0_0_34px_rgba(139,92,246,0.42)]" />
+      <div className="absolute h-52 w-52 rounded-full border border-cyan-200/22 shadow-[0_0_26px_rgba(0,229,255,0.22)]" />
+      <div className="absolute h-28 w-80 rounded-[50%] border border-cyan-200/18" />
+      <div className="absolute h-80 w-28 rounded-[50%] border border-purple-200/14" />
+      <div className="absolute h-40 w-80 rotate-12 rounded-[50%] border border-[#3BA8FF]/14" />
+      <div className="absolute h-40 w-80 -rotate-12 rounded-[50%] border border-[#FF3DFE]/12" />
+      <div className="absolute bottom-7 h-14 w-72 rounded-[50%] border border-[#8B5CF6]/50 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.34),rgba(0,229,255,0.16)_40%,transparent_72%)] shadow-[0_0_30px_rgba(139,92,246,0.36)]" />
+      <div className="absolute bottom-10 h-8 w-56 rounded-[50%] border border-cyan-200/42 shadow-[0_0_24px_rgba(0,229,255,0.46)]" />
+      <div className="absolute bottom-13 h-1.5 w-64 rounded-full bg-gradient-to-r from-transparent via-cyan-200/80 to-transparent shadow-[0_0_24px_rgba(0,229,255,0.7)]" />
+
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+        <span
+          key={item}
+          className="absolute h-1.5 w-1.5 rounded-full bg-cyan-100/80 shadow-[0_0_18px_rgba(0,229,255,0.9)]"
+          style={{
+            left: `${16 + item * 8}%`,
+            top: `${16 + ((item * 17) % 58)}%`,
+          }}
+        />
+      ))}
+
+      <div className="relative grid h-48 w-28 place-items-center border border-cyan-100/55 bg-[linear-gradient(155deg,rgba(25,200,255,0.46),rgba(83,108,255,0.5)_42%,rgba(151,79,255,0.44))] shadow-[0_0_36px_rgba(0,229,255,0.42),0_0_64px_rgba(139,92,246,0.46),inset_0_0_28px_rgba(255,255,255,0.16)] [clip-path:polygon(50%_0%,86%_16%,78%_82%,50%_100%,22%_82%,14%_16%)]">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.3),transparent_34%,rgba(255,255,255,0.13)_58%,transparent)]" />
+        <div className="absolute left-1/2 top-4 h-36 w-px -translate-x-1/2 bg-white/24" />
+        <div className="absolute left-6 top-12 h-24 w-px -rotate-12 bg-cyan-100/18" />
+        <div className="absolute right-6 top-12 h-24 w-px rotate-12 bg-purple-100/18" />
+        <div className="relative grid h-20 w-20 place-items-center rounded-full bg-[#070B16]/72 ring-1 ring-white/14 shadow-[inset_0_0_24px_rgba(0,229,255,0.08)]">
+          <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-2xl font-black tracking-tighter text-transparent drop-shadow-[0_0_18px_rgba(0,229,255,0.9)]">
+            TF
+          </span>
         </div>
       </div>
+
+      <div className="absolute bottom-7 h-10 w-72 rounded-[50%] bg-[#00E5FF]/12 blur-md" />
     </div>
   );
 }
@@ -634,29 +651,35 @@ function ReadinessPanel({
   readiness: number | null;
 }) {
   const readinessProgress = readiness ?? 0;
-  const label = readiness === null ? "N/A" : String(readiness);
+  const label = readiness === null ? "N/A" : `${readiness}%`;
 
   return (
-    <section className="rounded-[1.55rem] border border-white/[0.08] bg-white/[0.035] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.18)] backdrop-blur-2xl">
-      <div className="flex items-start justify-between gap-4">
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.095] bg-[linear-gradient(145deg,rgba(7,13,31,0.95),rgba(12,18,38,0.88))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.055)]">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-full bg-[radial-gradient(ellipse_at_bottom,rgba(0,229,255,0.07),transparent_68%)]" />
+      <div className="relative flex items-start justify-between gap-4">
         <div>
           <h2 className="text-sm font-semibold text-white">Career Readiness</h2>
           <p className="mt-1 text-xs text-slate-500">
             {snapshot.resumeTitle ? "Improving" : "Awaiting resume"}
           </p>
         </div>
-        <span className="rounded-xl border border-emerald-300/16 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+        <span className="rounded-xl bg-gradient-to-r from-emerald-300/14 to-cyan-300/12 px-3 py-1 text-xs font-semibold text-emerald-100 ring-1 ring-emerald-300/16 shadow-[0_0_16px_rgba(52,211,153,0.08)]">
           {readiness === null ? "Baseline needed" : "Improving"}
         </span>
       </div>
-      <div className="mt-5 flex justify-center">
+      <div className="relative mt-5 flex justify-center">
+        <span className="absolute top-1/2 h-36 w-36 -translate-y-1/2 rounded-full bg-[#00E5FF]/10 blur-2xl" aria-hidden="true" />
         <ReadinessDonut value={readinessProgress} label={label} />
       </div>
-      <p className="mx-auto mt-4 max-w-[240px] text-center text-sm leading-6 text-slate-400">
+      <p className="relative mx-auto mt-4 max-w-[240px] text-center text-sm leading-6 text-slate-400">
         {readiness === null
           ? "Upload a resume to activate readiness scoring."
           : "You are on the right track. Keep optimizing to reach the next level."}
       </p>
+      <div className="relative mt-4 h-7 overflow-hidden rounded-full bg-white/[0.04]" aria-hidden="true">
+        <div className="absolute inset-x-0 bottom-0 h-5 rounded-[50%] bg-gradient-to-r from-[#00E5FF]/20 via-[#8B5CF6]/20 to-[#00E5FF]/10 blur-sm" />
+      </div>
     </section>
   );
 }
@@ -679,59 +702,113 @@ function getAiInsight(snapshot: ResumeSnapshotData, readiness: number | null) {
     : "Your profile is application-ready. Keep GitHub and recruiter evidence current.";
 }
 
-function KpiGrid({ cards }: { cards: KpiCardData[] }) {
+function CareerCommandCenter() {
   return (
-    <section
-      className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5"
-      aria-label="Key metrics"
-    >
-      {cards.map((card) => (
-        <KpiCard key={card.label} card={card} />
-      ))}
+    <section className="relative overflow-visible">
+      <div className="pointer-events-none absolute inset-x-0 top-12 h-px bg-gradient-to-r from-transparent via-[#3BA8FF]/22 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-12 h-8 w-[58%] -translate-x-1/2 rounded-[50%] border border-[#3BA8FF]/8 bg-[#3BA8FF]/[0.025] blur-[2px]" />
+      <div className="relative mb-4">
+        <h2 className="text-lg font-semibold tracking-tight text-white">Your Command Center</h2>
+      </div>
+      <DashboardMotionGrid
+        className="relative grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6"
+        delay={0.08}
+      >
+        {commandCenterCards.map((card) => (
+          <DashboardMotionItem key={card.title}>
+            <CommandCenterCard card={card} />
+          </DashboardMotionItem>
+        ))}
+      </DashboardMotionGrid>
     </section>
   );
 }
 
-function KpiCard({ card }: { card: KpiCardData }) {
+function CommandCenterCard({ card }: { card: CommandCenterCardData }) {
   const Icon = card.icon;
   const tone = getTone(card.tone);
-
-  const content = (
-    <article className="group h-full rounded-[1.35rem] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.025))] p-4 shadow-[0_20px_55px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/20 hover:shadow-[0_0_26px_rgba(0,229,255,0.08)]">
-      <div className="flex items-start justify-between gap-3">
-        <span className={`grid h-10 w-10 place-items-center rounded-2xl border ${tone.icon}`}>
-          <Icon className="h-4 w-4" />
-        </span>
-        <span className={`rounded-full border px-2.5 py-1 text-[0.68rem] font-semibold ${tone.badge}`}>
-          {card.status}
-        </span>
-      </div>
-
-      <div className="mt-4">
-        <p className="text-sm font-medium text-slate-300">{card.label}</p>
-        <div className="mt-2 flex items-baseline gap-2">
-          <p className="text-2xl font-semibold tracking-tight text-white">{card.value}</p>
-          {card.suffix ? <span className="text-xs font-semibold text-slate-400">{card.suffix}</span> : null}
-        </div>
-        <p className="mt-1 text-xs text-slate-500">{card.subtitle}</p>
-      </div>
-
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <span className="text-xs font-semibold text-emerald-200">{card.delta}</span>
-        {card.trend ? <MiniSparkline values={card.trend} tone={card.tone} /> : <EmptySparkline />}
-      </div>
-    </article>
-  );
-
-  if (!card.href) return content;
+  const glassColor = hexToRgb(tone.stroke);
 
   return (
     <Link
       href={card.href}
-      className="block h-full rounded-[1.35rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+      className="group relative flex min-h-[248px] flex-col items-center overflow-hidden rounded-[16px] border px-4 pb-4 pt-6 text-center transition duration-300 hover:-translate-y-1 hover:scale-[1.018] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+      style={{
+        borderColor: `rgba(${glassColor},0.5)`,
+        background: `radial-gradient(circle at 50% 18%, rgba(${glassColor},0.2), transparent 30%), radial-gradient(circle at 50% 108%, rgba(${glassColor},0.1), transparent 28%), linear-gradient(180deg, rgba(8,13,31,0.97), rgba(4,8,20,0.95))`,
+        boxShadow: `0 16px 42px rgba(0,0,0,0.32), 0 0 16px rgba(${glassColor},0.12), inset 0 1px 0 rgba(255,255,255,0.1)`,
+      }}
     >
-      {content}
+      <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.025))]" />
+      <span
+        className="pointer-events-none absolute left-1/2 top-8 h-16 w-16 -translate-x-1/2 rounded-full opacity-42 blur-lg transition duration-300 group-hover:opacity-72"
+        style={{ background: tone.stroke }}
+      />
+      <span
+        className="pointer-events-none absolute -bottom-8 left-1/2 h-16 w-16 -translate-x-1/2 rounded-full opacity-14 blur-lg"
+        style={{ background: tone.stroke }}
+      />
+      <span
+        className="relative grid h-[4.7rem] w-[4.7rem] place-items-center rounded-[1.25rem] border text-white transition duration-300 group-hover:rotate-3 group-hover:scale-110"
+        style={{
+          borderColor: `rgba(${glassColor},0.62)`,
+          background: `radial-gradient(circle at 50% 42%, rgba(${glassColor},0.36), rgba(${glassColor},0.1) 58%, rgba(255,255,255,0.035))`,
+          boxShadow: `0 0 18px rgba(${glassColor},0.36), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -16px 22px rgba(0,0,0,0.2)`,
+          color: tone.stroke,
+        }}
+      >
+        <span className="absolute inset-3 rounded-[1rem] border border-white/10 bg-white/[0.035]" />
+        <Icon className="relative h-9 w-9 drop-shadow-[0_0_8px_currentColor]" strokeWidth={2.35} />
+        <span
+          className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_currentColor]"
+          style={{ color: tone.stroke }}
+        />
+      </span>
+      <h3 className="relative mt-6 text-base font-semibold leading-snug text-white">{card.title}</h3>
+      <p className="relative mx-auto mt-3 max-w-[9.5rem] text-xs leading-5 text-slate-400">
+        {card.subtitle}
+      </p>
+      <span
+        className="relative mt-auto grid h-9 w-9 place-items-center rounded-full border transition duration-300 group-hover:scale-110"
+        style={{
+          borderColor: `rgba(${glassColor},0.4)`,
+          background: `rgba(${glassColor},0.12)`,
+          color: tone.stroke,
+          boxShadow: `0 0 18px rgba(${glassColor},0.16)`,
+        }}
+      >
+        <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-0.5" />
+      </span>
     </Link>
+  );
+}
+
+function RoadmapBanner() {
+  return (
+    <section className="group relative overflow-hidden rounded-[20px] border border-purple-300/18 bg-[radial-gradient(circle_at_8%_45%,rgba(251,191,36,0.16),transparent_20%),radial-gradient(circle_at_92%_100%,rgba(139,92,246,0.22),transparent_34%),linear-gradient(135deg,rgba(7,16,36,0.86),rgba(11,13,35,0.74))] px-5 py-4 shadow-[0_24px_80px_rgba(0,0,0,0.22),0_0_34px_rgba(139,92,246,0.12)] backdrop-blur-2xl">
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-purple-200/50 to-transparent" />
+      <div className="pointer-events-none absolute -left-7 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[#FBBF24]/16 blur-2xl" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-20 w-56 bg-[linear-gradient(135deg,transparent,rgba(139,92,246,0.28))] blur-xl" />
+      <div className="pointer-events-none absolute bottom-0 right-7 h-16 w-28 bg-[linear-gradient(135deg,transparent_45%,rgba(139,92,246,0.34)_45%,rgba(13,7,28,0.8))]" />
+      <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-amber-200/22 bg-amber-300/10 text-amber-100 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
+            <Sparkles className="h-8 w-8 drop-shadow-[0_0_14px_rgba(251,191,36,0.8)]" />
+          </span>
+          <p className="max-w-xl text-base leading-7 text-slate-300">
+            Every step you take today brings you closer to your dream career.
+          </p>
+        </div>
+        <Link
+          href="/dashboard/coach"
+          className="group/link inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-[1.15rem] border border-purple-300/32 bg-purple-300/10 px-7 text-sm font-semibold text-white shadow-[0_0_22px_rgba(139,92,246,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/32 hover:bg-cyan-300/8 hover:shadow-[0_0_28px_rgba(139,92,246,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
+        >
+          View Career Roadmap
+          <ArrowRight className="h-4 w-4 transition duration-300 group-hover/link:translate-x-1" />
+        </Link>
+      </div>
+    </section>
   );
 }
 
@@ -740,63 +817,22 @@ function ReadinessDonut({ value, label }: { value: number; label: string }) {
 
   return (
     <div
-      className="grid h-40 w-40 place-items-center rounded-full p-3 shadow-[0_0_36px_rgba(106,92,255,0.18)]"
+      className="relative grid h-40 w-40 place-items-center rounded-full p-3 shadow-[0_0_34px_rgba(0,229,255,0.18),0_0_46px_rgba(139,92,246,0.18)]"
       style={{
         background: `conic-gradient(#8B5CF6 0 ${clampedValue * 0.58}%, #3BA8FF ${clampedValue * 0.58}% ${clampedValue}%, rgba(255,255,255,0.08) 0)`,
       }}
       role="img"
-      aria-label={`Career readiness ${label}${label === "N/A" ? "" : " out of 100"}`}
+      aria-label={`Career readiness ${label}`}
     >
-      <div className="grid h-full w-full place-items-center rounded-full bg-[#050914] text-center shadow-inner">
+      <span className="absolute inset-1 rounded-full bg-[linear-gradient(115deg,rgba(255,255,255,0.16),transparent_32%,rgba(255,255,255,0.04)_62%,transparent)] opacity-80" />
+      <div className="relative grid h-full w-full place-items-center rounded-full bg-[#070B16] text-center shadow-inner ring-1 ring-white/10">
         <div>
-          <p className="text-3xl font-semibold tracking-tight text-white">{label}</p>
-          <p className="mt-1 text-xs text-slate-500">{label === "N/A" ? "Pending" : "/100"}</p>
+          <Sparkles className="mx-auto mb-2 h-4 w-4 text-cyan-100 drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]" />
+          <p className="text-xs font-medium text-purple-200">{label === "N/A" ? "Pending" : "Excellent"}</p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight text-white">{label}</p>
+          <p className="mt-1 text-xs text-slate-500">{label === "N/A" ? "Awaiting score" : "Keep going"}</p>
         </div>
       </div>
-    </div>
-  );
-}
-
-function MiniSparkline({ values, tone }: { values: number[]; tone: Tone }) {
-  const points = values
-    .map((value, index) => {
-      const x = (index / Math.max(1, values.length - 1)) * 92;
-      const y = 30 - (Math.max(0, Math.min(100, value)) / 100) * 24;
-      return `${x},${y}`;
-    })
-    .join(" ");
-  const stroke = getTone(tone).stroke;
-
-  return (
-    <svg
-      className="h-9 w-24 overflow-visible"
-      viewBox="0 0 92 34"
-      role="img"
-      aria-label={`Trend sparkline values: ${values.join(", ")}.`}
-    >
-      <polyline
-        points={points}
-        fill="none"
-        stroke={stroke}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2.5"
-      />
-      <path d={`M0 34 L${points} L92 34 Z`} fill={stroke} opacity="0.08" />
-    </svg>
-  );
-}
-
-function EmptySparkline() {
-  return (
-    <div className="flex h-9 w-24 items-end gap-1" aria-hidden="true">
-      {[18, 26, 14, 30, 22].map((height, index) => (
-        <span
-          key={`${height}-${index}`}
-          className="w-3 rounded-full bg-white/[0.08]"
-          style={{ height }}
-        />
-      ))}
     </div>
   );
 }
@@ -811,10 +847,10 @@ function CareerOverview({
   const skills = getOverviewMetrics(snapshot, readiness);
 
   return (
-    <DashboardPanel title="Career Overview" description="A compact read on your strongest signals and open gaps.">
-      <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-center">
+    <DashboardPanel title="Career Overview" description="Radar and progress signals from your latest career evidence.">
+      <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-center">
         <RadarChart metrics={skills} />
-        <div className="space-y-3">
+        <div className="space-y-4">
           {skills.map((skill) => (
             <MetricBar key={skill.label} metric={skill} />
           ))}
@@ -867,9 +903,13 @@ function RadarChart({
   const polygonPoints = points.map((point) => `${point.x},${point.y}`).join(" ");
 
   return (
-    <div className="rounded-[1.25rem] border border-white/[0.08] bg-[#071024]/72 p-4">
+    <div className="relative overflow-hidden rounded-[24px] border border-white/[0.095] bg-[radial-gradient(circle_at_48%_46%,rgba(0,229,255,0.1),transparent_54%),radial-gradient(circle_at_72%_18%,rgba(139,92,246,0.08),transparent_38%),linear-gradient(145deg,rgba(5,10,25,0.96),rgba(8,14,31,0.9))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_18px_54px_rgba(0,0,0,0.22)]">
+      <div className="pointer-events-none absolute -left-14 top-10 h-32 w-32 rounded-full bg-[#00E5FF]/7 blur-3xl" />
+      <div className="pointer-events-none absolute -right-10 bottom-4 h-32 w-32 rounded-full bg-[#8B5CF6]/7 blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/38 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3BA8FF]/6 blur-xl" />
       <svg
-        className="mx-auto h-64 w-full max-w-[280px]"
+        className="relative mx-auto h-64 w-full max-w-[280px] drop-shadow-[0_0_12px_rgba(0,229,255,0.16)]"
         viewBox="0 0 240 240"
         role="img"
         aria-label={`Career overview radar: ${metrics
@@ -888,7 +928,7 @@ function RadarChart({
               key={scale}
               points={ring}
               fill="none"
-              stroke="rgba(255,255,255,0.08)"
+              stroke="rgba(0,229,255,0.18)"
               strokeWidth="1"
             />
           );
@@ -900,21 +940,21 @@ function RadarChart({
             y1={center}
             x2={point.axisX}
             y2={point.axisY}
-            stroke="rgba(255,255,255,0.08)"
+            stroke="rgba(139,92,246,0.22)"
           />
         ))}
         <polygon
           points={polygonPoints}
-          fill="rgba(0,229,255,0.17)"
+          fill="rgba(0,229,255,0.2)"
           stroke="#00E5FF"
-          strokeWidth="2"
+          strokeWidth="2.5"
         />
         <polygon
           points={polygonPoints}
-          fill="rgba(139,92,246,0.12)"
+          fill="rgba(139,92,246,0.15)"
           stroke="#8B5CF6"
-          strokeWidth="1.5"
-          opacity="0.7"
+          strokeWidth="1.8"
+          opacity="0.8"
         />
         {points.map((point) => (
           <text
@@ -923,7 +963,7 @@ function RadarChart({
             y={point.labelY}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="rgba(226,232,240,0.72)"
+            fill="rgba(226,232,240,0.78)"
             fontSize="10"
           >
             {point.label}
@@ -944,14 +984,25 @@ function MetricBar({
   const tone = getTone(metric.tone);
 
   return (
-    <div>
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-medium text-slate-300">{metric.label}</p>
+    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.075] bg-[#071024]/72 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/18 hover:bg-white/[0.045]">
+      <span
+        className="pointer-events-none absolute -left-10 top-1/2 h-20 w-20 -translate-y-1/2 rounded-full opacity-28 blur-2xl transition duration-300 group-hover:opacity-55"
+        style={{ background: tone.stroke }}
+      />
+      <div className="relative flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <span
+            className="h-2 w-2 rounded-full shadow-[0_0_12px_currentColor]"
+            style={{ background: tone.stroke, color: tone.stroke }}
+          />
+          <p className="text-sm font-medium text-slate-300">{metric.label}</p>
+        </div>
         <p className="text-sm font-semibold text-white">{value === null ? "--" : `${value}/100`}</p>
       </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/[0.08]">
+      <div className="relative mt-3 h-2.5 overflow-hidden rounded-full bg-white/[0.08] shadow-inner">
+        <span className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08),transparent)]" />
         <div
-          className="h-full rounded-full"
+          className="relative h-full rounded-full shadow-[0_0_18px_rgba(0,229,255,0.24)] transition-[width] duration-500"
           style={{
             width: `${Math.max(0, Math.min(100, width))}%`,
             background: tone.gradient,
@@ -975,19 +1026,20 @@ function TodaysFocus({ snapshot }: { snapshot: ResumeSnapshotData }) {
         </Button>
       }
     >
-      <div className="space-y-3">
+      <div className="grid gap-3">
         <Link
           href={primaryAction.href}
-          className="group flex items-center gap-3 rounded-[1.15rem] border border-purple-300/18 bg-purple-300/10 p-3 transition duration-300 hover:border-purple-200/35 hover:bg-purple-300/14 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
+          className="group relative flex items-center gap-4 overflow-hidden rounded-[22px] border border-purple-300/18 bg-[linear-gradient(135deg,rgba(9,15,34,0.94),rgba(12,18,38,0.88))] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.055)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-200/35 hover:shadow-[0_0_24px_rgba(139,92,246,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
         >
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-purple-300/18 bg-purple-300/14 text-purple-100">
-            <Sparkles className="h-4 w-4" />
+          <span className="pointer-events-none absolute -right-10 -top-12 h-28 w-28 rounded-full bg-purple-300/10 blur-2xl" />
+          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br from-purple-300/18 to-cyan-300/12 text-purple-100 ring-1 ring-purple-300/18">
+            <Sparkles className="h-5 w-5" />
           </span>
-          <span className="min-w-0 flex-1">
+          <span className="relative min-w-0 flex-1">
             <span className="block text-sm font-semibold text-white">{primaryAction.title}</span>
-            <span className="mt-0.5 block text-xs text-slate-400">{primaryAction.description}</span>
+            <span className="mt-1 block text-xs leading-5 text-slate-400">{primaryAction.description}</span>
           </span>
-          <span className="rounded-xl border border-purple-300/20 bg-purple-300/16 px-4 py-2 text-xs font-semibold text-purple-100">
+          <span className="relative rounded-xl border border-purple-300/20 bg-purple-300/16 px-4 py-2 text-xs font-semibold text-purple-100">
             Start
           </span>
         </Link>
@@ -999,16 +1051,16 @@ function TodaysFocus({ snapshot }: { snapshot: ResumeSnapshotData }) {
             <Link
               key={action.title}
               href={action.href}
-              className="group flex items-center gap-3 rounded-[1.15rem] border border-white/[0.08] bg-[#071024]/70 p-3 transition duration-300 hover:border-cyan-300/18 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+              className="group flex items-center gap-4 rounded-[20px] border border-white/[0.075] bg-[#071024]/72 p-4 shadow-[0_12px_34px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-cyan-300/18 hover:bg-white/[0.045] hover:shadow-[0_0_22px_rgba(0,229,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
             >
-              <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl border ${getTone(action.accent).icon}`}>
+              <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border ${getTone(action.accent).icon}`}>
                 <Icon className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-sm font-semibold text-white">{action.title}</span>
-                <span className="mt-0.5 block text-xs text-slate-500">{action.subtitle}</span>
+                <span className="mt-1 block text-xs text-slate-500">{action.subtitle}</span>
               </span>
-              <ArrowRight className="h-4 w-4 text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-cyan-100" />
+              <ArrowRight className="h-4 w-4 text-slate-500 transition duration-300 group-hover:translate-x-1 group-hover:text-cyan-100" />
             </Link>
           );
         })}
@@ -1028,8 +1080,8 @@ function getRecommendedAction(snapshot: ResumeSnapshotData) {
 
   if ((snapshot.atsScore ?? 0) < 75) {
     return {
-      title: "Improve ATS score",
-      description: "Optimize keywords, formatting, and recruiter-readable evidence.",
+      title: "Improve Resume Impact",
+      description: "Add metrics and strong keywords.",
       href: "/dashboard/resume/ats",
     };
   }
@@ -1069,17 +1121,23 @@ function ActivityTimeline() {
 function ActivityItem({ activity, index }: { activity: ActivityData; index: number }) {
   const icons = [FileText, ClipboardCheck, Target];
   const Icon = icons[index] ?? Activity;
+  const tone = getTone(index === 0 ? "purple" : index === 1 ? "amber" : "blue");
 
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[1.05rem] border border-white/[0.07] bg-[#071024]/68 px-3 py-3">
-      <span className={`grid h-9 w-9 place-items-center rounded-xl border ${getTone(index === 0 ? "purple" : index === 1 ? "amber" : "blue").icon}`}>
+    <div
+      className="group relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 overflow-hidden rounded-[1.15rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(7,16,36,0.94),rgba(10,15,32,0.88))] px-4 py-4 shadow-[0_14px_40px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1 hover:border-cyan-200/20 hover:bg-white/[0.045] hover:shadow-[0_0_26px_rgba(0,229,255,0.08)]"
+      style={{ boxShadow: `0 14px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)` }}
+    >
+      <span className="pointer-events-none absolute inset-y-0 left-0 w-1 rounded-full opacity-70" style={{ background: tone.gradient }} />
+      <span className="pointer-events-none absolute -left-12 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full opacity-18 blur-2xl transition duration-300 group-hover:opacity-45" style={{ background: tone.stroke }} />
+      <span className={`relative grid h-12 w-12 place-items-center rounded-full border ${tone.icon} shadow-[0_0_24px_rgba(0,229,255,0.08)]`}>
         <Icon className="h-4 w-4" />
       </span>
-      <div className="min-w-0">
+      <div className="relative min-w-0">
         <p className="truncate text-sm font-semibold text-white">{activity.label}</p>
         <p className="truncate text-xs text-slate-500">{activity.detail}</p>
       </div>
-      <div className="text-right">
+      <div className="relative text-right">
         <p className="text-xs text-slate-500">{activity.time}</p>
         <span
           className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold ${
@@ -1100,21 +1158,33 @@ function RecommendationPath({ snapshot }: { snapshot: ResumeSnapshotData }) {
 
   return (
     <DashboardPanel title="AI Recommended Path" description="Personalized steps to boost your career">
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="relative grid gap-4 py-3 md:grid-cols-4">
+        <span className="pointer-events-none absolute left-[10%] right-[10%] top-[4.8rem] hidden h-px bg-gradient-to-r from-cyan-300/8 via-purple-300/34 to-cyan-300/8 shadow-[0_0_16px_rgba(139,92,246,0.18)] md:block" />
+        <span className="pointer-events-none absolute left-[18%] right-[18%] top-[4.8rem] hidden h-[2px] rounded-full bg-gradient-to-r from-transparent via-cyan-300/16 to-transparent blur-sm md:block" />
         {recommendations.map((item, index) => {
           const Icon = item.icon;
+          const tone = getTone(item.tone);
 
           return (
-            <div key={item.title} className="relative text-center">
+            <div
+              key={item.title}
+              className="group relative overflow-hidden rounded-[22px] border border-white/[0.075] bg-[linear-gradient(155deg,rgba(7,16,36,0.94),rgba(9,14,31,0.86))] px-4 py-5 text-center shadow-[0_16px_44px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.045)] transition duration-300 hover:-translate-y-1 hover:border-cyan-200/18 hover:bg-white/[0.045] hover:shadow-[0_0_28px_rgba(139,92,246,0.1)]"
+            >
+              <span
+                className="pointer-events-none absolute -top-16 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full opacity-18 blur-2xl transition duration-300 group-hover:opacity-48"
+                style={{ background: tone.stroke }}
+              />
+              <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
               {index < recommendations.length - 1 ? (
-                <span className="pointer-events-none absolute left-1/2 top-7 hidden h-px w-full bg-gradient-to-r from-cyan-300/30 to-purple-300/20 md:block" />
+                <span className="pointer-events-none absolute left-1/2 top-7 hidden h-px w-full bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent md:block" />
               ) : null}
-              <span className={`relative mx-auto grid h-14 w-14 place-items-center rounded-full border ${getTone(item.tone).icon}`}>
-                <Icon className="h-5 w-5" />
+              <span className={`relative mx-auto grid h-16 w-16 place-items-center rounded-full border ${tone.icon} shadow-[0_0_32px_rgba(139,92,246,0.12)] transition duration-300 group-hover:scale-110`}>
+                <span className="absolute inset-1 rounded-full bg-white/[0.03]" />
+                <Icon className="relative h-5 w-5" />
               </span>
-              <h3 className="mt-4 text-sm font-semibold text-white">{item.title}</h3>
-              <p className="mx-auto mt-1 max-w-[170px] text-xs leading-5 text-slate-500">{item.detail}</p>
-              <span className={`mt-3 inline-flex rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold ${getTone(item.tone).badge}`}>
+              <h3 className="relative mt-4 text-sm font-semibold text-white">{item.title}</h3>
+              <p className="relative mx-auto mt-1 max-w-[170px] text-xs leading-5 text-slate-500">{item.detail}</p>
+              <span className={`relative mt-4 inline-flex rounded-full border px-3 py-1 text-[0.65rem] font-semibold ${tone.badge}`}>
                 {item.impact}
               </span>
             </div>
@@ -1122,9 +1192,12 @@ function RecommendationPath({ snapshot }: { snapshot: ResumeSnapshotData }) {
         })}
       </div>
       <div className="mt-5 flex justify-center">
-        <Button asChild variant="outline" size="sm">
-          <Link href="/dashboard/coach">View Full Roadmap</Link>
-        </Button>
+        <Link
+          href="/dashboard/coach"
+          className="inline-flex h-11 items-center justify-center rounded-2xl border border-purple-300/24 bg-purple-300/8 px-6 text-sm font-semibold text-white shadow-[0_0_24px_rgba(139,92,246,0.1)] transition hover:-translate-y-0.5 hover:border-cyan-300/28 hover:bg-cyan-300/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
+        >
+          View Full Roadmap
+        </Link>
       </div>
     </DashboardPanel>
   );
@@ -1208,15 +1281,22 @@ function DashboardPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[1.45rem] border border-white/[0.08] bg-white/[0.035] p-5 shadow-[0_20px_65px_rgba(0,0,0,0.18)] backdrop-blur-2xl">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <section className="relative overflow-hidden rounded-[26px] border border-white/[0.095] bg-[radial-gradient(circle_at_12%_0%,rgba(0,229,255,0.08),transparent_28%),radial-gradient(circle_at_88%_4%,rgba(139,92,246,0.09),transparent_30%),linear-gradient(145deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_55%,rgba(4,8,20,0.95))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.3),0_0_28px_rgba(0,229,255,0.035),inset_0_1px_0_rgba(255,255,255,0.055)]">
+      <div className="pointer-events-none absolute -left-16 top-0 h-56 w-56 rounded-full bg-[#00E5FF]/6 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 h-56 w-56 rounded-full bg-[#8B5CF6]/7 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/4 top-0 h-24 w-1/2 rounded-full bg-[#3BA8FF]/4 blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/42 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-10 left-0 w-px bg-gradient-to-b from-transparent via-cyan-200/28 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-10 right-0 w-px bg-gradient-to-b from-transparent via-purple-200/28 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-[radial-gradient(ellipse_at_bottom,rgba(59,168,255,0.06),transparent_72%)]" />
+      <div className="relative mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-base font-semibold tracking-tight text-white">{title}</h2>
           {description ? <p className="mt-1 text-xs text-slate-500">{description}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
-      {children}
+      <div className="relative">{children}</div>
     </section>
   );
 }
@@ -1228,6 +1308,16 @@ function getDisplayName(email: string) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function hexToRgb(hex: string) {
+  const normalized = hex.replace("#", "");
+  const value = Number.parseInt(normalized, 16);
+  const red = (value >> 16) & 255;
+  const green = (value >> 8) & 255;
+  const blue = value & 255;
+
+  return `${red},${green},${blue}`;
 }
 
 function getTone(tone: Tone) {

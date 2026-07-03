@@ -89,7 +89,7 @@ export function DashboardEmptyState({
   return (
     <Card className={`${forge.cardStrong} h-fit`}>
       <CardContent className="px-6 py-12 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#00E5FF]/10 text-cyan-100 ring-1 ring-[#00E5FF]/14">
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-[#00E5FF]/18 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.14)] ring-1 ring-[#00E5FF]/14">
           <Inbox className="h-7 w-7" aria-hidden="true" />
         </span>
         <h2 className="mt-4 text-xl font-semibold">{title}</h2>
@@ -120,7 +120,7 @@ export function DashboardErrorFallback({
       <section className="mx-auto grid min-h-[70vh] w-full max-w-3xl place-items-center">
         <Card className={`${forge.cardStrong} w-full`}>
           <CardContent className="p-8 text-center">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-300/10 text-amber-100 ring-1 ring-amber-300/14">
+            <span className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-amber-300/18 bg-amber-300/10 text-amber-100 shadow-[0_0_28px_rgba(251,191,36,0.14)] ring-1 ring-amber-300/14">
               <AlertTriangle className="h-7 w-7" aria-hidden="true" />
             </span>
             <h1 className="mt-5 text-2xl font-semibold">{title}</h1>

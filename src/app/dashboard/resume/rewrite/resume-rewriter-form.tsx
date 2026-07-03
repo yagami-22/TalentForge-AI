@@ -802,7 +802,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <Card className={forge.cardStrong}>
         <CardHeader className="border-b border-white/10 bg-black/10">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -906,7 +906,7 @@ export function ResumeRewriterForm({ resumes }: { resumes: ResumeOption[] }) {
                 defaultValue={validSavedRewriteState?.jobDescription ?? ""}
                 aria-invalid={state.status === "error"}
                 placeholder="Paste the job description you want to tailor this resume toward..."
-                className={`mt-3 max-h-[52vh] min-h-60 resize-y overflow-y-auto p-4 ${forge.input}`}
+                className={`mt-3 max-h-[46vh] min-h-52 resize-y overflow-y-auto p-4 ${forge.input}`}
               />
             </div>
 

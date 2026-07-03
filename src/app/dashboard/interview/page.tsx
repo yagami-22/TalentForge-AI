@@ -101,7 +101,7 @@ export default async function InterviewPage() {
         />
       </section>
 
-      <section className={`${forge.content} pb-16`}>
+      <section className={`${forge.content} pb-12`}>
         {resumes.length ? (
           <InterviewSetupForm
             resumes={resumes.map((resume) => ({

@@ -100,7 +100,7 @@ export default async function ResumeMatchPage() {
         />
       </section>
 
-      <section className={`${forge.content} pb-16`}>
+      <section className={`${forge.content} pb-12`}>
         {resumes.length ? (
           <MatchAnalyzerForm
             resumes={resumes.map((resume) => ({

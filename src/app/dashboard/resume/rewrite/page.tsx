@@ -93,7 +93,7 @@ export default async function ResumeRewritePage() {
         />
       </section>
 
-      <section className={`${forge.content} pb-16`}>
+      <section className={`${forge.content} pb-12`}>
         {resumes.length ? (
           <ResumeRewriterForm
             resumes={resumes.map((resume) => ({

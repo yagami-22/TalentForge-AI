@@ -1378,6 +1378,31 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
   const [error, setError] = useState<{ kind: GitHubApiErrorKind; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const metrics = useMemo(() => (result ? metricCards(result) : []), [result]);
+  const preAnalysisMetrics = [
+    {
+      label: "Resume Skills",
+      value: String(resumeContext.skills.length),
+      tone: "cyan" as const,
+    },
+    {
+      label: "Resume Context",
+      value: resumeContext.title ? "Connected" : "Not linked",
+      tone: resumeContext.title ? ("emerald" as const) : ("amber" as const),
+    },
+    {
+      label: "Evidence Source",
+      value: "Public GitHub",
+      tone: "purple" as const,
+    },
+  ];
+  const preAnalysisDetails = [
+    resumeContext.title ? `Resume context: ${resumeContext.title}` : null,
+    resumeContext.skills.length
+      ? `${resumeContext.skills.length} resume skills ready for GitHub alignment`
+      : "Upload a resume to compare GitHub evidence against resume skills",
+    "Analysis uses public repositories, README files, language data, deployment links, and recent activity",
+    "Results appear here after you enter a GitHub username",
+  ].filter((item): item is string => Boolean(item));
 
   async function runAnalysis() {
     setError(null);
@@ -1411,7 +1436,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
     <div className={forge.section}>
       <GitHubHero
         isLoading={isLoading}
-        metrics={result ? heroMetrics(result) : undefined}
+        metrics={result ? heroMetrics(result) : preAnalysisMetrics}
         summary={result?.hero.recruiterSummary}
       >
         <form onSubmit={handleAnalyze} className="mt-6 grid gap-3 lg:grid-cols-[1fr_1fr_auto]">
@@ -1501,12 +1526,13 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
         <AnalyzerEmptyState
           title="No GitHub profile analyzed yet"
           description="Enter a public GitHub username to generate evidence-based project quality, production readiness, recruiter visibility, and resume-alignment insights."
+          details={preAnalysisDetails}
         />
       ) : null}
 
       {result ? (
         <>
-          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+          <section className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
             <GitHubSection
               title="Top Projects Comparison"
               description="Ranked by recruiter value, production evidence, modern stack, and project depth."
@@ -1534,7 +1560,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
             </div>
           </GitHubSection>
 
-          <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+          <section className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
             <GitHubSection
               title="Top Recruiter Projects"
               description="The first repositories a technical recruiter should open."
@@ -1563,7 +1589,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
             </GitHubSection>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <section className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
             <GitHubSection
               title="Missing GitHub Proof"
               description="Specific evidence gaps that weaken otherwise strong projects during recruiter or hiring-manager review."

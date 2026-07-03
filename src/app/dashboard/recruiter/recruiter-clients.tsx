@@ -329,20 +329,20 @@ const pipelineStages: Array<{
 
 function RecruiterWorkspaceHero() {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.09),rgba(106,92,255,0.07)_48%,rgba(139,92,246,0.09))] p-6 shadow-[0_0_24px_rgba(0,229,255,0.055),0_0_34px_rgba(106,92,255,0.045)] backdrop-blur-2xl sm:p-8 lg:p-10">
+    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.09),rgba(106,92,255,0.07)_48%,rgba(139,92,246,0.09))] p-6 shadow-[0_0_24px_rgba(0,229,255,0.055),0_0_34px_rgba(106,92,255,0.045)] backdrop-blur-2xl sm:p-7">
       <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#00E5FF]/9 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-28 left-10 h-80 w-80 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
 
-      <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
+      <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center">
         <div>
           <p className={forge.badge}>AI Recruiter Mode</p>
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             Hire faster with AI.
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-300 sm:text-base">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-300 sm:text-base">
             Analyze resumes, rank candidates, compare applicants, generate recruiter reports, and shortlist top talent automatically.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3">
             <Button asChild className={forge.primaryButton}>
               <Link href="/dashboard/recruiter/upload">
                 <Upload className="h-4 w-4" />
@@ -358,7 +358,7 @@ function RecruiterWorkspaceHero() {
           </div>
         </div>
 
-        <div className="relative hidden min-h-80 lg:block" aria-hidden="true">
+        <div className="relative hidden min-h-72 lg:block" aria-hidden="true">
           <div className="absolute inset-0 rounded-[2rem] border border-white/[0.07] bg-[#070B16]/45 shadow-[inset_0_0_24px_rgba(0,229,255,0.035)]" />
           <div className="absolute left-8 top-8 h-56 w-56 rounded-full border border-cyan-300/15 bg-[#00E5FF]/8 blur-[1px] motion-safe:animate-pulse" />
           <div className="absolute right-8 top-10 h-40 w-40 rounded-full border border-violet-300/15 bg-[#8B5CF6]/10 motion-safe:animate-pulse" />
@@ -547,7 +547,7 @@ export function RecruiterUploadClient() {
         secondaryLabel="Recruiter Dashboard"
       />
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]">
         <RecruiterSection
           title="Job Description"
           description="The recruiter engine uses this as the hiring bar for ATS, skill match, projects, and interview questions."
@@ -555,9 +555,9 @@ export function RecruiterUploadClient() {
           <Textarea
             value={jobDescription}
             onChange={(event) => setJobDescription(event.target.value)}
-            rows={14}
+            rows={10}
             aria-label="Job description"
-            className={`min-h-80 p-4 ${forge.input}`}
+            className={`min-h-64 p-4 ${forge.input}`}
             placeholder="Paste the role description, responsibilities, requirements, must-have skills, and preferred qualifications..."
           />
         </RecruiterSection>

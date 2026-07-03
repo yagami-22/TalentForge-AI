@@ -341,8 +341,8 @@ export default async function ResumePage() {
         </Card>
       </section>
 
-      <section className={`${forge.content} pb-16`}>
-        <div className="mb-5 flex items-end justify-between gap-4">
+      <section className={`${forge.content} pb-12`}>
+        <div className="mb-4 flex items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase text-cyan-100">
               Library
@@ -357,7 +357,7 @@ export default async function ResumePage() {
         </div>
 
         {resumes.length ? (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {resumes.map((resume) => {
               const analysis = isResumeDiagnostics(resume.atsAnalysis)
                 ? resume.atsAnalysis
