@@ -61,44 +61,6 @@ The product combines resume parsing, structured scoring, authenticated dashboard
 
 ---
 
-## Screenshots
-
-Screenshots can be added after final production QA.
-
-### Landing Page
-
-![Landing Page Screenshot](docs/screenshots/landing-page.png)
-
-### Dashboard
-
-![Dashboard Screenshot](docs/screenshots/dashboard.png)
-
-### Resume Analyzer
-
-![Resume Analyzer Screenshot](docs/screenshots/resume-analyzer.png)
-
-### JD Match
-
-![JD Match Screenshot](docs/screenshots/jd-match.png)
-
-### ATS Optimizer
-
-![ATS Optimizer Screenshot](docs/screenshots/ats-optimizer.png)
-
-### Interview Module
-
-![Interview Module Screenshot](docs/screenshots/interview-module.png)
-
-### GitHub Analyzer
-
-![GitHub Analyzer Screenshot](docs/screenshots/github-analyzer.png)
-
-### OA Module
-
-![OA Module Screenshot](docs/screenshots/oa-module.png)
-
----
-
 ## Project Structure
 
 ```text
