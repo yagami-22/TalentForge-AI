@@ -18,6 +18,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { PremiumBackground } from "@/components/premium-background";
@@ -391,40 +392,16 @@ function CareerIntelligenceVisual() {
         <FloatingChart />
       </div>
 
-      <div className="absolute left-1/2 top-[43%] h-[430px] w-[580px] -translate-x-1/2 -translate-y-1/2">
-        <div className="landing-orbit absolute left-1/2 top-[43%] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/24 shadow-[0_0_44px_rgba(0,229,255,0.24)]" />
-        <div className="absolute left-1/2 top-[43%] h-[265px] w-[485px] -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-[50%] border border-cyan-200/28 shadow-[0_0_20px_rgba(0,229,255,0.18)]" />
-        <div className="absolute left-1/2 top-[43%] h-[265px] w-[485px] -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-[50%] border border-purple-300/26 shadow-[0_0_20px_rgba(139,92,246,0.18)]" />
-        <div className="absolute left-1/2 top-[43%] h-[330px] w-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.22),rgba(106,92,255,0.14)_38%,transparent_66%)] blur-xl" />
-
-        {[0, 1, 2, 3, 4, 5, 6].map((item) => (
-          <span
-            key={item}
-            className="landing-pulse absolute h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(0,229,255,1)]"
-            style={{
-              left: `${20 + item * 10}%`,
-              top: `${18 + ((item * 29) % 46)}%`,
-              animationDelay: `${item * 0.28}s`,
-            }}
-          />
-        ))}
-
-        <div className="absolute left-1/2 top-[62%] h-28 w-[340px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.62),rgba(106,92,255,0.38)_40%,transparent_72%)] blur-md" />
-        <div className="absolute left-1/2 top-[62%] z-10 h-[4.2rem] w-[290px] -translate-x-1/2 rounded-[50%] border border-cyan-200/42 bg-[linear-gradient(90deg,rgba(0,229,255,0.44),rgba(82,117,255,0.46),rgba(255,61,254,0.32))] shadow-[0_0_46px_rgba(0,229,255,0.52),0_0_74px_rgba(139,92,246,0.42),inset_0_0_24px_rgba(255,255,255,0.16)]" />
-        <div className="absolute left-1/2 top-[67%] z-[1] h-[4.4rem] w-[360px] -translate-x-1/2 rounded-[50%] border border-purple-200/32 bg-[linear-gradient(90deg,rgba(3,8,27,0.96),rgba(32,43,126,0.82)_30%,rgba(106,30,190,0.78)_70%,rgba(4,8,28,0.96))] shadow-[0_0_46px_rgba(106,92,255,0.56)]" />
-        <div className="absolute left-1/2 top-[72%] z-0 h-[4rem] w-[305px] -translate-x-1/2 rounded-[50%] border border-cyan-300/20 bg-[linear-gradient(90deg,rgba(3,8,24,0.98),rgba(0,229,255,0.18),rgba(139,92,246,0.28),rgba(3,8,24,0.98))] shadow-[0_0_30px_rgba(0,229,255,0.24)]" />
-        <div className="absolute left-[28%] top-[66%] z-20 h-2 w-16 rounded-full bg-[#1E8CFF] shadow-[0_0_16px_rgba(30,140,255,0.9)]" />
-        <div className="absolute right-[27%] top-[66%] z-20 h-2 w-16 rounded-full bg-[#B735FF] shadow-[0_0_16px_rgba(183,53,255,0.9)]" />
-
-        <div className="landing-shimmer absolute left-1/2 top-[41%] z-20 grid h-56 w-56 -translate-x-1/2 -translate-y-1/2 place-items-center overflow-hidden rounded-full border border-cyan-100/48 bg-[radial-gradient(circle_at_30%_22%,rgba(255,255,255,0.92),rgba(112,221,255,0.56)_13%,rgba(24,120,255,0.48)_33%,rgba(88,82,255,0.58)_55%,rgba(7,12,38,0.98)_86%)] shadow-[0_0_68px_rgba(0,229,255,0.95),0_0_120px_rgba(139,92,246,0.72),inset_0_0_34px_rgba(255,255,255,0.22),inset_0_-34px_42px_rgba(0,0,0,0.38)]">
-          <span className="absolute inset-3 rounded-full border border-white/10 bg-[radial-gradient(circle_at_62%_68%,rgba(255,61,254,0.28),transparent_34%)]" />
-          <span className="absolute -left-4 top-6 h-20 w-36 rotate-[-28deg] rounded-full bg-white/24 blur-xl" />
-          <span className="absolute left-7 top-7 h-8 w-24 rotate-[-28deg] rounded-full bg-cyan-100/38 blur-sm" />
-          <span className="absolute inset-x-8 bottom-8 h-7 rounded-full bg-[#00E5FF]/22 blur-md" />
-          <span className="relative scale-110 drop-shadow-[0_0_24px_rgba(0,229,255,0.95)]">
-            <TFMark size="lg" />
-          </span>
-        </div>
+      <div className="absolute left-1/2 top-[45%] h-[460px] w-[720px] -translate-x-1/2 -translate-y-1/2">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.16),transparent_58%)] blur-2xl" />
+        <Image
+          src="/landing/talentforge-ai-core.png"
+          alt=""
+          width={1586}
+          height={992}
+          priority
+          className="landing-shimmer relative h-full w-full object-contain drop-shadow-[0_0_46px_rgba(0,229,255,0.58)]"
+        />
       </div>
     </div>
   );
