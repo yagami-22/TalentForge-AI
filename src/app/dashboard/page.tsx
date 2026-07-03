@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import {
@@ -723,16 +722,46 @@ function WelcomeHero({
 
 function HeroIllustration() {
   return (
-    <div className="relative mx-auto hidden h-[240px] w-[360px] place-items-center overflow-visible lg:grid" aria-hidden="true">
-      <div className="absolute inset-x-0 bottom-2 h-20 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.28),rgba(139,92,246,0.18)_45%,transparent_72%)] blur-xl" />
-      <Image
-        src="/landing/talentforge-ai-core.png"
-        alt=""
-        width={1586}
-        height={992}
-        priority
-        className="relative h-[260px] w-[420px] max-w-none object-contain drop-shadow-[0_0_38px_rgba(0,229,255,0.55)]"
-      />
+    <div className="relative mx-auto hidden h-[250px] w-[360px] place-items-center lg:grid" aria-hidden="true">
+      <div className="absolute inset-3 rounded-full bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.18),rgba(60,130,255,0.2)_36%,rgba(139,92,246,0.2)_58%,transparent_78%)] blur-2xl" />
+      <div className="absolute h-[15rem] w-[15rem] rounded-full border border-cyan-100/28 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.1),transparent_62%)] shadow-[0_0_44px_rgba(0,229,255,0.26),0_0_72px_rgba(139,92,246,0.22)]" />
+      <div className="absolute h-[12.5rem] w-[12.5rem] rounded-full border border-purple-200/40 shadow-[0_0_44px_rgba(139,92,246,0.42)]" />
+      <div className="absolute h-28 w-[20rem] rounded-[50%] border border-cyan-200/28 shadow-[0_0_26px_rgba(0,229,255,0.24)]" />
+      <div className="absolute h-[18rem] w-28 rounded-[50%] border border-purple-200/22 shadow-[0_0_24px_rgba(139,92,246,0.2)]" />
+      <div className="absolute h-40 w-[20rem] rotate-12 rounded-[50%] border border-[#3BA8FF]/24 shadow-[0_0_20px_rgba(59,168,255,0.16)]" />
+      <div className="absolute h-40 w-[20rem] -rotate-12 rounded-[50%] border border-[#FF3DFE]/22 shadow-[0_0_20px_rgba(255,61,254,0.14)]" />
+      <div className="absolute bottom-5 h-14 w-[18.5rem] rounded-[50%] border border-cyan-200/36 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.46),rgba(139,92,246,0.26)_42%,transparent_74%)] shadow-[0_0_42px_rgba(0,229,255,0.42),0_0_58px_rgba(139,92,246,0.3)]" />
+      <div className="absolute bottom-9 h-8 w-60 rounded-[50%] border border-cyan-100/55 bg-cyan-300/10 shadow-[0_0_32px_rgba(0,229,255,0.68)]" />
+      <div className="absolute bottom-12 h-2 w-64 rounded-full bg-gradient-to-r from-transparent via-cyan-100 to-transparent shadow-[0_0_28px_rgba(0,229,255,0.9)]" />
+      <div className="absolute bottom-8 h-9 w-72 rounded-[50%] bg-[#00E5FF]/20 blur-md" />
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((dot) => {
+        const positions = [
+          "left-[24%] top-[24%]",
+          "left-[35%] top-[38%]",
+          "right-[27%] top-[22%]",
+          "right-[17%] top-[42%]",
+          "left-[31%] bottom-[36%]",
+          "right-[39%] bottom-[32%]",
+          "left-[18%] top-[47%]",
+          "right-[24%] bottom-[45%]",
+        ];
+        return (
+          <span
+            key={dot}
+            className={`absolute h-2.5 w-2.5 rounded-full bg-cyan-100 shadow-[0_0_16px_rgba(0,229,255,0.95)] ${positions[dot]}`}
+          />
+        );
+      })}
+      <div className="relative grid h-44 w-28 place-items-center border border-cyan-50/70 bg-[linear-gradient(155deg,rgba(104,219,255,0.68),rgba(75,119,255,0.68)_42%,rgba(158,88,255,0.62))] shadow-[0_0_48px_rgba(0,229,255,0.56),0_0_86px_rgba(139,92,246,0.58),inset_0_0_34px_rgba(255,255,255,0.24)] [clip-path:polygon(50%_0%,88%_18%,78%_78%,50%_100%,22%_78%,12%_18%)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_36%_18%,rgba(255,255,255,0.55),transparent_22%),linear-gradient(90deg,rgba(255,255,255,0.34),transparent_34%,rgba(255,255,255,0.16)_58%,transparent)]" />
+        <div className="absolute left-1/2 top-4 h-32 w-px -translate-x-1/2 bg-white/34" />
+        <div className="absolute bottom-7 h-16 w-20 rounded-full bg-[#00E5FF]/16 blur-xl" />
+        <div className="relative grid h-[4.6rem] w-[4.6rem] place-items-center rounded-full bg-[#050914]/82 ring-1 ring-cyan-100/18 shadow-[0_0_30px_rgba(0,229,255,0.22),inset_0_0_28px_rgba(0,229,255,0.12)]">
+          <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#B05CFF] bg-clip-text text-[1.45rem] font-black tracking-tighter text-transparent drop-shadow-[0_0_22px_rgba(0,229,255,1)]">
+            TF
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
