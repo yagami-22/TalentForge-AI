@@ -130,8 +130,8 @@ export default function Home() {
           }
 
           @keyframes landing-shimmer {
-            0%, 100% { opacity: .52; }
-            50% { opacity: .92; }
+            0%, 100% { opacity: .82; }
+            50% { opacity: 1; }
           }
 
           .landing-float { animation: landing-float 6s ease-in-out infinite; }
@@ -371,7 +371,7 @@ function TFMark({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 function CareerIntelligenceVisual() {
   return (
     <div className="relative hidden min-h-[520px] lg:block" aria-label="TalentForge AI career intelligence preview">
-      <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_48%_42%,rgba(0,229,255,0.18),transparent_58%)] blur-2xl" />
+      <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_42%,rgba(0,229,255,0.2),transparent_47%),radial-gradient(circle_at_62%_36%,rgba(139,92,246,0.2),transparent_42%)] blur-2xl" />
       <div className="landing-float absolute left-[10%] top-[4%] z-30">
         <FloatingMetric title="Resume Analysis" label="ATS Score" value="86%" delta="+18%" accent="cyan" />
       </div>
@@ -392,10 +392,10 @@ function CareerIntelligenceVisual() {
       </div>
 
       <div className="absolute left-1/2 top-[43%] h-[430px] w-[580px] -translate-x-1/2 -translate-y-1/2">
-        <div className="landing-orbit absolute left-1/2 top-[43%] h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/20 shadow-[0_0_36px_rgba(0,229,255,0.18)]" />
-        <div className="absolute left-1/2 top-[43%] h-[255px] w-[455px] -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-[50%] border border-cyan-300/24" />
-        <div className="absolute left-1/2 top-[43%] h-[255px] w-[455px] -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-[50%] border border-purple-300/22" />
-        <div className="absolute left-1/2 top-[43%] h-[330px] w-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.16),transparent_63%)] blur-xl" />
+        <div className="landing-orbit absolute left-1/2 top-[43%] h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/24 shadow-[0_0_44px_rgba(0,229,255,0.24)]" />
+        <div className="absolute left-1/2 top-[43%] h-[265px] w-[485px] -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-[50%] border border-cyan-200/28 shadow-[0_0_20px_rgba(0,229,255,0.18)]" />
+        <div className="absolute left-1/2 top-[43%] h-[265px] w-[485px] -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-[50%] border border-purple-300/26 shadow-[0_0_20px_rgba(139,92,246,0.18)]" />
+        <div className="absolute left-1/2 top-[43%] h-[330px] w-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.22),rgba(106,92,255,0.14)_38%,transparent_66%)] blur-xl" />
 
         {[0, 1, 2, 3, 4, 5, 6].map((item) => (
           <span
@@ -409,15 +409,21 @@ function CareerIntelligenceVisual() {
           />
         ))}
 
-        <div className="absolute left-1/2 top-[63%] h-28 w-[330px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.44),rgba(106,92,255,0.34)_42%,transparent_72%)] blur-md" />
-        <div className="absolute left-1/2 top-[63%] z-10 h-16 w-[280px] -translate-x-1/2 rounded-[50%] border border-cyan-300/28 bg-[linear-gradient(90deg,rgba(0,229,255,0.28),rgba(139,92,246,0.35),rgba(255,61,254,0.22))] shadow-[0_0_36px_rgba(0,229,255,0.34),0_0_60px_rgba(139,92,246,0.32)]" />
-        <div className="absolute left-1/2 top-[68%] z-0 h-16 w-[350px] -translate-x-1/2 rounded-[50%] border border-purple-300/22 bg-[linear-gradient(90deg,rgba(9,16,42,0.82),rgba(65,51,154,0.72),rgba(7,12,32,0.84))] shadow-[0_0_36px_rgba(106,92,255,0.42)]" />
-        <div className="absolute left-1/2 top-[73%] z-0 h-16 w-[300px] -translate-x-1/2 rounded-[50%] border border-cyan-300/16 bg-[linear-gradient(90deg,rgba(5,10,27,0.86),rgba(0,229,255,0.18),rgba(139,92,246,0.24))]" />
+        <div className="absolute left-1/2 top-[62%] h-28 w-[340px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.62),rgba(106,92,255,0.38)_40%,transparent_72%)] blur-md" />
+        <div className="absolute left-1/2 top-[62%] z-10 h-[4.2rem] w-[290px] -translate-x-1/2 rounded-[50%] border border-cyan-200/42 bg-[linear-gradient(90deg,rgba(0,229,255,0.44),rgba(82,117,255,0.46),rgba(255,61,254,0.32))] shadow-[0_0_46px_rgba(0,229,255,0.52),0_0_74px_rgba(139,92,246,0.42),inset_0_0_24px_rgba(255,255,255,0.16)]" />
+        <div className="absolute left-1/2 top-[67%] z-[1] h-[4.4rem] w-[360px] -translate-x-1/2 rounded-[50%] border border-purple-200/32 bg-[linear-gradient(90deg,rgba(3,8,27,0.96),rgba(32,43,126,0.82)_30%,rgba(106,30,190,0.78)_70%,rgba(4,8,28,0.96))] shadow-[0_0_46px_rgba(106,92,255,0.56)]" />
+        <div className="absolute left-1/2 top-[72%] z-0 h-[4rem] w-[305px] -translate-x-1/2 rounded-[50%] border border-cyan-300/20 bg-[linear-gradient(90deg,rgba(3,8,24,0.98),rgba(0,229,255,0.18),rgba(139,92,246,0.28),rgba(3,8,24,0.98))] shadow-[0_0_30px_rgba(0,229,255,0.24)]" />
+        <div className="absolute left-[28%] top-[66%] z-20 h-2 w-16 rounded-full bg-[#1E8CFF] shadow-[0_0_16px_rgba(30,140,255,0.9)]" />
+        <div className="absolute right-[27%] top-[66%] z-20 h-2 w-16 rounded-full bg-[#B735FF] shadow-[0_0_16px_rgba(183,53,255,0.9)]" />
 
-        <div className="landing-shimmer absolute left-1/2 top-[42%] z-20 grid h-56 w-56 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-cyan-100/36 bg-[radial-gradient(circle_at_32%_24%,rgba(255,255,255,0.68),rgba(74,184,255,0.42)_18%,rgba(55,116,255,0.42)_42%,rgba(139,92,246,0.45)_62%,rgba(5,9,26,0.94)_86%)] shadow-[0_0_54px_rgba(0,229,255,0.78),0_0_110px_rgba(139,92,246,0.58),inset_0_0_36px_rgba(255,255,255,0.18)]">
-          <span className="absolute inset-4 rounded-full border border-cyan-100/16" />
-          <span className="absolute left-8 top-8 h-12 w-24 rounded-full bg-white/20 blur-xl" />
-          <TFMark size="lg" />
+        <div className="landing-shimmer absolute left-1/2 top-[41%] z-20 grid h-56 w-56 -translate-x-1/2 -translate-y-1/2 place-items-center overflow-hidden rounded-full border border-cyan-100/48 bg-[radial-gradient(circle_at_30%_22%,rgba(255,255,255,0.92),rgba(112,221,255,0.56)_13%,rgba(24,120,255,0.48)_33%,rgba(88,82,255,0.58)_55%,rgba(7,12,38,0.98)_86%)] shadow-[0_0_68px_rgba(0,229,255,0.95),0_0_120px_rgba(139,92,246,0.72),inset_0_0_34px_rgba(255,255,255,0.22),inset_0_-34px_42px_rgba(0,0,0,0.38)]">
+          <span className="absolute inset-3 rounded-full border border-white/10 bg-[radial-gradient(circle_at_62%_68%,rgba(255,61,254,0.28),transparent_34%)]" />
+          <span className="absolute -left-4 top-6 h-20 w-36 rotate-[-28deg] rounded-full bg-white/24 blur-xl" />
+          <span className="absolute left-7 top-7 h-8 w-24 rotate-[-28deg] rounded-full bg-cyan-100/38 blur-sm" />
+          <span className="absolute inset-x-8 bottom-8 h-7 rounded-full bg-[#00E5FF]/22 blur-md" />
+          <span className="relative scale-110 drop-shadow-[0_0_24px_rgba(0,229,255,0.95)]">
+            <TFMark size="lg" />
+          </span>
         </div>
       </div>
     </div>
@@ -438,18 +444,20 @@ function FloatingMetric({
   accent: "cyan" | "emerald" | "purple";
 }) {
   const accentClass = {
-    cyan: "border-cyan-300/30 shadow-[0_0_32px_rgba(0,229,255,0.18)]",
-    emerald: "border-emerald-300/30 shadow-[0_0_32px_rgba(52,211,153,0.16)]",
-    purple: "border-purple-300/30 shadow-[0_0_32px_rgba(139,92,246,0.18)]",
+    cyan: "border-cyan-300/42 shadow-[0_0_34px_rgba(0,229,255,0.24),inset_0_1px_0_rgba(255,255,255,0.08)]",
+    emerald: "border-emerald-300/42 shadow-[0_0_34px_rgba(45,212,191,0.22),inset_0_1px_0_rgba(255,255,255,0.08)]",
+    purple: "border-purple-300/42 shadow-[0_0_34px_rgba(139,92,246,0.24),inset_0_1px_0_rgba(255,255,255,0.08)]",
   }[accent];
 
   return (
-    <div className={`w-40 rounded-[1rem] border bg-[#071024]/76 p-4 backdrop-blur-xl ${accentClass}`}>
+    <div className={`relative w-40 overflow-hidden rounded-[1rem] border bg-[linear-gradient(145deg,rgba(8,16,38,0.9),rgba(8,13,31,0.74)_55%,rgba(14,26,56,0.82))] p-4 backdrop-blur-xl ${accentClass}`}>
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+      <span className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-cyan-300/10 blur-2xl" />
       <h3 className="text-sm font-semibold text-white">{title}</h3>
       <p className="mt-3 text-xs text-slate-500">{label}</p>
       <div className="mt-1 flex items-end justify-between">
         <p className="text-2xl font-semibold text-white">{value}</p>
-        <span className="grid h-10 w-10 place-items-center rounded-full border border-cyan-300/20 bg-cyan-300/8 text-xs font-semibold text-cyan-100">
+        <span className="grid h-10 w-10 place-items-center rounded-full border border-cyan-300/30 bg-cyan-300/12 text-xs font-semibold text-cyan-100 shadow-[0_0_18px_rgba(0,229,255,0.22)]">
           {value.replace("+", "")}
         </span>
       </div>
@@ -463,7 +471,8 @@ function FloatingMetric({
 
 function FloatingStars() {
   return (
-    <div className="w-44 rounded-[1rem] border border-purple-300/28 bg-[#071024]/74 p-4 shadow-[0_0_32px_rgba(139,92,246,0.2)] backdrop-blur-xl">
+    <div className="relative w-44 overflow-hidden rounded-[1rem] border border-purple-300/42 bg-[linear-gradient(145deg,rgba(13,15,36,0.9),rgba(9,12,31,0.74)_55%,rgba(35,20,70,0.76))] p-4 shadow-[0_0_36px_rgba(139,92,246,0.28),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
       <h3 className="text-sm font-semibold text-white">Career Readiness</h3>
       <p className="mt-3 text-xs text-slate-500">Overall Score</p>
       <p className="mt-1 text-xl font-semibold text-white">Excellent</p>
@@ -478,7 +487,8 @@ function FloatingStars() {
 
 function FloatingChecklist() {
   return (
-    <div className="w-48 rounded-[1rem] border border-cyan-300/26 bg-[#071024]/78 p-4 shadow-[0_0_34px_rgba(0,229,255,0.18)] backdrop-blur-xl">
+    <div className="relative w-48 overflow-hidden rounded-[1rem] border border-cyan-300/38 bg-[linear-gradient(145deg,rgba(8,16,38,0.9),rgba(7,12,31,0.76)_55%,rgba(8,38,51,0.72))] p-4 shadow-[0_0_36px_rgba(0,229,255,0.25),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
       <h3 className="text-sm font-semibold text-white">AI Recommendations</h3>
       <div className="mt-3 space-y-2 text-xs text-slate-300">
         {["Improve Impact", "Add Keywords", "Strengthen Skills"].map((item) => (
@@ -495,7 +505,8 @@ function FloatingChecklist() {
 
 function FloatingChart() {
   return (
-    <div className="w-52 rounded-[1rem] border border-purple-300/28 bg-[#071024]/76 p-4 shadow-[0_0_32px_rgba(139,92,246,0.2)] backdrop-blur-xl">
+    <div className="relative w-52 overflow-hidden rounded-[1rem] border border-cyan-300/38 bg-[linear-gradient(145deg,rgba(8,16,38,0.9),rgba(7,12,31,0.76)_55%,rgba(15,43,50,0.72))] p-4 shadow-[0_0_36px_rgba(0,229,255,0.24),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+      <span className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
       <h3 className="text-sm font-semibold text-white">Hiring Probability</h3>
       <p className="mt-3 text-lg font-semibold text-emerald-300">High</p>
       <p className="text-xs text-slate-400">Top 20% Candidates</p>
