@@ -1,48 +1,18 @@
 import { Show, SignUpButton, UserButton } from "@clerk/nextjs";
 import {
   ArrowRight,
-  BarChart3,
   Bot,
   CheckCircle2,
-  ChevronDown,
   CirclePlay,
-  ClipboardCheck,
-  Code2,
-  Compass,
-  FileSearch,
-  GitBranch,
-  MessageSquareText,
-  PenLine,
-  Route,
   ShieldCheck,
   Sparkles,
   Star,
-  Target,
-  WandSparkles,
   Zap,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
-
-type ModuleTone = "cyan" | "blue" | "emerald" | "amber" | "purple" | "pink";
-
-type ModuleCard = {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  tone: ModuleTone;
-};
-
-type Feature = {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  metric: string;
-  metricLabel: string;
-};
 
 const heroHighlights = [
   {
@@ -61,132 +31,6 @@ const heroHighlights = [
     description: "Improve scores, build skills, land better roles.",
   },
 ];
-
-const moduleCards: ModuleCard[] = [
-  {
-    icon: FileSearch,
-    title: "Resume Analyzer",
-    description: "Deep resume insights",
-    tone: "cyan",
-  },
-  {
-    icon: Zap,
-    title: "ATS Optimizer",
-    description: "Improve ATS score instantly",
-    tone: "blue",
-  },
-  {
-    icon: Target,
-    title: "JD Matcher",
-    description: "Match jobs with perfect fit",
-    tone: "emerald",
-  },
-  {
-    icon: WandSparkles,
-    title: "AI Rewriter",
-    description: "Rewrite and strengthen your resume",
-    tone: "amber",
-  },
-  {
-    icon: MessageSquareText,
-    title: "Interview Prep",
-    description: "Mock interviews with AI feedback",
-    tone: "purple",
-  },
-  {
-    icon: Code2,
-    title: "OA Practice",
-    description: "Coding, SQL, and aptitude practice",
-    tone: "pink",
-  },
-  {
-    icon: GitBranch,
-    title: "GitHub Analyzer",
-    description: "Insights on your developer profile",
-    tone: "blue",
-  },
-  {
-    icon: Compass,
-    title: "Career Coach",
-    description: "Personalized career guidance",
-    tone: "cyan",
-  },
-  {
-    icon: Sparkles,
-    title: "And More",
-    description: "New tools coming soon",
-    tone: "purple",
-  },
-];
-
-const features: Feature[] = [
-  {
-    icon: FileSearch,
-    title: "Resume Intelligence",
-    description:
-      "Turn your resume into a scored readiness profile with role, impact, and credibility signals.",
-    metric: "3 min",
-    metricLabel: "analysis time",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "ATS Optimization",
-    description:
-      "Find missing keywords, formatting risks, and recruiter filters before you apply.",
-    metric: "+18%",
-    metricLabel: "typical score lift",
-  },
-  {
-    icon: Target,
-    title: "JD Match",
-    description:
-      "Compare any job description against your profile and see the gaps that matter.",
-    metric: "92K",
-    metricLabel: "JDs analyzed",
-  },
-  {
-    icon: PenLine,
-    title: "Resume Rewriter",
-    description:
-      "Rewrite bullets with stronger evidence, cleaner phrasing, and measurable outcomes.",
-    metric: "4.6x",
-    metricLabel: "faster edits",
-  },
-  {
-    icon: MessageSquareText,
-    title: "Mock Interviews",
-    description:
-      "Practice OA, technical, project, and behavioral rounds with structured AI feedback.",
-    metric: "31K",
-    metricLabel: "sessions completed",
-  },
-  {
-    icon: Compass,
-    title: "Career Coach",
-    description:
-      "Get focused guidance for role strategy, skill gaps, projects, and interview prep.",
-    metric: "24/7",
-    metricLabel: "AI coaching",
-  },
-  {
-    icon: Route,
-    title: "Roadmaps",
-    description:
-      "Convert career goals into weekly plans with milestones, proof points, and next actions.",
-    metric: "14d",
-    metricLabel: "planning horizon",
-  },
-  {
-    icon: BarChart3,
-    title: "Analytics",
-    description:
-      "Track readiness, resume health, interview progress, and application momentum.",
-    metric: "1 view",
-    metricLabel: "career command",
-  },
-];
-
-const trustedBrands = ["Google", "Microsoft", "Amazon", "Adobe", "Infosys", "TCS", "Deloitte"];
 
 export default function Home() {
   return (
@@ -239,9 +83,6 @@ export default function Home() {
           </Link>
 
           <div className="hidden items-center gap-8 text-sm font-medium text-slate-300 lg:flex">
-            <NavLink href="#features">Platform</NavLink>
-            <NavLink href="#solutions">Solutions</NavLink>
-            <NavLink href="#how-it-works">Resources</NavLink>
             <a href="#pricing" className="transition hover:text-cyan-50">
               Pricing
             </a>
@@ -253,7 +94,7 @@ export default function Home() {
               variant="outline"
               className="hidden h-10 rounded-xl border-white/[0.08] bg-[#080D1D]/70 px-4 text-sm font-semibold text-white shadow-[0_0_22px_rgba(139,92,246,0.1)] md:inline-flex"
             >
-              <a href="#features">
+              <a href="#pricing">
                 <Bot className="h-4 w-4 text-amber-300" />
                 AI Assistant
               </a>
@@ -353,7 +194,7 @@ export default function Home() {
                 variant="outline"
                 className="h-12 w-full max-w-sm rounded-[1.15rem] border-white/[0.08] bg-[#080D1D]/66 px-7 text-base text-white shadow-[0_0_24px_rgba(0,0,0,0.22)] sm:w-auto"
               >
-                <a href="#how-it-works">
+                <a href="#pricing">
                   <CirclePlay className="h-4 w-4" />
                   See How It Works
                 </a>
@@ -374,62 +215,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="features"
-        className="relative mx-auto w-full max-w-[1360px] px-5 py-10 sm:px-6 lg:px-8"
-      >
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="mx-auto inline-flex rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200">
-            All-In-One Career Intelligence Suite
-          </p>
-          <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
-            Everything you need.
-            <span className="block">
-              In one{" "}
-              <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-transparent">
-                intelligent
-              </span>{" "}
-              platform.
-            </span>
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
-            Powerful AI tools to analyze, optimize, and accelerate your career growth.
-          </p>
-        </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
-          {moduleCards.map((module) => (
-            <ModuleCardView key={module.title} module={module} />
-          ))}
-        </div>
-        <div className="mt-9 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.45em] text-slate-600 sm:tracking-[0.55em]">
-            Trusted by aspiring professionals from
-          </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-2xl font-semibold text-slate-500/72">
-            {trustedBrands.map((brand) => (
-              <span key={brand}>{brand}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="solutions"
-        className="mx-auto w-full max-w-[1360px] px-5 py-16 sm:px-6 lg:px-8"
-      >
-        <SectionHeader
-          eyebrow="Solutions"
-          title="Every signal recruiters check, sharpened in one place."
-          description="Premium modules for resume quality, ATS fit, role matching, interview readiness, and career planning."
-        />
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {features.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
-        </div>
-      </section>
-
-      <section id="pricing" className="mx-auto w-full max-w-[1360px] px-5 pb-16 sm:px-6 lg:px-8">
+      <section id="pricing" className="mx-auto w-full max-w-[1360px] px-5 py-12 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.16),rgba(106,92,255,0.12)_50%,rgba(139,92,246,0.18))] p-6 shadow-[0_0_40px_rgba(0,229,255,0.14),0_0_70px_rgba(106,92,255,0.16)] backdrop-blur-2xl sm:p-8 lg:p-10">
           <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-[#8B5CF6]/18 blur-3xl" />
@@ -481,28 +267,13 @@ export default function Home() {
             </span>
           </Link>
           <div className="flex flex-wrap gap-4">
-            <a href="#features" className="transition hover:text-cyan-50">
-              Platform
-            </a>
-            <a href="#solutions" className="transition hover:text-cyan-50">
-              Solutions
-            </a>
-            <a href="#how-it-works" className="transition hover:text-cyan-50">
-              Workflow
+            <a href="#pricing" className="transition hover:text-cyan-50">
+              Get Started
             </a>
           </div>
         </div>
       </footer>
     </PremiumBackground>
-  );
-}
-
-function NavLink({ href, children }: { href: string; children: string }) {
-  return (
-    <a href={href} className="inline-flex items-center gap-1 transition hover:text-cyan-50">
-      {children}
-      <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
-    </a>
   );
 }
 
@@ -657,115 +428,5 @@ function FloatingChart() {
         <div className="h-full rounded-lg border-b border-l border-cyan-300/18 bg-[linear-gradient(135deg,transparent_10%,rgba(59,168,255,0.26)_11%,transparent_18%,rgba(139,92,246,0.3)_36%,transparent_42%,rgba(255,61,254,0.38)_70%,transparent_76%)]" />
       </div>
     </div>
-  );
-}
-
-function ModuleCardView({ module }: { module: ModuleCard }) {
-  const Icon = module.icon;
-  const tone = getModuleTone(module.tone);
-
-  return (
-    <article className={`group relative min-h-[132px] overflow-hidden rounded-[1rem] border bg-[#071024]/72 p-4 shadow-[0_0_34px_rgba(0,0,0,0.18)] transition duration-300 hover:-translate-y-1 ${tone.border}`}>
-      <span className={`absolute -left-10 -top-10 h-24 w-24 rounded-full blur-2xl transition duration-300 group-hover:opacity-80 ${tone.glow}`} />
-      <span className={`relative grid h-10 w-10 place-items-center rounded-xl border text-white shadow-[0_0_24px_rgba(0,229,255,0.12)] ${tone.icon}`}>
-        <Icon className="h-5 w-5" />
-      </span>
-      <h3 className="relative mt-4 text-sm font-semibold text-white">{module.title}</h3>
-      <p className="relative mt-1 text-xs leading-5 text-slate-400">{module.description}</p>
-    </article>
-  );
-}
-
-function getModuleTone(tone: ModuleTone) {
-  const tones = {
-    cyan: {
-      border: "border-cyan-300/20 hover:border-cyan-200/42",
-      icon: "border-cyan-300/24 bg-cyan-300/12 text-cyan-100",
-      glow: "bg-cyan-300/20",
-    },
-    blue: {
-      border: "border-blue-300/20 hover:border-blue-200/42",
-      icon: "border-blue-300/24 bg-blue-300/12 text-blue-100",
-      glow: "bg-blue-300/20",
-    },
-    emerald: {
-      border: "border-emerald-300/20 hover:border-emerald-200/42",
-      icon: "border-emerald-300/24 bg-emerald-300/12 text-emerald-100",
-      glow: "bg-emerald-300/20",
-    },
-    amber: {
-      border: "border-amber-300/20 hover:border-amber-200/42",
-      icon: "border-amber-300/24 bg-amber-300/12 text-amber-100",
-      glow: "bg-amber-300/20",
-    },
-    purple: {
-      border: "border-purple-300/20 hover:border-purple-200/42",
-      icon: "border-purple-300/24 bg-purple-300/12 text-purple-100",
-      glow: "bg-purple-300/20",
-    },
-    pink: {
-      border: "border-fuchsia-300/20 hover:border-fuchsia-200/42",
-      icon: "border-fuchsia-300/24 bg-fuchsia-300/12 text-fuchsia-100",
-      glow: "bg-fuchsia-300/20",
-    },
-  };
-
-  return tones[tone];
-}
-
-function SectionHeader({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="max-w-3xl">
-      <p className="text-sm font-semibold uppercase tracking-wide text-cyan-200">
-        {eyebrow}
-      </p>
-      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-        {title}
-      </h2>
-      <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:text-base">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-function FeatureCard({ feature }: { feature: Feature }) {
-  const Icon = feature.icon;
-
-  return (
-    <article className="group relative min-h-[270px] overflow-hidden rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_40px_rgba(0,229,255,0.08),0_0_60px_rgba(106,92,255,0.08)] ring-1 ring-white/[0.08] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-[#00E5FF]/25 hover:bg-white/[0.055] hover:shadow-[0_0_52px_rgba(0,229,255,0.16),0_0_70px_rgba(106,92,255,0.15)]">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#00E5FF]/0 blur-3xl transition duration-300 group-hover:bg-[#00E5FF]/14" />
-      <div className="relative flex h-full flex-col">
-        <div className="flex items-start justify-between gap-4">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl border border-cyan-300/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_28px_rgba(0,229,255,0.12)]">
-            <Icon className="h-5 w-5" />
-          </span>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-white">{feature.metric}</p>
-            <p className="text-xs text-slate-500">{feature.metricLabel}</p>
-          </div>
-        </div>
-        <h3 className="mt-6 text-xl font-semibold tracking-tight text-white">
-          {feature.title}
-        </h3>
-        <p className="mt-3 text-sm leading-6 text-slate-400">
-          {feature.description}
-        </p>
-        <div className="mt-auto pt-6 text-sm font-medium text-cyan-100">
-          <span className="inline-flex items-center gap-2">
-            Explore workflow
-            <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-0.5" />
-          </span>
-        </div>
-      </div>
-    </article>
   );
 }
