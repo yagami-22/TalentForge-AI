@@ -4,15 +4,33 @@ import {
   Bot,
   CheckCircle2,
   CirclePlay,
+  Code2,
+  Compass,
+  FileSearch,
+  GitBranch,
+  MessageSquareText,
+  PenLine,
   ShieldCheck,
   Sparkles,
   Star,
+  Target,
+  WandSparkles,
   Zap,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
+
+type ModuleTone = "cyan" | "blue" | "emerald" | "amber" | "purple";
+
+type ModuleCard = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  tone: ModuleTone;
+};
 
 const heroHighlights = [
   {
@@ -31,6 +49,65 @@ const heroHighlights = [
     description: "Improve scores, build skills, land better roles.",
   },
 ];
+
+const moduleCards: ModuleCard[] = [
+  {
+    icon: FileSearch,
+    title: "Resume Analyzer",
+    description: "Deep resume insights & scoring",
+    tone: "cyan",
+  },
+  {
+    icon: Zap,
+    title: "ATS Optimizer",
+    description: "Improve ATS score instantly",
+    tone: "blue",
+  },
+  {
+    icon: Target,
+    title: "JD Matcher",
+    description: "Match jobs with perfect fit",
+    tone: "emerald",
+  },
+  {
+    icon: WandSparkles,
+    title: "AI Rewriter",
+    description: "Rewrite & strengthen your resume",
+    tone: "amber",
+  },
+  {
+    icon: MessageSquareText,
+    title: "Interview Prep",
+    description: "Mock interviews with AI feedback",
+    tone: "purple",
+  },
+  {
+    icon: Code2,
+    title: "OA Practice",
+    description: "Coding, SQL & aptitude practice",
+    tone: "blue",
+  },
+  {
+    icon: GitBranch,
+    title: "GitHub Analyzer",
+    description: "Insights on your developer profile",
+    tone: "cyan",
+  },
+  {
+    icon: Compass,
+    title: "Career Coach",
+    description: "Personalized career guidance",
+    tone: "purple",
+  },
+  {
+    icon: Sparkles,
+    title: "And More",
+    description: "New tools coming soon",
+    tone: "amber",
+  },
+];
+
+const trustedBrands = ["Google", "Microsoft", "Amazon", "Adobe", "Infosys", "TCS", "Deloitte"];
 
 export default function Home() {
   return (
@@ -212,6 +289,50 @@ export default function Home() {
           </div>
 
           <CareerIntelligenceVisual />
+        </div>
+      </section>
+
+      <section
+        id="features"
+        className="relative mx-auto w-full max-w-[1360px] px-5 py-12 sm:px-6 lg:px-8"
+      >
+        <div className="pointer-events-none absolute left-1/2 top-10 h-56 w-56 -translate-x-1/2 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+        <div className="pointer-events-none absolute right-[12%] top-20 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
+
+        <div className="relative mx-auto max-w-3xl text-center">
+          <p className="mx-auto inline-flex rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200 shadow-[0_0_24px_rgba(0,229,255,0.12)]">
+            All-In-One Career Intelligence Suite
+          </p>
+          <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
+            Everything you need.
+            <span className="block">
+              In one{" "}
+              <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] bg-clip-text text-transparent">
+                intelligent
+              </span>{" "}
+              platform.
+            </span>
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-slate-400">
+            Powerful AI tools to analyze, optimize, and accelerate your career growth.
+          </p>
+        </div>
+
+        <div className="relative mt-8 grid grid-cols-1 gap-4 min-[460px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
+          {moduleCards.map((module) => (
+            <ModuleCardView key={module.title} module={module} />
+          ))}
+        </div>
+
+        <div className="relative mt-9 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.36em] text-slate-600 sm:tracking-[0.5em]">
+            Trusted by aspiring professionals from
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-xl font-semibold text-slate-500/72 sm:gap-x-10 sm:text-2xl">
+            {trustedBrands.map((brand) => (
+              <span key={brand}>{brand}</span>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -429,4 +550,62 @@ function FloatingChart() {
       </div>
     </div>
   );
+}
+
+function ModuleCardView({ module }: { module: ModuleCard }) {
+  const Icon = module.icon;
+  const tone = getModuleTone(module.tone);
+
+  return (
+    <article
+      className={`group relative min-h-[150px] overflow-hidden rounded-[1.05rem] border bg-[#071024]/72 p-4 shadow-[0_0_34px_rgba(0,0,0,0.18)] ring-1 ring-white/[0.04] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.05] ${tone.border}`}
+    >
+      <span
+        className={`absolute -left-12 -top-12 h-28 w-28 rounded-full opacity-55 blur-2xl transition duration-300 group-hover:opacity-90 ${tone.glow}`}
+      />
+      <span
+        className={`relative grid h-11 w-11 place-items-center rounded-2xl border shadow-[0_0_24px_rgba(0,229,255,0.12)] ${tone.icon}`}
+      >
+        <Icon className="h-5 w-5" />
+      </span>
+      <h3 className="relative mt-4 text-sm font-semibold tracking-tight text-white">
+        {module.title}
+      </h3>
+      <p className="relative mt-2 text-xs leading-5 text-slate-400">
+        {module.description}
+      </p>
+    </article>
+  );
+}
+
+function getModuleTone(tone: ModuleTone) {
+  const tones = {
+    cyan: {
+      border: "border-cyan-300/20 hover:border-cyan-200/45 hover:shadow-[0_0_42px_rgba(0,229,255,0.16)]",
+      icon: "border-cyan-300/24 bg-cyan-300/12 text-cyan-100",
+      glow: "bg-cyan-300/22",
+    },
+    blue: {
+      border: "border-blue-300/20 hover:border-blue-200/45 hover:shadow-[0_0_42px_rgba(59,130,246,0.16)]",
+      icon: "border-blue-300/24 bg-blue-300/12 text-blue-100",
+      glow: "bg-blue-300/22",
+    },
+    emerald: {
+      border: "border-emerald-300/20 hover:border-emerald-200/45 hover:shadow-[0_0_42px_rgba(52,211,153,0.14)]",
+      icon: "border-emerald-300/24 bg-emerald-300/12 text-emerald-100",
+      glow: "bg-emerald-300/20",
+    },
+    amber: {
+      border: "border-amber-300/20 hover:border-amber-200/45 hover:shadow-[0_0_42px_rgba(245,158,11,0.14)]",
+      icon: "border-amber-300/24 bg-amber-300/12 text-amber-100",
+      glow: "bg-amber-300/20",
+    },
+    purple: {
+      border: "border-purple-300/20 hover:border-purple-200/45 hover:shadow-[0_0_42px_rgba(139,92,246,0.16)]",
+      icon: "border-purple-300/24 bg-purple-300/12 text-purple-100",
+      glow: "bg-purple-300/22",
+    },
+  };
+
+  return tones[tone];
 }
