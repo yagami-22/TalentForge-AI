@@ -438,20 +438,20 @@ export default async function DashboardPage() {
   const readiness = getCareerReadiness(snapshot);
 
   return (
-    <PremiumBackground contentClassName="mx-auto flex min-h-screen w-full max-w-[1536px] flex-col px-0 py-0 xl:flex-row">
+    <PremiumBackground contentClassName="mx-auto flex min-h-screen w-full max-w-[1500px] flex-col px-0 py-0 xl:flex-row">
       <div className="xl:hidden">
         <MobileExecutiveNav profile={profile} />
       </div>
 
-      <div className="hidden xl:block xl:w-[292px] xl:shrink-0">
+      <div className="hidden xl:block xl:w-[272px] xl:shrink-0">
         <ExecutiveSidebar profile={profile} />
       </div>
 
-      <main className="relative min-w-0 flex-1 px-4 py-6 sm:px-5 lg:px-6 lg:py-7">
+      <main className="relative min-w-0 flex-1 px-4 py-4 sm:px-5 lg:px-5 lg:py-5">
         <DashboardAmbient />
         <DashboardHeader profile={profile} />
 
-        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
           <DashboardMotionSection>
             <WelcomeHero snapshot={snapshot} readiness={readiness} />
           </DashboardMotionSection>
@@ -460,20 +460,20 @@ export default async function DashboardPage() {
           </DashboardMotionSection>
         </div>
 
-        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="space-y-5">
+        <div className="mt-4 grid gap-4 2xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="space-y-4">
             <CareerCommandCenter />
             <RoadmapBanner />
           </div>
           <TodaysFocus snapshot={snapshot} />
         </div>
 
-        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
+        <div className="mt-4 grid gap-4 2xl:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)]">
           <CareerOverview snapshot={snapshot} readiness={readiness} />
           <ActivityTimeline />
         </div>
 
-        <div className="mt-5">
+        <div className="mt-4">
           <RecommendationPath snapshot={snapshot} />
         </div>
       </main>
@@ -515,26 +515,26 @@ function DashboardAmbient() {
 
 function ExecutiveSidebar({ profile }: { profile: UserProfile }) {
   return (
-    <aside className="sticky top-0 flex h-screen flex-col p-3">
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[26px] border border-cyan-200/10 bg-[#071024]/72 px-4 py-5 shadow-[0_24px_90px_rgba(0,0,0,0.28),0_0_42px_rgba(0,229,255,0.08)] backdrop-blur-2xl">
+    <aside className="sticky top-0 flex h-screen flex-col p-2.5">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-cyan-200/10 bg-[#071024]/72 px-3.5 py-4 shadow-[0_24px_90px_rgba(0,0,0,0.28),0_0_42px_rgba(0,229,255,0.08)] backdrop-blur-2xl">
         <span className="pointer-events-none absolute -left-24 top-20 h-56 w-56 rounded-full bg-[#00E5FF]/10 blur-3xl" />
         <span className="pointer-events-none absolute -right-24 bottom-20 h-56 w-56 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
       <Link
         href="/dashboard"
         className="relative flex shrink-0 items-center gap-3 rounded-2xl px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
       >
-        <span className="relative grid h-11 w-11 place-items-center">
+        <span className="relative grid h-10 w-10 place-items-center">
           <span className="absolute h-8 w-11 rounded-[0.65rem] bg-gradient-to-br from-[#00E5FF] via-[#6A5CFF] to-[#FF3DFE] opacity-85 shadow-[0_0_24px_rgba(139,92,246,0.28)] [clip-path:polygon(8%_10%,100%_10%,78%_38%,59%_38%,45%_90%,27%_90%,43%_38%,0_38%)]" />
           <span className="relative text-[0.72rem] font-black tracking-tighter text-white drop-shadow-[0_0_12px_rgba(0,229,255,0.8)]">
             TF
           </span>
         </span>
-        <span className="text-lg font-semibold tracking-tight text-white">TalentForge AI</span>
+        <span className="text-base font-semibold tracking-tight text-white">TalentForge AI</span>
       </Link>
 
-      <nav className="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pb-2 pr-1 [scrollbar-color:rgba(0,229,255,0.24)_transparent] [scrollbar-width:thin]" aria-label="Dashboard navigation">
+      <nav className="mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain pb-2 pr-1 [scrollbar-color:rgba(0,229,255,0.24)_transparent] [scrollbar-width:thin]" aria-label="Dashboard navigation">
         {dashboardNav.map((group) => (
-          <div key={group.label} className="space-y-2">
+          <div key={group.label} className="space-y-1.5">
             <p className="px-3 text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-slate-500/75">
               {group.label}
             </p>
@@ -547,10 +547,10 @@ function ExecutiveSidebar({ profile }: { profile: UserProfile }) {
         ))}
       </nav>
 
-      <div className="mt-auto shrink-0 pt-3">
-        <div className="relative rounded-[1.25rem] border border-white/[0.08] bg-white/[0.035] p-3">
+      <div className="mt-auto shrink-0 pt-2.5">
+        <div className="relative rounded-[1.15rem] border border-white/[0.08] bg-white/[0.035] p-2.5">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white">
+            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-[#00E5FF] to-[#6A5CFF] text-sm font-bold text-white">
               {profile.initial}
             </span>
             <div className="min-w-0">
@@ -608,7 +608,7 @@ function SidebarLink({
     <Link
       href={item.href}
       aria-current={item.active ? "page" : undefined}
-      className={`group relative flex h-10 items-center gap-3.5 rounded-2xl border px-3.5 text-sm transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35 ${
+      className={`group relative flex h-9 items-center gap-3 rounded-2xl border px-3 text-sm transition duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35 ${
         item.active
           ? "border-cyan-300/38 bg-[linear-gradient(135deg,rgba(0,229,255,0.22),rgba(106,92,255,0.24))] text-white shadow-[0_0_34px_rgba(0,229,255,0.24),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_0_20px_rgba(0,229,255,0.055)]"
           : "border-transparent text-slate-400 hover:-translate-y-0.5 hover:border-white/[0.1] hover:bg-white/[0.055] hover:text-slate-100"
@@ -618,13 +618,13 @@ function SidebarLink({
         <span className="pointer-events-none absolute inset-y-2 left-1 w-0.5 rounded-full bg-cyan-200 shadow-[0_0_16px_rgba(0,229,255,0.8)]" />
       ) : null}
       <span
-        className={`grid h-7 w-7 shrink-0 place-items-center rounded-xl transition duration-300 ${
+        className={`grid h-6 w-6 shrink-0 place-items-center rounded-xl transition duration-300 ${
           item.active
             ? "bg-cyan-300/10 text-cyan-50 shadow-[0_0_18px_rgba(0,229,255,0.22)]"
             : "text-slate-500 group-hover:bg-cyan-300/8 group-hover:text-cyan-100 group-hover:shadow-[0_0_16px_rgba(0,229,255,0.12)]"
         }`}
       >
-        <Icon className="h-4 w-4" />
+        <Icon className="h-3.5 w-3.5" />
       </span>
       <span>{item.label}</span>
     </Link>
@@ -635,24 +635,24 @@ function DashboardHeader({ profile }: { profile: UserProfile }) {
   const name = getDisplayName(profile.email);
 
   return (
-    <header className="relative flex flex-col gap-4 py-2 lg:flex-row lg:items-start lg:justify-between">
+    <header className="relative flex flex-col gap-3 py-1 lg:flex-row lg:items-start lg:justify-between">
       <div>
-        <p className="text-xl font-medium tracking-tight text-slate-300">Good evening,</p>
-        <h1 className="mt-2 bg-gradient-to-r from-[#39C8FF] via-[#7C5CFF] to-[#FF3DFE] bg-clip-text text-4xl font-semibold tracking-tight text-transparent sm:text-5xl">
+        <p className="text-lg font-medium tracking-tight text-slate-300">Good evening,</p>
+        <h1 className="mt-1.5 bg-gradient-to-r from-[#39C8FF] via-[#7C5CFF] to-[#FF3DFE] bg-clip-text text-[2.35rem] font-semibold leading-none tracking-tight text-transparent sm:text-[2.8rem]">
           {name}
           <span className="ml-2 text-white drop-shadow-[0_0_16px_rgba(139,92,246,0.7)]">
             ✦
           </span>
         </h1>
-        <p className="mt-3 text-base text-slate-400">
+        <p className="mt-2 text-base text-slate-400">
           Let&apos;s accelerate your career journey.
         </p>
       </div>
 
-      <div className="flex items-center gap-3 lg:pt-2">
+      <div className="flex items-center gap-2.5 lg:pt-2">
         <Link
           href="/dashboard/coach"
-          className="group inline-flex h-12 items-center gap-2 rounded-[1.35rem] border border-purple-300/22 bg-[#0B1024]/78 px-5 text-sm font-semibold text-white shadow-[0_0_28px_rgba(139,92,246,0.12)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-purple-200/38 hover:bg-purple-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/40"
+          className="group inline-flex h-10 items-center gap-2 rounded-[1.2rem] border border-purple-300/22 bg-[#0B1024]/78 px-4 text-sm font-semibold text-white shadow-[0_0_28px_rgba(139,92,246,0.12)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-purple-200/38 hover:bg-purple-300/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/40"
         >
           <Sparkles className="h-4 w-4 text-purple-100" />
           AI Assistant
@@ -661,13 +661,13 @@ function DashboardHeader({ profile }: { profile: UserProfile }) {
         <button
           type="button"
           aria-label="Notifications"
-          className="relative grid h-12 w-12 place-items-center rounded-full border border-white/[0.08] bg-[#080D1D]/76 text-slate-300 shadow-[0_0_22px_rgba(0,0,0,0.22)] backdrop-blur-2xl transition hover:border-cyan-300/25 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+          className="relative grid h-10 w-10 place-items-center rounded-full border border-white/[0.08] bg-[#080D1D]/76 text-slate-300 shadow-[0_0_22px_rgba(0,0,0,0.22)] backdrop-blur-2xl transition hover:border-cyan-300/25 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
         >
           <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#8B5CF6] shadow-[0_0_12px_rgba(139,92,246,0.9)]" />
           <Bell className="h-4 w-4" />
         </button>
-        <div className="grid h-[3.25rem] w-[3.25rem] place-items-center rounded-full bg-gradient-to-br from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] p-px shadow-[0_0_26px_rgba(59,168,255,0.26)]">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-[#3BA8FF] to-[#6A5CFF] text-base font-bold text-white">
+        <div className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] p-px shadow-[0_0_26px_rgba(59,168,255,0.26)]">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-[#3BA8FF] to-[#6A5CFF] text-sm font-bold text-white">
             {profile.initial}
           </span>
         </div>
@@ -687,27 +687,27 @@ function WelcomeHero({
   const suggestion = getRecommendedAction(snapshot);
 
   return (
-    <section className="relative min-h-[305px] overflow-hidden rounded-[26px] border border-white/[0.105] bg-[radial-gradient(circle_at_74%_28%,rgba(139,92,246,0.22),transparent_28%),radial-gradient(circle_at_75%_74%,rgba(0,229,255,0.12),transparent_24%),linear-gradient(135deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_50%,rgba(3,7,18,0.95))] p-7 shadow-[0_26px_86px_rgba(0,0,0,0.34),0_0_34px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-7">
+    <section className="relative min-h-[270px] overflow-hidden rounded-[24px] border border-white/[0.105] bg-[radial-gradient(circle_at_74%_28%,rgba(139,92,246,0.22),transparent_28%),radial-gradient(circle_at_75%_74%,rgba(0,229,255,0.12),transparent_24%),linear-gradient(135deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_50%,rgba(3,7,18,0.95))] p-5 shadow-[0_26px_86px_rgba(0,0,0,0.34),0_0_34px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-6">
       <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
       <div className="pointer-events-none absolute right-24 top-20 h-56 w-56 rounded-full bg-[#00E5FF]/8 blur-3xl" />
       <div className="pointer-events-none absolute right-24 bottom-8 h-20 w-72 rounded-[50%] border border-cyan-200/14 bg-[#3BA8FF]/8 blur-sm" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.075),transparent_22%,rgba(255,255,255,0.025)_54%,transparent_74%)] opacity-70" />
-      <div className="relative grid h-full gap-6 lg:grid-cols-[minmax(0,0.78fr)_minmax(360px,0.9fr)] lg:items-center">
+      <div className="relative grid h-full gap-5 lg:grid-cols-[minmax(0,0.78fr)_minmax(340px,0.9fr)] lg:items-center">
         <div className="max-w-xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-purple-300/18 bg-purple-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-purple-100 shadow-[0_0_18px_rgba(139,92,246,0.14)]">
             <Sparkles className="h-3.5 w-3.5" />
             AI Insight
           </span>
-          <h2 className="mt-5 max-w-[390px] text-3xl font-semibold leading-tight tracking-tight text-white sm:text-[2.05rem]">
+          <h2 className="mt-4 max-w-[370px] text-[1.8rem] font-semibold leading-tight tracking-tight text-white sm:text-[1.95rem]">
             You&apos;re building something{" "}
             <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-transparent">
               great.
             </span>
           </h2>
-          <p className="mt-4 max-w-md text-sm leading-6 text-slate-400">{insight}</p>
+          <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">{insight}</p>
           <Link
             href={suggestion.href}
-            className="group mt-7 inline-flex h-11 items-center gap-3 rounded-full border border-cyan-300/26 bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(139,92,246,0.14))] px-6 text-sm font-semibold text-white shadow-[0_0_28px_rgba(0,229,255,0.14)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/45 hover:shadow-[0_0_36px_rgba(139,92,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+            className="group mt-5 inline-flex h-10 items-center gap-3 rounded-full border border-cyan-300/26 bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(139,92,246,0.14))] px-5 text-sm font-semibold text-white shadow-[0_0_28px_rgba(0,229,255,0.14)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/45 hover:shadow-[0_0_36px_rgba(139,92,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
           >
             Get AI Recommendations
             <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-1" />
@@ -722,17 +722,17 @@ function WelcomeHero({
 
 function HeroIllustration() {
   return (
-    <div className="relative mx-auto hidden h-[282px] w-[390px] place-items-center lg:grid" aria-hidden="true">
+    <div className="relative mx-auto hidden h-[240px] w-[340px] place-items-center lg:grid" aria-hidden="true">
       <div className="absolute inset-12 rounded-full bg-[#8B5CF6]/16 blur-2xl" />
-      <div className="absolute h-64 w-64 rounded-full border border-purple-300/42 shadow-[0_0_34px_rgba(139,92,246,0.42)]" />
-      <div className="absolute h-52 w-52 rounded-full border border-cyan-200/22 shadow-[0_0_26px_rgba(0,229,255,0.22)]" />
-      <div className="absolute h-28 w-80 rounded-[50%] border border-cyan-200/18" />
-      <div className="absolute h-80 w-28 rounded-[50%] border border-purple-200/14" />
-      <div className="absolute h-40 w-80 rotate-12 rounded-[50%] border border-[#3BA8FF]/14" />
-      <div className="absolute h-40 w-80 -rotate-12 rounded-[50%] border border-[#FF3DFE]/12" />
-      <div className="absolute bottom-7 h-14 w-72 rounded-[50%] border border-[#8B5CF6]/50 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.34),rgba(0,229,255,0.16)_40%,transparent_72%)] shadow-[0_0_30px_rgba(139,92,246,0.36)]" />
-      <div className="absolute bottom-10 h-8 w-56 rounded-[50%] border border-cyan-200/42 shadow-[0_0_24px_rgba(0,229,255,0.46)]" />
-      <div className="absolute bottom-13 h-1.5 w-64 rounded-full bg-gradient-to-r from-transparent via-cyan-200/80 to-transparent shadow-[0_0_24px_rgba(0,229,255,0.7)]" />
+      <div className="absolute h-56 w-56 rounded-full border border-purple-300/42 shadow-[0_0_34px_rgba(139,92,246,0.42)]" />
+      <div className="absolute h-44 w-44 rounded-full border border-cyan-200/22 shadow-[0_0_26px_rgba(0,229,255,0.22)]" />
+      <div className="absolute h-24 w-72 rounded-[50%] border border-cyan-200/18" />
+      <div className="absolute h-72 w-24 rounded-[50%] border border-purple-200/14" />
+      <div className="absolute h-36 w-72 rotate-12 rounded-[50%] border border-[#3BA8FF]/14" />
+      <div className="absolute h-36 w-72 -rotate-12 rounded-[50%] border border-[#FF3DFE]/12" />
+      <div className="absolute bottom-6 h-12 w-64 rounded-[50%] border border-[#8B5CF6]/50 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.34),rgba(0,229,255,0.16)_40%,transparent_72%)] shadow-[0_0_30px_rgba(139,92,246,0.36)]" />
+      <div className="absolute bottom-9 h-7 w-52 rounded-[50%] border border-cyan-200/42 shadow-[0_0_24px_rgba(0,229,255,0.46)]" />
+      <div className="absolute bottom-12 h-1.5 w-56 rounded-full bg-gradient-to-r from-transparent via-cyan-200/80 to-transparent shadow-[0_0_24px_rgba(0,229,255,0.7)]" />
 
       {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
         <span
@@ -745,13 +745,13 @@ function HeroIllustration() {
         />
       ))}
 
-      <div className="relative grid h-48 w-28 place-items-center border border-cyan-100/55 bg-[linear-gradient(155deg,rgba(25,200,255,0.46),rgba(83,108,255,0.5)_42%,rgba(151,79,255,0.44))] shadow-[0_0_36px_rgba(0,229,255,0.42),0_0_64px_rgba(139,92,246,0.46),inset_0_0_28px_rgba(255,255,255,0.16)] [clip-path:polygon(50%_0%,86%_16%,78%_82%,50%_100%,22%_82%,14%_16%)]">
+      <div className="relative grid h-40 w-24 place-items-center border border-cyan-100/55 bg-[linear-gradient(155deg,rgba(25,200,255,0.46),rgba(83,108,255,0.5)_42%,rgba(151,79,255,0.44))] shadow-[0_0_36px_rgba(0,229,255,0.42),0_0_64px_rgba(139,92,246,0.46),inset_0_0_28px_rgba(255,255,255,0.16)] [clip-path:polygon(50%_0%,86%_16%,78%_82%,50%_100%,22%_82%,14%_16%)]">
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.3),transparent_34%,rgba(255,255,255,0.13)_58%,transparent)]" />
-        <div className="absolute left-1/2 top-4 h-36 w-px -translate-x-1/2 bg-white/24" />
-        <div className="absolute left-6 top-12 h-24 w-px -rotate-12 bg-cyan-100/18" />
-        <div className="absolute right-6 top-12 h-24 w-px rotate-12 bg-purple-100/18" />
-        <div className="relative grid h-20 w-20 place-items-center rounded-full bg-[#070B16]/72 ring-1 ring-white/14 shadow-[inset_0_0_24px_rgba(0,229,255,0.08)]">
-          <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-2xl font-black tracking-tighter text-transparent drop-shadow-[0_0_18px_rgba(0,229,255,0.9)]">
+        <div className="absolute left-1/2 top-4 h-28 w-px -translate-x-1/2 bg-white/24" />
+        <div className="absolute left-5 top-10 h-20 w-px -rotate-12 bg-cyan-100/18" />
+        <div className="absolute right-5 top-10 h-20 w-px rotate-12 bg-purple-100/18" />
+        <div className="relative grid h-16 w-16 place-items-center rounded-full bg-[#070B16]/72 ring-1 ring-white/14 shadow-[inset_0_0_24px_rgba(0,229,255,0.08)]">
+          <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-xl font-black tracking-tighter text-transparent drop-shadow-[0_0_18px_rgba(0,229,255,0.9)]">
             TF
           </span>
         </div>
@@ -773,7 +773,7 @@ function ReadinessPanel({
   const label = readiness === null ? "N/A" : `${readiness}%`;
 
   return (
-    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.095] bg-[linear-gradient(145deg,rgba(7,13,31,0.95),rgba(12,18,38,0.88))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.055)]">
+    <section className="relative overflow-hidden rounded-[22px] border border-white/[0.095] bg-[linear-gradient(145deg,rgba(7,13,31,0.95),rgba(12,18,38,0.88))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.055)]">
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 left-0 h-24 w-full bg-[radial-gradient(ellipse_at_bottom,rgba(0,229,255,0.07),transparent_68%)]" />
       <div className="relative flex items-start justify-between gap-4">
@@ -787,16 +787,16 @@ function ReadinessPanel({
           {readiness === null ? "Baseline needed" : "Improving"}
         </span>
       </div>
-      <div className="relative mt-5 flex justify-center">
-        <span className="absolute top-1/2 h-36 w-36 -translate-y-1/2 rounded-full bg-[#00E5FF]/10 blur-2xl" aria-hidden="true" />
+      <div className="relative mt-4 flex justify-center">
+        <span className="absolute top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-[#00E5FF]/10 blur-2xl" aria-hidden="true" />
         <ReadinessDonut value={readinessProgress} label={label} />
       </div>
-      <p className="relative mx-auto mt-4 max-w-[240px] text-center text-sm leading-6 text-slate-400">
+      <p className="relative mx-auto mt-3 max-w-[240px] text-center text-sm leading-6 text-slate-400">
         {readiness === null
           ? "Upload a resume to activate readiness scoring."
           : "You are on the right track. Keep optimizing to reach the next level."}
       </p>
-      <div className="relative mt-4 h-7 overflow-hidden rounded-full bg-white/[0.04]" aria-hidden="true">
+      <div className="relative mt-3 h-6 overflow-hidden rounded-full bg-white/[0.04]" aria-hidden="true">
         <div className="absolute inset-x-0 bottom-0 h-5 rounded-[50%] bg-gradient-to-r from-[#00E5FF]/20 via-[#8B5CF6]/20 to-[#00E5FF]/10 blur-sm" />
       </div>
     </section>
@@ -826,7 +826,7 @@ function CareerCommandCenter() {
     <section className="relative overflow-visible">
       <div className="pointer-events-none absolute inset-x-0 top-12 h-px bg-gradient-to-r from-transparent via-[#3BA8FF]/22 to-transparent" />
       <div className="pointer-events-none absolute left-1/2 top-12 h-8 w-[58%] -translate-x-1/2 rounded-[50%] border border-[#3BA8FF]/8 bg-[#3BA8FF]/[0.025] blur-[2px]" />
-      <div className="relative mb-4">
+      <div className="relative mb-3">
         <h2 className="text-lg font-semibold tracking-tight text-white">Your Command Center</h2>
       </div>
       <DashboardMotionGrid
@@ -851,7 +851,7 @@ function CommandCenterCard({ card }: { card: CommandCenterCardData }) {
   return (
     <Link
       href={card.href}
-      className="group relative flex min-h-[248px] flex-col items-center overflow-hidden rounded-[16px] border px-4 pb-4 pt-6 text-center transition duration-300 hover:-translate-y-1 hover:scale-[1.018] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+      className="group relative flex h-[210px] flex-col items-center overflow-hidden rounded-[16px] border px-3.5 pb-3.5 pt-5 text-center transition duration-300 hover:-translate-y-1 hover:scale-[1.018] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
       style={{
         borderColor: `rgba(${glassColor},0.5)`,
         background: `radial-gradient(circle at 50% 18%, rgba(${glassColor},0.2), transparent 30%), radial-gradient(circle at 50% 108%, rgba(${glassColor},0.1), transparent 28%), linear-gradient(180deg, rgba(8,13,31,0.97), rgba(4,8,20,0.95))`,
@@ -861,7 +861,7 @@ function CommandCenterCard({ card }: { card: CommandCenterCardData }) {
       <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.025))]" />
       <span
-        className="pointer-events-none absolute left-1/2 top-8 h-16 w-16 -translate-x-1/2 rounded-full opacity-42 blur-lg transition duration-300 group-hover:opacity-72"
+        className="pointer-events-none absolute left-1/2 top-7 h-14 w-14 -translate-x-1/2 rounded-full opacity-42 blur-lg transition duration-300 group-hover:opacity-72"
         style={{ background: tone.stroke }}
       />
       <span
@@ -869,7 +869,7 @@ function CommandCenterCard({ card }: { card: CommandCenterCardData }) {
         style={{ background: tone.stroke }}
       />
       <span
-        className="relative grid h-[4.7rem] w-[4.7rem] place-items-center rounded-[1.25rem] border text-white transition duration-300 group-hover:rotate-3 group-hover:scale-110"
+        className="relative grid h-16 w-16 place-items-center rounded-[1.15rem] border text-white transition duration-300 group-hover:rotate-3 group-hover:scale-110"
         style={{
           borderColor: `rgba(${glassColor},0.62)`,
           background: `radial-gradient(circle at 50% 42%, rgba(${glassColor},0.36), rgba(${glassColor},0.1) 58%, rgba(255,255,255,0.035))`,
@@ -877,19 +877,21 @@ function CommandCenterCard({ card }: { card: CommandCenterCardData }) {
           color: tone.stroke,
         }}
       >
-        <span className="absolute inset-3 rounded-[1rem] border border-white/10 bg-white/[0.035]" />
-        <Icon className="relative h-9 w-9 drop-shadow-[0_0_8px_currentColor]" strokeWidth={2.35} />
+        <span className="absolute inset-2.5 rounded-[0.95rem] border border-white/10 bg-white/[0.035]" />
+        <Icon className="relative h-8 w-8 drop-shadow-[0_0_8px_currentColor]" strokeWidth={2.35} />
         <span
           className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-white/80 shadow-[0_0_8px_currentColor]"
           style={{ color: tone.stroke }}
         />
       </span>
-      <h3 className="relative mt-6 text-base font-semibold leading-snug text-white">{card.title}</h3>
-      <p className="relative mx-auto mt-3 max-w-[9.5rem] text-xs leading-5 text-slate-400">
+      <h3 className="relative mt-4 flex h-10 items-center justify-center text-[0.92rem] font-semibold leading-tight text-white">
+        {card.title}
+      </h3>
+      <p className="relative mx-auto mt-1.5 h-[3.75rem] max-w-[9.5rem] overflow-hidden text-[0.72rem] leading-5 text-slate-400">
         {card.subtitle}
       </p>
       <span
-        className="relative mt-auto grid h-9 w-9 place-items-center rounded-full border transition duration-300 group-hover:scale-110"
+        className="relative mt-auto grid h-8 w-8 place-items-center rounded-full border transition duration-300 group-hover:scale-110"
         style={{
           borderColor: `rgba(${glassColor},0.4)`,
           background: `rgba(${glassColor},0.12)`,
@@ -905,23 +907,23 @@ function CommandCenterCard({ card }: { card: CommandCenterCardData }) {
 
 function RoadmapBanner() {
   return (
-    <section className="group relative overflow-hidden rounded-[20px] border border-purple-300/18 bg-[radial-gradient(circle_at_8%_45%,rgba(251,191,36,0.16),transparent_20%),radial-gradient(circle_at_92%_100%,rgba(139,92,246,0.22),transparent_34%),linear-gradient(135deg,rgba(7,16,36,0.86),rgba(11,13,35,0.74))] px-5 py-4 shadow-[0_24px_80px_rgba(0,0,0,0.22),0_0_34px_rgba(139,92,246,0.12)] backdrop-blur-2xl">
+    <section className="group relative overflow-hidden rounded-[20px] border border-purple-300/18 bg-[radial-gradient(circle_at_8%_45%,rgba(251,191,36,0.16),transparent_20%),radial-gradient(circle_at_92%_100%,rgba(139,92,246,0.22),transparent_34%),linear-gradient(135deg,rgba(7,16,36,0.86),rgba(11,13,35,0.74))] px-4 py-3.5 shadow-[0_24px_80px_rgba(0,0,0,0.22),0_0_34px_rgba(139,92,246,0.12)] backdrop-blur-2xl">
       <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-purple-200/50 to-transparent" />
       <div className="pointer-events-none absolute -left-7 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full bg-[#FBBF24]/16 blur-2xl" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-20 w-56 bg-[linear-gradient(135deg,transparent,rgba(139,92,246,0.28))] blur-xl" />
       <div className="pointer-events-none absolute bottom-0 right-7 h-16 w-28 bg-[linear-gradient(135deg,transparent_45%,rgba(139,92,246,0.34)_45%,rgba(13,7,28,0.8))]" />
-      <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+      <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
-          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-amber-200/22 bg-amber-300/10 text-amber-100 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
-            <Sparkles className="h-8 w-8 drop-shadow-[0_0_14px_rgba(251,191,36,0.8)]" />
+          <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-amber-200/22 bg-amber-300/10 text-amber-100 shadow-[0_0_30px_rgba(251,191,36,0.2)]">
+            <Sparkles className="h-7 w-7 drop-shadow-[0_0_14px_rgba(251,191,36,0.8)]" />
           </span>
-          <p className="max-w-xl text-base leading-7 text-slate-300">
+          <p className="max-w-xl text-sm leading-6 text-slate-300">
             Every step you take today brings you closer to your dream career.
           </p>
         </div>
         <Link
           href="/dashboard/coach"
-          className="group/link inline-flex h-12 shrink-0 items-center justify-center gap-3 rounded-[1.15rem] border border-purple-300/32 bg-purple-300/10 px-7 text-sm font-semibold text-white shadow-[0_0_22px_rgba(139,92,246,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/32 hover:bg-cyan-300/8 hover:shadow-[0_0_28px_rgba(139,92,246,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
+          className="group/link inline-flex h-10 shrink-0 items-center justify-center gap-3 rounded-[1.05rem] border border-purple-300/32 bg-purple-300/10 px-6 text-sm font-semibold text-white shadow-[0_0_22px_rgba(139,92,246,0.12)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/32 hover:bg-cyan-300/8 hover:shadow-[0_0_28px_rgba(139,92,246,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
         >
           View Career Roadmap
           <ArrowRight className="h-4 w-4 transition duration-300 group-hover/link:translate-x-1" />
@@ -936,7 +938,7 @@ function ReadinessDonut({ value, label }: { value: number; label: string }) {
 
   return (
     <div
-      className="relative grid h-40 w-40 place-items-center rounded-full p-3 shadow-[0_0_34px_rgba(0,229,255,0.18),0_0_46px_rgba(139,92,246,0.18)]"
+      className="relative grid h-36 w-36 place-items-center rounded-full p-2.5 shadow-[0_0_34px_rgba(0,229,255,0.18),0_0_46px_rgba(139,92,246,0.18)]"
       style={{
         background: `conic-gradient(#8B5CF6 0 ${clampedValue * 0.58}%, #3BA8FF ${clampedValue * 0.58}% ${clampedValue}%, rgba(255,255,255,0.08) 0)`,
       }}
@@ -948,7 +950,7 @@ function ReadinessDonut({ value, label }: { value: number; label: string }) {
         <div>
           <Sparkles className="mx-auto mb-2 h-4 w-4 text-cyan-100 drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]" />
           <p className="text-xs font-medium text-purple-200">{label === "N/A" ? "Pending" : "Excellent"}</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-white">{label}</p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-white">{label}</p>
           <p className="mt-1 text-xs text-slate-500">{label === "N/A" ? "Awaiting score" : "Keep going"}</p>
         </div>
       </div>
@@ -967,9 +969,9 @@ function CareerOverview({
 
   return (
     <DashboardPanel title="Career Overview" description="Radar and progress signals from your latest career evidence.">
-      <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-center">
+      <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center">
         <RadarChart metrics={skills} />
-        <div className="space-y-4">
+        <div className="space-y-3">
           {skills.map((skill) => (
             <MetricBar key={skill.label} metric={skill} />
           ))}
@@ -1022,13 +1024,13 @@ function RadarChart({
   const polygonPoints = points.map((point) => `${point.x},${point.y}`).join(" ");
 
   return (
-    <div className="relative overflow-hidden rounded-[24px] border border-white/[0.095] bg-[radial-gradient(circle_at_48%_46%,rgba(0,229,255,0.1),transparent_54%),radial-gradient(circle_at_72%_18%,rgba(139,92,246,0.08),transparent_38%),linear-gradient(145deg,rgba(5,10,25,0.96),rgba(8,14,31,0.9))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_18px_54px_rgba(0,0,0,0.22)]">
+    <div className="relative overflow-hidden rounded-[22px] border border-white/[0.095] bg-[radial-gradient(circle_at_48%_46%,rgba(0,229,255,0.1),transparent_54%),radial-gradient(circle_at_72%_18%,rgba(139,92,246,0.08),transparent_38%),linear-gradient(145deg,rgba(5,10,25,0.96),rgba(8,14,31,0.9))] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_18px_54px_rgba(0,0,0,0.22)]">
       <div className="pointer-events-none absolute -left-14 top-10 h-32 w-32 rounded-full bg-[#00E5FF]/7 blur-3xl" />
       <div className="pointer-events-none absolute -right-10 bottom-4 h-32 w-32 rounded-full bg-[#8B5CF6]/7 blur-3xl" />
       <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/38 to-transparent" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3BA8FF]/6 blur-xl" />
       <svg
-        className="relative mx-auto h-64 w-full max-w-[280px] drop-shadow-[0_0_12px_rgba(0,229,255,0.16)]"
+        className="relative mx-auto h-56 w-full max-w-[250px] drop-shadow-[0_0_12px_rgba(0,229,255,0.16)]"
         viewBox="0 0 240 240"
         role="img"
         aria-label={`Career overview radar: ${metrics
@@ -1103,7 +1105,7 @@ function MetricBar({
   const tone = getTone(metric.tone);
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.075] bg-[#071024]/72 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/18 hover:bg-white/[0.045]">
+    <div className="group relative overflow-hidden rounded-2xl border border-white/[0.075] bg-[#071024]/72 p-2.5 shadow-[0_12px_34px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/18 hover:bg-white/[0.045]">
       <span
         className="pointer-events-none absolute -left-10 top-1/2 h-20 w-20 -translate-y-1/2 rounded-full opacity-28 blur-2xl transition duration-300 group-hover:opacity-55"
         style={{ background: tone.stroke }}
@@ -1114,11 +1116,11 @@ function MetricBar({
             className="h-2 w-2 rounded-full shadow-[0_0_12px_currentColor]"
             style={{ background: tone.stroke, color: tone.stroke }}
           />
-          <p className="text-sm font-medium text-slate-300">{metric.label}</p>
+          <p className="text-[0.82rem] font-medium text-slate-300">{metric.label}</p>
         </div>
-        <p className="text-sm font-semibold text-white">{value === null ? "--" : `${value}/100`}</p>
+        <p className="text-[0.82rem] font-semibold text-white">{value === null ? "--" : `${value}/100`}</p>
       </div>
-      <div className="relative mt-3 h-2.5 overflow-hidden rounded-full bg-white/[0.08] shadow-inner">
+      <div className="relative mt-2.5 h-2 overflow-hidden rounded-full bg-white/[0.08] shadow-inner">
         <span className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.08),transparent)]" />
         <div
           className="relative h-full rounded-full shadow-[0_0_18px_rgba(0,229,255,0.24)] transition-[width] duration-500"
@@ -1145,13 +1147,13 @@ function TodaysFocus({ snapshot }: { snapshot: ResumeSnapshotData }) {
         </Button>
       }
     >
-      <div className="grid gap-3">
+      <div className="grid gap-2.5">
         <Link
           href={primaryAction.href}
-          className="group relative flex items-center gap-4 overflow-hidden rounded-[22px] border border-purple-300/18 bg-[linear-gradient(135deg,rgba(9,15,34,0.94),rgba(12,18,38,0.88))] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.055)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-200/35 hover:shadow-[0_0_24px_rgba(139,92,246,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
+          className="group relative flex items-center gap-3.5 overflow-hidden rounded-[20px] border border-purple-300/18 bg-[linear-gradient(135deg,rgba(9,15,34,0.94),rgba(12,18,38,0.88))] p-3.5 shadow-[0_16px_42px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.055)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-purple-200/35 hover:shadow-[0_0_24px_rgba(139,92,246,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
         >
           <span className="pointer-events-none absolute -right-10 -top-12 h-28 w-28 rounded-full bg-purple-300/10 blur-2xl" />
-          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-to-br from-purple-300/18 to-cyan-300/12 text-purple-100 ring-1 ring-purple-300/18">
+          <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-purple-300/18 to-cyan-300/12 text-purple-100 ring-1 ring-purple-300/18">
             <Sparkles className="h-5 w-5" />
           </span>
           <span className="relative min-w-0 flex-1">
@@ -1170,9 +1172,9 @@ function TodaysFocus({ snapshot }: { snapshot: ResumeSnapshotData }) {
             <Link
               key={action.title}
               href={action.href}
-              className="group flex items-center gap-4 rounded-[20px] border border-white/[0.075] bg-[#071024]/72 p-4 shadow-[0_12px_34px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-cyan-300/18 hover:bg-white/[0.045] hover:shadow-[0_0_22px_rgba(0,229,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+              className="group flex items-center gap-3.5 rounded-[18px] border border-white/[0.075] bg-[#071024]/72 p-3.5 shadow-[0_12px_34px_rgba(0,0,0,0.16)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:border-cyan-300/18 hover:bg-white/[0.045] hover:shadow-[0_0_22px_rgba(0,229,255,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
             >
-              <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border ${getTone(action.accent).icon}`}>
+              <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border ${getTone(action.accent).icon}`}>
                 <Icon className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
@@ -1228,7 +1230,7 @@ function ActivityTimeline() {
           <ActivityItem key={activity.label} activity={activity} index={index} />
         ))}
       </div>
-      <div className="mt-4 flex justify-center">
+      <div className="mt-3 flex justify-center">
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard/analytics">View All Activity</Link>
         </Button>
@@ -1244,20 +1246,20 @@ function ActivityItem({ activity, index }: { activity: ActivityData; index: numb
 
   return (
     <div
-      className="group relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 overflow-hidden rounded-[1.15rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(7,16,36,0.94),rgba(10,15,32,0.88))] px-4 py-4 shadow-[0_14px_40px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1 hover:border-cyan-200/20 hover:bg-white/[0.045] hover:shadow-[0_0_26px_rgba(0,229,255,0.08)]"
+      className="group relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3.5 overflow-hidden rounded-[1.05rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgba(7,16,36,0.94),rgba(10,15,32,0.88))] px-3.5 py-3 shadow-[0_14px_40px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1 hover:border-cyan-200/20 hover:bg-white/[0.045] hover:shadow-[0_0_26px_rgba(0,229,255,0.08)]"
       style={{ boxShadow: `0 14px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)` }}
     >
       <span className="pointer-events-none absolute inset-y-0 left-0 w-1 rounded-full opacity-70" style={{ background: tone.gradient }} />
       <span className="pointer-events-none absolute -left-12 top-1/2 h-28 w-28 -translate-y-1/2 rounded-full opacity-18 blur-2xl transition duration-300 group-hover:opacity-45" style={{ background: tone.stroke }} />
-      <span className={`relative grid h-12 w-12 place-items-center rounded-full border ${tone.icon} shadow-[0_0_24px_rgba(0,229,255,0.08)]`}>
+      <span className={`relative grid h-10 w-10 place-items-center rounded-full border ${tone.icon} shadow-[0_0_24px_rgba(0,229,255,0.08)]`}>
         <Icon className="h-4 w-4" />
       </span>
       <div className="relative min-w-0">
-        <p className="truncate text-sm font-semibold text-white">{activity.label}</p>
-        <p className="truncate text-xs text-slate-500">{activity.detail}</p>
+        <p className="truncate text-[0.82rem] font-semibold text-white">{activity.label}</p>
+        <p className="truncate text-[0.72rem] text-slate-500">{activity.detail}</p>
       </div>
       <div className="relative text-right">
-        <p className="text-xs text-slate-500">{activity.time}</p>
+        <p className="text-[0.7rem] text-slate-500">{activity.time}</p>
         <span
           className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold ${
             activity.status === "Completed"
@@ -1277,9 +1279,9 @@ function RecommendationPath({ snapshot }: { snapshot: ResumeSnapshotData }) {
 
   return (
     <DashboardPanel title="AI Recommended Path" description="Personalized steps to boost your career">
-      <div className="relative grid gap-4 py-3 md:grid-cols-4">
-        <span className="pointer-events-none absolute left-[10%] right-[10%] top-[4.8rem] hidden h-px bg-gradient-to-r from-cyan-300/8 via-purple-300/34 to-cyan-300/8 shadow-[0_0_16px_rgba(139,92,246,0.18)] md:block" />
-        <span className="pointer-events-none absolute left-[18%] right-[18%] top-[4.8rem] hidden h-[2px] rounded-full bg-gradient-to-r from-transparent via-cyan-300/16 to-transparent blur-sm md:block" />
+      <div className="relative grid gap-3 py-2 md:grid-cols-4">
+        <span className="pointer-events-none absolute left-[10%] right-[10%] top-[4.15rem] hidden h-px bg-gradient-to-r from-cyan-300/8 via-purple-300/34 to-cyan-300/8 shadow-[0_0_16px_rgba(139,92,246,0.18)] md:block" />
+        <span className="pointer-events-none absolute left-[18%] right-[18%] top-[4.15rem] hidden h-[2px] rounded-full bg-gradient-to-r from-transparent via-cyan-300/16 to-transparent blur-sm md:block" />
         {recommendations.map((item, index) => {
           const Icon = item.icon;
           const tone = getTone(item.tone);
@@ -1287,7 +1289,7 @@ function RecommendationPath({ snapshot }: { snapshot: ResumeSnapshotData }) {
           return (
             <div
               key={item.title}
-              className="group relative overflow-hidden rounded-[22px] border border-white/[0.075] bg-[linear-gradient(155deg,rgba(7,16,36,0.94),rgba(9,14,31,0.86))] px-4 py-5 text-center shadow-[0_16px_44px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.045)] transition duration-300 hover:-translate-y-1 hover:border-cyan-200/18 hover:bg-white/[0.045] hover:shadow-[0_0_28px_rgba(139,92,246,0.1)]"
+              className="group relative overflow-hidden rounded-[20px] border border-white/[0.075] bg-[linear-gradient(155deg,rgba(7,16,36,0.94),rgba(9,14,31,0.86))] px-3.5 py-4 text-center shadow-[0_16px_44px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.045)] transition duration-300 hover:-translate-y-1 hover:border-cyan-200/18 hover:bg-white/[0.045] hover:shadow-[0_0_28px_rgba(139,92,246,0.1)]"
             >
               <span
                 className="pointer-events-none absolute -top-16 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full opacity-18 blur-2xl transition duration-300 group-hover:opacity-48"
@@ -1295,25 +1297,25 @@ function RecommendationPath({ snapshot }: { snapshot: ResumeSnapshotData }) {
               />
               <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
               {index < recommendations.length - 1 ? (
-                <span className="pointer-events-none absolute left-1/2 top-7 hidden h-px w-full bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent md:block" />
+                <span className="pointer-events-none absolute left-1/2 top-6 hidden h-px w-full bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent md:block" />
               ) : null}
-              <span className={`relative mx-auto grid h-16 w-16 place-items-center rounded-full border ${tone.icon} shadow-[0_0_32px_rgba(139,92,246,0.12)] transition duration-300 group-hover:scale-110`}>
+              <span className={`relative mx-auto grid h-14 w-14 place-items-center rounded-full border ${tone.icon} shadow-[0_0_32px_rgba(139,92,246,0.12)] transition duration-300 group-hover:scale-110`}>
                 <span className="absolute inset-1 rounded-full bg-white/[0.03]" />
                 <Icon className="relative h-5 w-5" />
               </span>
-              <h3 className="relative mt-4 text-sm font-semibold text-white">{item.title}</h3>
-              <p className="relative mx-auto mt-1 max-w-[170px] text-xs leading-5 text-slate-500">{item.detail}</p>
-              <span className={`relative mt-4 inline-flex rounded-full border px-3 py-1 text-[0.65rem] font-semibold ${tone.badge}`}>
+              <h3 className="relative mt-3 text-[0.82rem] font-semibold text-white">{item.title}</h3>
+              <p className="relative mx-auto mt-1 max-w-[160px] text-[0.72rem] leading-5 text-slate-500">{item.detail}</p>
+              <span className={`relative mt-3 inline-flex rounded-full border px-2.5 py-1 text-[0.6rem] font-semibold ${tone.badge}`}>
                 {item.impact}
               </span>
             </div>
           );
         })}
       </div>
-      <div className="mt-5 flex justify-center">
+      <div className="mt-4 flex justify-center">
         <Link
           href="/dashboard/coach"
-          className="inline-flex h-11 items-center justify-center rounded-2xl border border-purple-300/24 bg-purple-300/8 px-6 text-sm font-semibold text-white shadow-[0_0_24px_rgba(139,92,246,0.1)] transition hover:-translate-y-0.5 hover:border-cyan-300/28 hover:bg-cyan-300/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
+          className="inline-flex h-10 items-center justify-center rounded-2xl border border-purple-300/24 bg-purple-300/8 px-5 text-sm font-semibold text-white shadow-[0_0_24px_rgba(139,92,246,0.1)] transition hover:-translate-y-0.5 hover:border-cyan-300/28 hover:bg-cyan-300/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300/35"
         >
           View Full Roadmap
         </Link>
@@ -1400,7 +1402,7 @@ function DashboardPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[26px] border border-white/[0.095] bg-[radial-gradient(circle_at_12%_0%,rgba(0,229,255,0.08),transparent_28%),radial-gradient(circle_at_88%_4%,rgba(139,92,246,0.09),transparent_30%),linear-gradient(145deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_55%,rgba(4,8,20,0.95))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.3),0_0_28px_rgba(0,229,255,0.035),inset_0_1px_0_rgba(255,255,255,0.055)]">
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.095] bg-[radial-gradient(circle_at_12%_0%,rgba(0,229,255,0.08),transparent_28%),radial-gradient(circle_at_88%_4%,rgba(139,92,246,0.09),transparent_30%),linear-gradient(145deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_55%,rgba(4,8,20,0.95))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.3),0_0_28px_rgba(0,229,255,0.035),inset_0_1px_0_rgba(255,255,255,0.055)]">
       <div className="pointer-events-none absolute -left-16 top-0 h-56 w-56 rounded-full bg-[#00E5FF]/6 blur-3xl" />
       <div className="pointer-events-none absolute -right-16 bottom-0 h-56 w-56 rounded-full bg-[#8B5CF6]/7 blur-3xl" />
       <div className="pointer-events-none absolute left-1/4 top-0 h-24 w-1/2 rounded-full bg-[#3BA8FF]/4 blur-3xl" />
@@ -1408,10 +1410,10 @@ function DashboardPanel({
       <div className="pointer-events-none absolute inset-y-10 left-0 w-px bg-gradient-to-b from-transparent via-cyan-200/28 to-transparent" />
       <div className="pointer-events-none absolute inset-y-10 right-0 w-px bg-gradient-to-b from-transparent via-purple-200/28 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-[radial-gradient(ellipse_at_bottom,rgba(59,168,255,0.06),transparent_72%)]" />
-      <div className="relative mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="relative mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-white">{title}</h2>
-          {description ? <p className="mt-1 text-xs text-slate-500">{description}</p> : null}
+          <h2 className="text-[0.95rem] font-semibold tracking-tight text-white">{title}</h2>
+          {description ? <p className="mt-1 text-[0.72rem] text-slate-500">{description}</p> : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
