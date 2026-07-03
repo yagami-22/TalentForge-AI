@@ -301,18 +301,20 @@ export default function Home() {
 
       <section
         id="features"
-        className="relative mx-auto w-full max-w-[1410px] px-5 py-5 sm:px-7 lg:px-8"
+        className="relative mx-auto w-full max-w-[1410px] overflow-hidden border-t border-white/[0.06] px-5 py-8 sm:px-7 lg:px-8"
       >
-        <div className="pointer-events-none absolute left-1/2 top-4 h-56 w-56 -translate-x-1/2 rounded-full bg-[#00E5FF]/8 blur-3xl" />
-        <div className="pointer-events-none absolute right-[12%] top-8 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/18 to-transparent" />
+        <div className="pointer-events-none absolute left-1/2 top-6 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.12),rgba(139,92,246,0.1)_42%,transparent_72%)] blur-3xl" />
+        <div className="pointer-events-none absolute left-[10%] top-16 h-56 w-56 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+        <div className="pointer-events-none absolute right-[8%] top-14 h-64 w-64 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-3xl text-center">
-          <p className="mx-auto inline-flex rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200 shadow-[0_0_24px_rgba(0,229,255,0.12)]">
+          <p className="mx-auto inline-flex rounded-full border border-cyan-200/28 bg-cyan-300/10 px-5 py-1.5 text-xs font-semibold uppercase tracking-[0.34em] text-cyan-100 shadow-[0_0_30px_rgba(0,229,255,0.2),inset_0_1px_0_rgba(255,255,255,0.12)]">
             All-In-One Career Intelligence Suite
           </p>
-          <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
+          <h2 className="mt-5 text-3xl font-semibold leading-tight tracking-tight text-white drop-shadow-[0_0_24px_rgba(255,255,255,0.08)] sm:text-4xl lg:text-[2.8rem]">
             Everything you need. In one{" "}
-            <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#A855F7] bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(0,229,255,0.18)]">
               intelligent
             </span>{" "}
             platform.
@@ -322,19 +324,24 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="relative mt-6 grid grid-cols-1 gap-4 min-[460px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
+        <div className="relative mt-8 grid grid-cols-1 gap-4 min-[460px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
           {moduleCards.map((module) => (
             <ModuleCardView key={module.title} module={module} />
           ))}
         </div>
 
-        <div className="relative mt-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.36em] text-slate-600 sm:tracking-[0.5em]">
+        <div className="relative mt-9 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.36em] text-slate-500/80 sm:tracking-[0.5em]">
             Trusted by aspiring professionals from
           </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-xl font-semibold text-slate-500/72 sm:gap-x-10 sm:text-2xl">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-xl font-semibold text-slate-400/80 sm:gap-x-11 sm:text-2xl">
             {trustedBrands.map((brand) => (
-              <span key={brand}>{brand}</span>
+              <span
+                key={brand}
+                className="transition duration-300 hover:text-cyan-100 hover:drop-shadow-[0_0_16px_rgba(0,229,255,0.32)]"
+              >
+                {brand}
+              </span>
             ))}
           </div>
         </div>
@@ -500,20 +507,24 @@ function ModuleCardView({ module }: { module: ModuleCard }) {
 
   return (
     <article
-      className={`group relative min-h-[150px] overflow-hidden rounded-[1.05rem] border bg-[#071024]/72 p-4 shadow-[0_0_34px_rgba(0,0,0,0.18)] ring-1 ring-white/[0.04] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.05] ${tone.border}`}
+      className={`group relative min-h-[176px] overflow-hidden rounded-[1.25rem] border bg-[linear-gradient(180deg,rgba(13,25,55,0.82),rgba(5,10,27,0.88)_55%,rgba(3,7,20,0.95))] p-5 shadow-[0_0_34px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-white/[0.045] backdrop-blur-2xl transition duration-300 hover:-translate-y-1.5 hover:bg-white/[0.055] ${tone.border}`}
     >
       <span
-        className={`absolute -left-12 -top-12 h-28 w-28 rounded-full opacity-55 blur-2xl transition duration-300 group-hover:opacity-90 ${tone.glow}`}
+        className={`absolute -left-12 -top-12 h-32 w-32 rounded-full opacity-70 blur-2xl transition duration-300 group-hover:opacity-100 ${tone.glow}`}
       />
+      <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+      <span className={`pointer-events-none absolute inset-x-6 bottom-0 h-px opacity-70 ${tone.beam}`} />
+      <span className="pointer-events-none absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-white/55 shadow-[0_0_12px_rgba(255,255,255,0.6)]" />
       <span
-        className={`relative grid h-11 w-11 place-items-center rounded-2xl border shadow-[0_0_24px_rgba(0,229,255,0.12)] ${tone.icon}`}
+        className={`relative grid h-14 w-14 place-items-center rounded-[1.15rem] border shadow-[0_0_28px_rgba(0,229,255,0.18),inset_0_1px_0_rgba(255,255,255,0.14)] transition duration-300 group-hover:scale-105 ${tone.icon}`}
       >
+        <span className={`absolute inset-1 rounded-[0.95rem] blur-sm ${tone.iconGlow}`} />
         <Icon className="h-5 w-5" />
       </span>
-      <h3 className="relative mt-4 text-sm font-semibold tracking-tight text-white">
+      <h3 className="relative mt-5 text-base font-semibold leading-tight tracking-tight text-white">
         {module.title}
       </h3>
-      <p className="relative mt-2 text-xs leading-5 text-slate-400">
+      <p className="relative mt-3 text-sm leading-6 text-slate-400">
         {module.description}
       </p>
     </article>
@@ -523,29 +534,39 @@ function ModuleCardView({ module }: { module: ModuleCard }) {
 function getModuleTone(tone: ModuleTone) {
   const tones = {
     cyan: {
-      border: "border-cyan-300/20 hover:border-cyan-200/45 hover:shadow-[0_0_42px_rgba(0,229,255,0.16)]",
-      icon: "border-cyan-300/24 bg-cyan-300/12 text-cyan-100",
-      glow: "bg-cyan-300/22",
+      border: "border-cyan-300/26 hover:border-cyan-100/58 hover:shadow-[0_0_52px_rgba(0,229,255,0.24),inset_0_1px_0_rgba(255,255,255,0.12)]",
+      icon: "border-cyan-200/36 bg-cyan-300/14 text-cyan-100",
+      iconGlow: "bg-cyan-300/18",
+      glow: "bg-cyan-300/26",
+      beam: "bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent",
     },
     blue: {
-      border: "border-blue-300/20 hover:border-blue-200/45 hover:shadow-[0_0_42px_rgba(59,130,246,0.16)]",
-      icon: "border-blue-300/24 bg-blue-300/12 text-blue-100",
-      glow: "bg-blue-300/22",
+      border: "border-blue-300/26 hover:border-blue-100/58 hover:shadow-[0_0_52px_rgba(59,130,246,0.24),inset_0_1px_0_rgba(255,255,255,0.12)]",
+      icon: "border-blue-200/36 bg-blue-300/14 text-blue-100",
+      iconGlow: "bg-blue-300/18",
+      glow: "bg-blue-300/26",
+      beam: "bg-gradient-to-r from-transparent via-blue-200/70 to-transparent",
     },
     emerald: {
-      border: "border-emerald-300/20 hover:border-emerald-200/45 hover:shadow-[0_0_42px_rgba(52,211,153,0.14)]",
-      icon: "border-emerald-300/24 bg-emerald-300/12 text-emerald-100",
-      glow: "bg-emerald-300/20",
+      border: "border-emerald-300/26 hover:border-emerald-100/58 hover:shadow-[0_0_52px_rgba(52,211,153,0.22),inset_0_1px_0_rgba(255,255,255,0.12)]",
+      icon: "border-emerald-200/36 bg-emerald-300/14 text-emerald-100",
+      iconGlow: "bg-emerald-300/18",
+      glow: "bg-emerald-300/24",
+      beam: "bg-gradient-to-r from-transparent via-emerald-200/70 to-transparent",
     },
     amber: {
-      border: "border-amber-300/20 hover:border-amber-200/45 hover:shadow-[0_0_42px_rgba(245,158,11,0.14)]",
-      icon: "border-amber-300/24 bg-amber-300/12 text-amber-100",
-      glow: "bg-amber-300/20",
+      border: "border-amber-300/26 hover:border-amber-100/58 hover:shadow-[0_0_52px_rgba(245,158,11,0.22),inset_0_1px_0_rgba(255,255,255,0.12)]",
+      icon: "border-amber-200/36 bg-amber-300/14 text-amber-100",
+      iconGlow: "bg-amber-300/18",
+      glow: "bg-amber-300/24",
+      beam: "bg-gradient-to-r from-transparent via-amber-200/70 to-transparent",
     },
     purple: {
-      border: "border-purple-300/20 hover:border-purple-200/45 hover:shadow-[0_0_42px_rgba(139,92,246,0.16)]",
-      icon: "border-purple-300/24 bg-purple-300/12 text-purple-100",
-      glow: "bg-purple-300/22",
+      border: "border-purple-300/26 hover:border-purple-100/58 hover:shadow-[0_0_52px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.12)]",
+      icon: "border-purple-200/36 bg-purple-300/14 text-purple-100",
+      iconGlow: "bg-purple-300/18",
+      glow: "bg-purple-300/26",
+      beam: "bg-gradient-to-r from-transparent via-purple-200/70 to-transparent",
     },
   };
 
