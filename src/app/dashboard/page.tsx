@@ -614,9 +614,6 @@ function SidebarLink({
           : "border-transparent text-slate-400 hover:-translate-y-0.5 hover:border-white/[0.1] hover:bg-white/[0.055] hover:text-slate-100"
       }`}
     >
-      {item.active ? (
-        <span className="pointer-events-none absolute inset-y-2 left-1 w-0.5 rounded-full bg-cyan-200 shadow-[0_0_16px_rgba(0,229,255,0.8)]" />
-      ) : null}
       <span
         className={`grid h-6 w-6 shrink-0 place-items-center rounded-xl transition duration-300 ${
           item.active
