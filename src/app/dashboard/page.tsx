@@ -31,10 +31,11 @@ import {
   DashboardMotionItem,
   DashboardMotionSection,
 } from "@/components/dashboard/dashboard-motion";
+import { DashboardErrorFallback } from "@/app/dashboard/dashboard-production";
 import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
-import { prisma } from "@/lib/prisma";
+import { isPrismaConfigurationError, prisma } from "@/lib/prisma";
 import { withRetry } from "@/lib/retry";
 
 type Tone = "cyan" | "purple" | "emerald" | "amber" | "blue";
@@ -71,6 +72,21 @@ type ResumeSnapshotData = {
   lastAnalysis: string;
   resumeTitle: string | null;
 };
+
+type DashboardRuntimeIssue = {
+  title: string;
+  description: string;
+};
+
+type DashboardUser = Awaited<ReturnType<typeof getCurrentDbUser>>;
+
+type LatestResume = {
+  title: string;
+  atsScore: number | null;
+  matchScore: number | null;
+  updatedAt: Date;
+  atsAnalysis: unknown;
+} | null;
 
 type UserProfile = {
   email: string;
@@ -221,15 +237,7 @@ const recentActivity: ActivityData[] = [
   },
 ];
 
-function buildResumeSnapshot(
-  latestResume: {
-    title: string;
-    atsScore: number | null;
-    matchScore: number | null;
-    updatedAt: Date;
-    atsAnalysis: unknown;
-  } | null
-): ResumeSnapshotData {
+function buildResumeSnapshot(latestResume: LatestResume): ResumeSnapshotData {
   if (!latestResume) {
     return {
       atsScore: null,
@@ -257,6 +265,107 @@ function buildResumeSnapshot(
     lastAnalysis: formatRelativeTime(latestResume.updatedAt),
     resumeTitle: latestResume.title,
   };
+}
+
+function isNextNavigationError(error: unknown) {
+  if (!error || typeof error !== "object" || !("digest" in error)) {
+    return false;
+  }
+
+  const digest = (error as { digest?: unknown }).digest;
+
+  return (
+    typeof digest === "string" &&
+    (digest.startsWith("NEXT_REDIRECT") || digest.startsWith("NEXT_NOT_FOUND"))
+  );
+}
+
+function logDashboardServerError(error: unknown, source: string) {
+  if (process.env.NODE_ENV === "production") {
+    return;
+  }
+
+  console.error("[dashboard-server]", {
+    source,
+    message: error instanceof Error ? error.message : String(error),
+    stack: error instanceof Error ? error.stack : undefined,
+  });
+}
+
+function getDatabaseIssue(error: unknown): DashboardRuntimeIssue {
+  if (isPrismaConfigurationError(error)) {
+    return {
+      title: "Dashboard database is not configured.",
+      description:
+        "The production DATABASE_URL environment variable is missing. Add the Neon connection string in Vercel Project Settings, then redeploy.",
+    };
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+
+  if (/does not exist|table|relation|schema|P2021|P2022/i.test(message)) {
+    return {
+      title: "Dashboard database schema is not ready.",
+      description:
+        "The production database is reachable, but the Prisma schema has not been synced. Run `npx prisma db push` with the production DATABASE_URL, then redeploy.",
+    };
+  }
+
+  if (/connect|connection|timeout|fetch failed|network|database|prisma|neon/i.test(message)) {
+    return {
+      title: "Dashboard database connection failed.",
+      description:
+        "TalentForge AI could not reach the production database. Verify DATABASE_URL, Neon project status, and Vercel environment variable scope.",
+    };
+  }
+
+  return {
+    title: "Dashboard data could not load.",
+    description:
+      "Authentication succeeded, but the dashboard data loader failed. Check the Vercel function logs for the server error details.",
+  };
+}
+
+async function loadDashboardUser(): Promise<
+  { user: DashboardUser; issue: null } | { user: null; issue: DashboardRuntimeIssue }
+> {
+  try {
+    return { user: await getCurrentDbUser(), issue: null };
+  } catch (error) {
+    if (isNextNavigationError(error)) {
+      throw error;
+    }
+
+    logDashboardServerError(error, "get-current-db-user");
+
+    return { user: null, issue: getDatabaseIssue(error) };
+  }
+}
+
+async function loadLatestResume(userId: string): Promise<
+  { latestResume: LatestResume; issue: null } | { latestResume: null; issue: DashboardRuntimeIssue }
+> {
+  try {
+    const latestResume = await withRetry(() =>
+      prisma.resume.findFirst({
+        where: { userId },
+        orderBy: { updatedAt: "desc" },
+        select: {
+          title: true,
+          atsScore: true,
+          matchScore: true,
+          updatedAt: true,
+          atsAnalysis: true,
+        },
+      })
+    );
+
+    return { latestResume, issue: null };
+  } catch (error) {
+    logDashboardServerError(error, "load-latest-resume");
+
+    return { latestResume: null, issue: getDatabaseIssue(error) };
+  }
 }
 
 function getAnalysisText(value: unknown, key: string) {
@@ -291,7 +400,18 @@ function formatRelativeTime(date: Date) {
 }
 
 export default async function DashboardPage() {
-  const user = await getCurrentDbUser();
+  const userResult = await loadDashboardUser();
+
+  if (userResult.issue) {
+    return (
+      <DashboardErrorFallback
+        title={userResult.issue.title}
+        description={userResult.issue.description}
+      />
+    );
+  }
+
+  const user = userResult.user;
 
   if (!user.role) {
     redirect("/onboarding");
@@ -302,19 +422,18 @@ export default async function DashboardPage() {
     role: user.role,
     initial: user.email?.[0]?.toUpperCase() ?? "U",
   };
-  const latestResume = await withRetry(() =>
-    prisma.resume.findFirst({
-      where: { userId: user.id },
-      orderBy: { updatedAt: "desc" },
-      select: {
-        title: true,
-        atsScore: true,
-        matchScore: true,
-        updatedAt: true,
-        atsAnalysis: true,
-      },
-    })
-  );
+  const resumeResult = await loadLatestResume(user.id);
+
+  if (resumeResult.issue) {
+    return (
+      <DashboardErrorFallback
+        title={resumeResult.issue.title}
+        description={resumeResult.issue.description}
+      />
+    );
+  }
+
+  const latestResume = resumeResult.latestResume;
   const snapshot = buildResumeSnapshot(latestResume);
   const readiness = getCareerReadiness(snapshot);
 

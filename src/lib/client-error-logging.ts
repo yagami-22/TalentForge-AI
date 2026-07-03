@@ -5,6 +5,10 @@ type ClientErrorContext = {
 };
 
 export function logClientError(error: unknown, context: ClientErrorContext = {}) {
+  if (process.env.NODE_ENV === "production") {
+    return;
+  }
+
   const message = error instanceof Error ? error.message : String(error);
   const stack = error instanceof Error ? error.stack : undefined;
 
