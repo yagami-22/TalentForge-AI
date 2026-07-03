@@ -684,11 +684,11 @@ function WelcomeHero({
   const suggestion = getRecommendedAction(snapshot);
 
   return (
-    <section className="relative min-h-[270px] overflow-hidden rounded-[24px] border border-white/[0.105] bg-[radial-gradient(circle_at_74%_28%,rgba(139,92,246,0.22),transparent_28%),radial-gradient(circle_at_75%_74%,rgba(0,229,255,0.12),transparent_24%),linear-gradient(135deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_50%,rgba(3,7,18,0.95))] p-5 shadow-[0_26px_86px_rgba(0,0,0,0.34),0_0_34px_rgba(139,92,246,0.08),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-6">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
-      <div className="pointer-events-none absolute right-24 top-20 h-56 w-56 rounded-full bg-[#00E5FF]/8 blur-3xl" />
-      <div className="pointer-events-none absolute right-24 bottom-8 h-20 w-72 rounded-[50%] border border-cyan-200/14 bg-[#3BA8FF]/8 blur-sm" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.075),transparent_22%,rgba(255,255,255,0.025)_54%,transparent_74%)] opacity-70" />
+    <section className="relative min-h-[270px] overflow-hidden rounded-[24px] border border-white/[0.105] bg-[radial-gradient(circle_at_74%_28%,rgba(139,92,246,0.28),transparent_28%),radial-gradient(circle_at_75%_74%,rgba(0,229,255,0.16),transparent_24%),linear-gradient(135deg,rgba(5,10,25,0.96),rgba(9,15,34,0.9)_50%,rgba(3,7,18,0.95))] p-5 shadow-[0_26px_86px_rgba(0,0,0,0.38),0_0_44px_rgba(139,92,246,0.11),0_0_34px_rgba(0,229,255,0.06),inset_0_1px_0_rgba(255,255,255,0.075)] sm:p-6">
+      <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full bg-[#8B5CF6]/18 blur-3xl" />
+      <div className="pointer-events-none absolute right-24 top-20 h-56 w-56 rounded-full bg-[#00E5FF]/11 blur-3xl" />
+      <div className="pointer-events-none absolute right-24 bottom-8 h-20 w-72 rounded-[50%] border border-cyan-200/18 bg-[#3BA8FF]/11 blur-sm" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.095),transparent_22%,rgba(255,255,255,0.035)_54%,transparent_74%)] opacity-75" />
       <div className="relative grid h-full gap-5 lg:grid-cols-[minmax(0,0.78fr)_minmax(340px,0.9fr)] lg:items-center">
         <div className="max-w-xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-purple-300/18 bg-purple-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-purple-100 shadow-[0_0_18px_rgba(139,92,246,0.14)]">
@@ -704,7 +704,7 @@ function WelcomeHero({
           <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">{insight}</p>
           <Link
             href={suggestion.href}
-            className="group mt-5 inline-flex h-10 items-center gap-3 rounded-full border border-cyan-300/26 bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(139,92,246,0.14))] px-5 text-sm font-semibold text-white shadow-[0_0_28px_rgba(0,229,255,0.14)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/45 hover:shadow-[0_0_36px_rgba(139,92,246,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
+            className="group mt-5 inline-flex h-10 items-center gap-3 rounded-full border border-cyan-300/26 bg-[linear-gradient(135deg,rgba(0,229,255,0.14),rgba(139,92,246,0.14))] px-5 text-sm font-semibold text-white shadow-[0_0_34px_rgba(0,229,255,0.18),0_0_24px_rgba(139,92,246,0.1)] transition duration-300 hover:-translate-y-0.5 hover:border-cyan-200/45 hover:shadow-[0_0_42px_rgba(139,92,246,0.24),0_0_34px_rgba(0,229,255,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/35"
           >
             Get AI Recommendations
             <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-1" />
@@ -720,17 +720,17 @@ function WelcomeHero({
 function HeroIllustration() {
   return (
     <div className="relative mx-auto hidden h-[250px] w-[360px] place-items-center lg:grid" aria-hidden="true">
-      <div className="absolute inset-3 rounded-full bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.18),rgba(60,130,255,0.2)_36%,rgba(139,92,246,0.2)_58%,transparent_78%)] blur-2xl" />
-      <div className="absolute h-[15rem] w-[15rem] rounded-full border border-cyan-100/28 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.1),transparent_62%)] shadow-[0_0_44px_rgba(0,229,255,0.26),0_0_72px_rgba(139,92,246,0.22)]" />
-      <div className="absolute h-[12.5rem] w-[12.5rem] rounded-full border border-purple-200/40 shadow-[0_0_44px_rgba(139,92,246,0.42)]" />
-      <div className="absolute h-28 w-[20rem] rounded-[50%] border border-cyan-200/28 shadow-[0_0_26px_rgba(0,229,255,0.24)]" />
-      <div className="absolute h-[18rem] w-28 rounded-[50%] border border-purple-200/22 shadow-[0_0_24px_rgba(139,92,246,0.2)]" />
-      <div className="absolute h-40 w-[20rem] rotate-12 rounded-[50%] border border-[#3BA8FF]/24 shadow-[0_0_20px_rgba(59,168,255,0.16)]" />
-      <div className="absolute h-40 w-[20rem] -rotate-12 rounded-[50%] border border-[#FF3DFE]/22 shadow-[0_0_20px_rgba(255,61,254,0.14)]" />
-      <div className="absolute bottom-5 h-14 w-[18.5rem] rounded-[50%] border border-cyan-200/36 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.46),rgba(139,92,246,0.26)_42%,transparent_74%)] shadow-[0_0_42px_rgba(0,229,255,0.42),0_0_58px_rgba(139,92,246,0.3)]" />
-      <div className="absolute bottom-9 h-8 w-60 rounded-[50%] border border-cyan-100/55 bg-cyan-300/10 shadow-[0_0_32px_rgba(0,229,255,0.68)]" />
-      <div className="absolute bottom-12 h-2 w-64 rounded-full bg-gradient-to-r from-transparent via-cyan-100 to-transparent shadow-[0_0_28px_rgba(0,229,255,0.9)]" />
-      <div className="absolute bottom-8 h-9 w-72 rounded-[50%] bg-[#00E5FF]/20 blur-md" />
+      <div className="absolute inset-3 rounded-full bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.24),rgba(60,130,255,0.26)_36%,rgba(139,92,246,0.27)_58%,transparent_78%)] blur-2xl" />
+      <div className="absolute h-[15rem] w-[15rem] rounded-full border border-cyan-100/36 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.14),transparent_62%)] shadow-[0_0_56px_rgba(0,229,255,0.34),0_0_90px_rgba(139,92,246,0.28)]" />
+      <div className="absolute h-[12.5rem] w-[12.5rem] rounded-full border border-purple-200/50 shadow-[0_0_58px_rgba(139,92,246,0.54)]" />
+      <div className="absolute h-28 w-[20rem] rounded-[50%] border border-cyan-200/36 shadow-[0_0_34px_rgba(0,229,255,0.32)]" />
+      <div className="absolute h-[18rem] w-28 rounded-[50%] border border-purple-200/28 shadow-[0_0_32px_rgba(139,92,246,0.26)]" />
+      <div className="absolute h-40 w-[20rem] rotate-12 rounded-[50%] border border-[#3BA8FF]/32 shadow-[0_0_28px_rgba(59,168,255,0.22)]" />
+      <div className="absolute h-40 w-[20rem] -rotate-12 rounded-[50%] border border-[#FF3DFE]/28 shadow-[0_0_28px_rgba(255,61,254,0.2)]" />
+      <div className="absolute bottom-5 h-14 w-[18.5rem] rounded-[50%] border border-cyan-200/46 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.58),rgba(139,92,246,0.34)_42%,transparent_74%)] shadow-[0_0_54px_rgba(0,229,255,0.54),0_0_72px_rgba(139,92,246,0.38)]" />
+      <div className="absolute bottom-9 h-8 w-60 rounded-[50%] border border-cyan-100/68 bg-cyan-300/14 shadow-[0_0_42px_rgba(0,229,255,0.82)]" />
+      <div className="absolute bottom-12 h-2 w-64 rounded-full bg-gradient-to-r from-transparent via-cyan-100 to-transparent shadow-[0_0_36px_rgba(0,229,255,1)]" />
+      <div className="absolute bottom-8 h-9 w-72 rounded-[50%] bg-[#00E5FF]/26 blur-md" />
       {[0, 1, 2, 3, 4, 5, 6, 7].map((dot) => {
         const positions = [
           "left-[24%] top-[24%]",
@@ -745,16 +745,16 @@ function HeroIllustration() {
         return (
           <span
             key={dot}
-            className={`absolute h-2.5 w-2.5 rounded-full bg-cyan-100 shadow-[0_0_16px_rgba(0,229,255,0.95)] ${positions[dot]}`}
+            className={`absolute h-2.5 w-2.5 rounded-full bg-cyan-100 shadow-[0_0_22px_rgba(0,229,255,1),0_0_10px_rgba(255,255,255,0.55)] ${positions[dot]}`}
           />
         );
       })}
-      <div className="relative grid h-44 w-28 place-items-center border border-cyan-50/70 bg-[linear-gradient(155deg,rgba(104,219,255,0.68),rgba(75,119,255,0.68)_42%,rgba(158,88,255,0.62))] shadow-[0_0_48px_rgba(0,229,255,0.56),0_0_86px_rgba(139,92,246,0.58),inset_0_0_34px_rgba(255,255,255,0.24)] [clip-path:polygon(50%_0%,88%_18%,78%_78%,50%_100%,22%_78%,12%_18%)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_36%_18%,rgba(255,255,255,0.55),transparent_22%),linear-gradient(90deg,rgba(255,255,255,0.34),transparent_34%,rgba(255,255,255,0.16)_58%,transparent)]" />
-        <div className="absolute left-1/2 top-4 h-32 w-px -translate-x-1/2 bg-white/34" />
-        <div className="absolute bottom-7 h-16 w-20 rounded-full bg-[#00E5FF]/16 blur-xl" />
-        <div className="relative grid h-[4.6rem] w-[4.6rem] place-items-center rounded-full bg-[#050914]/82 ring-1 ring-cyan-100/18 shadow-[0_0_30px_rgba(0,229,255,0.22),inset_0_0_28px_rgba(0,229,255,0.12)]">
-          <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#B05CFF] bg-clip-text text-[1.45rem] font-black tracking-tighter text-transparent drop-shadow-[0_0_22px_rgba(0,229,255,1)]">
+      <div className="relative grid h-44 w-28 place-items-center border border-cyan-50/82 bg-[linear-gradient(155deg,rgba(104,219,255,0.78),rgba(75,119,255,0.78)_42%,rgba(158,88,255,0.72))] shadow-[0_0_62px_rgba(0,229,255,0.68),0_0_110px_rgba(139,92,246,0.7),inset_0_0_44px_rgba(255,255,255,0.32),inset_0_-22px_34px_rgba(6,10,25,0.22)] [clip-path:polygon(50%_0%,88%_18%,78%_78%,50%_100%,22%_78%,12%_18%)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_36%_18%,rgba(255,255,255,0.72),transparent_22%),linear-gradient(90deg,rgba(255,255,255,0.44),transparent_34%,rgba(255,255,255,0.22)_58%,transparent)]" />
+        <div className="absolute left-1/2 top-4 h-32 w-px -translate-x-1/2 bg-white/46" />
+        <div className="absolute bottom-7 h-16 w-20 rounded-full bg-[#00E5FF]/22 blur-xl" />
+        <div className="relative grid h-[4.6rem] w-[4.6rem] place-items-center rounded-full bg-[#050914]/86 ring-1 ring-cyan-100/24 shadow-[0_0_38px_rgba(0,229,255,0.3),inset_0_0_34px_rgba(0,229,255,0.16),inset_0_-14px_26px_rgba(0,0,0,0.24)]">
+          <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#B05CFF] bg-clip-text text-[1.45rem] font-black tracking-tighter text-transparent drop-shadow-[0_0_30px_rgba(0,229,255,1)]">
             TF
           </span>
         </div>
