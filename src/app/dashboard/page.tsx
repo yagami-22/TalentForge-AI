@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import {
@@ -722,42 +723,16 @@ function WelcomeHero({
 
 function HeroIllustration() {
   return (
-    <div className="relative mx-auto hidden h-[240px] w-[340px] place-items-center lg:grid" aria-hidden="true">
-      <div className="absolute inset-12 rounded-full bg-[#8B5CF6]/16 blur-2xl" />
-      <div className="absolute h-56 w-56 rounded-full border border-purple-300/42 shadow-[0_0_34px_rgba(139,92,246,0.42)]" />
-      <div className="absolute h-44 w-44 rounded-full border border-cyan-200/22 shadow-[0_0_26px_rgba(0,229,255,0.22)]" />
-      <div className="absolute h-24 w-72 rounded-[50%] border border-cyan-200/18" />
-      <div className="absolute h-72 w-24 rounded-[50%] border border-purple-200/14" />
-      <div className="absolute h-36 w-72 rotate-12 rounded-[50%] border border-[#3BA8FF]/14" />
-      <div className="absolute h-36 w-72 -rotate-12 rounded-[50%] border border-[#FF3DFE]/12" />
-      <div className="absolute bottom-6 h-12 w-64 rounded-[50%] border border-[#8B5CF6]/50 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.34),rgba(0,229,255,0.16)_40%,transparent_72%)] shadow-[0_0_30px_rgba(139,92,246,0.36)]" />
-      <div className="absolute bottom-9 h-7 w-52 rounded-[50%] border border-cyan-200/42 shadow-[0_0_24px_rgba(0,229,255,0.46)]" />
-      <div className="absolute bottom-12 h-1.5 w-56 rounded-full bg-gradient-to-r from-transparent via-cyan-200/80 to-transparent shadow-[0_0_24px_rgba(0,229,255,0.7)]" />
-
-      {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-        <span
-          key={item}
-          className="absolute h-1.5 w-1.5 rounded-full bg-cyan-100/80 shadow-[0_0_18px_rgba(0,229,255,0.9)]"
-          style={{
-            left: `${16 + item * 8}%`,
-            top: `${16 + ((item * 17) % 58)}%`,
-          }}
-        />
-      ))}
-
-      <div className="relative grid h-40 w-24 place-items-center border border-cyan-100/55 bg-[linear-gradient(155deg,rgba(25,200,255,0.46),rgba(83,108,255,0.5)_42%,rgba(151,79,255,0.44))] shadow-[0_0_36px_rgba(0,229,255,0.42),0_0_64px_rgba(139,92,246,0.46),inset_0_0_28px_rgba(255,255,255,0.16)] [clip-path:polygon(50%_0%,86%_16%,78%_82%,50%_100%,22%_82%,14%_16%)]">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.3),transparent_34%,rgba(255,255,255,0.13)_58%,transparent)]" />
-        <div className="absolute left-1/2 top-4 h-28 w-px -translate-x-1/2 bg-white/24" />
-        <div className="absolute left-5 top-10 h-20 w-px -rotate-12 bg-cyan-100/18" />
-        <div className="absolute right-5 top-10 h-20 w-px rotate-12 bg-purple-100/18" />
-        <div className="relative grid h-16 w-16 place-items-center rounded-full bg-[#070B16]/72 ring-1 ring-white/14 shadow-[inset_0_0_24px_rgba(0,229,255,0.08)]">
-          <span className="bg-gradient-to-r from-[#39C8FF] to-[#8B5CF6] bg-clip-text text-xl font-black tracking-tighter text-transparent drop-shadow-[0_0_18px_rgba(0,229,255,0.9)]">
-            TF
-          </span>
-        </div>
-      </div>
-
-      <div className="absolute bottom-7 h-10 w-72 rounded-[50%] bg-[#00E5FF]/12 blur-md" />
+    <div className="relative mx-auto hidden h-[240px] w-[360px] place-items-center overflow-visible lg:grid" aria-hidden="true">
+      <div className="absolute inset-x-0 bottom-2 h-20 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.28),rgba(139,92,246,0.18)_45%,transparent_72%)] blur-xl" />
+      <Image
+        src="/landing/talentforge-ai-core.png"
+        alt=""
+        width={1586}
+        height={992}
+        priority
+        className="relative h-[260px] w-[420px] max-w-none object-contain drop-shadow-[0_0_38px_rgba(0,229,255,0.55)]"
+      />
     </div>
   );
 }
