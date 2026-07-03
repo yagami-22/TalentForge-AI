@@ -14,15 +14,39 @@ class PrismaConfigurationError extends Error {
   }
 }
 
+function getDatabaseUrlIssue(connectionString: string | undefined) {
+  if (!connectionString) {
+    return "DATABASE_URL is missing.";
+  }
+
+  try {
+    const parsedUrl = new URL(connectionString);
+
+    if (parsedUrl.protocol !== "postgresql:" && parsedUrl.protocol !== "postgres:") {
+      return "DATABASE_URL must be a PostgreSQL connection string.";
+    }
+
+    if (!parsedUrl.hostname || !parsedUrl.username || !parsedUrl.pathname) {
+      return "DATABASE_URL is incomplete. It must include user, host, database, and password details.";
+    }
+  } catch {
+    return "DATABASE_URL is not a valid connection string.";
+  }
+
+  return null;
+}
+
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL?.trim();
+  const databaseUrlIssue = getDatabaseUrlIssue(connectionString);
 
-  if (!connectionString) {
+  if (databaseUrlIssue || !connectionString) {
     throw new PrismaConfigurationError(
-      "DATABASE_URL is required before dashboard database queries can run."
+      `${databaseUrlIssue} Add the Neon pooled connection string in Vercel Project Settings and redeploy.`
     );
   }
 
+  // `databaseUrlIssue` guarantees this is defined without exposing the secret.
   const adapter = new PrismaNeon({ connectionString });
 
   return new PrismaClient({

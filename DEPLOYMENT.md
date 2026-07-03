@@ -26,10 +26,30 @@ Set these in Vercel Project Settings for Production, Preview, and Development as
 | --- | --- | --- |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes | Public Clerk browser key. |
 | `CLERK_SECRET_KEY` | Yes | Secret Clerk server key. |
-| `DATABASE_URL` | Yes | Neon PostgreSQL connection string used by Prisma. |
+| `DATABASE_URL` | Yes | Neon PostgreSQL pooled connection string used by Prisma at runtime and by `prisma db push`. |
 | `GITHUB_TOKEN` | Optional | Server-side only; improves GitHub API rate limits. |
 
+`DIRECT_URL` is not required for the current project. The Prisma schema does not define `directUrl`, and `prisma.config.ts` reads only `DATABASE_URL`. Add `DIRECT_URL` only if the project later switches to a Prisma setup that explicitly uses `directUrl` for migrations.
+
 Never paste real secret values into README files, issues, screenshots, commits, or pull requests.
+
+## Neon Database Setup
+
+1. Create or open the Neon project for TalentForge AI.
+2. Open **Connection Details** in Neon.
+3. Select the production branch and database.
+4. Copy the pooled PostgreSQL connection string for serverless usage.
+5. The value should start with `postgresql://` or `postgres://` and include the database name, username, password, host, and SSL settings.
+6. Do not commit this value and do not paste it into project documentation.
+7. Add the value to Vercel as `DATABASE_URL`.
+
+Recommended Vercel variable scopes:
+
+- Production: required for the live deployment from `main`.
+- Preview: required if you test preview deployments from branches.
+- Development: optional, only if you use Vercel-linked local development.
+
+After adding or changing Vercel environment variables, redeploy the project. Existing deployments do not automatically receive changed environment variables until redeployed.
 
 ## Vercel Settings
 
@@ -46,11 +66,11 @@ No custom `vercel.json` is required for the current setup.
 
 1. Push the latest code to GitHub.
 2. Create or confirm the Neon production database.
-3. Add `DATABASE_URL` to Vercel environment variables.
+3. Add the Neon pooled connection string as `DATABASE_URL` in Vercel environment variables.
 4. Add Clerk production keys to Vercel environment variables.
 5. In Clerk, add the Vercel production domain to allowed origins and redirect URLs.
 6. Add `GITHUB_TOKEN` only if you want higher GitHub API limits.
-7. Sync the Prisma schema against the production database:
+7. Sync the Prisma schema against the production database. Use the same `DATABASE_URL` value that is configured in Vercel:
 
 ```bash
 npx prisma db push
@@ -59,6 +79,21 @@ npx prisma db push
 8. Import or redeploy the project in Vercel.
 9. Confirm the build uses `npm install` and `npm run build`.
 10. Open the deployed site and complete the post-deployment checks below.
+
+## Database Error Troubleshooting
+
+If `/dashboard` shows `Dashboard database connection failed`, the app was able to render and authenticate, but a Prisma query could not reach Neon.
+
+Check these in order:
+
+1. `DATABASE_URL` exists in Vercel for the deployment environment you are opening.
+2. The deployed URL is a Production deployment if the variable was added only to Production scope.
+3. The Neon project and branch are active.
+4. The connection string was copied completely and has no surrounding quotes or extra spaces.
+5. The schema has been pushed to that exact database with `npx prisma db push`.
+6. Redeploy after changing environment variables.
+
+If `/dashboard` shows `Dashboard database is not configured`, `DATABASE_URL` is missing or malformed in the runtime environment. If it shows `Dashboard database schema is not ready`, the connection works but the tables/columns do not match `prisma/schema.prisma`.
 
 ## Post-Deployment Checks
 

@@ -72,6 +72,8 @@ Do not commit real secret values. `.env.local` is ignored by this repository.
 | `DATABASE_URL` | Yes | Prisma + Neon PostgreSQL |
 | `GITHUB_TOKEN` | Optional | Server-side GitHub API requests with higher rate limits |
 
+`DIRECT_URL` is not required in this project because the Prisma schema/config only use `DATABASE_URL`.
+
 Example shape only:
 
 ```bash
@@ -96,7 +98,7 @@ Deployment steps:
 1. Push the repository to GitHub.
 2. Import the GitHub repository into Vercel.
 3. Add the required environment variables in Vercel Project Settings.
-4. Create or connect a Neon PostgreSQL database and set `DATABASE_URL`.
+4. Create or connect a Neon PostgreSQL database and set `DATABASE_URL` to the Neon pooled connection string.
 5. Configure Clerk production keys and allowed redirect URLs for the Vercel domain.
 6. Run `npx prisma db push` against the production database before first use.
 7. Deploy the project.
