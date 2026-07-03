@@ -3,7 +3,6 @@ import {
   ArrowRight,
   BarChart3,
   Bot,
-  Brain,
   CheckCircle2,
   ChevronDown,
   CirclePlay,
@@ -11,19 +10,14 @@ import {
   Code2,
   Compass,
   FileSearch,
-  FileText,
   GitBranch,
-  LockKeyhole,
   MessageSquareText,
   PenLine,
   Route,
-  SearchCheck,
   ShieldCheck,
   Sparkles,
   Star,
   Target,
-  TrendingUp,
-  Upload,
   WandSparkles,
   Zap,
 } from "lucide-react";
@@ -48,18 +42,6 @@ type Feature = {
   description: string;
   metric: string;
   metricLabel: string;
-};
-
-type WorkflowStep = {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-};
-
-type TrustItem = {
-  icon: LucideIcon;
-  title: string;
-  description: string;
 };
 
 const heroHighlights = [
@@ -204,67 +186,6 @@ const features: Feature[] = [
   },
 ];
 
-const workflow: WorkflowStep[] = [
-  {
-    icon: Upload,
-    title: "Upload Resume",
-    description: "Start with your current resume and the role you want next.",
-  },
-  {
-    icon: Brain,
-    title: "AI Analysis",
-    description: "TalentForge scores ATS fit, recruiter clarity, and evidence quality.",
-  },
-  {
-    icon: PenLine,
-    title: "Improve Resume",
-    description: "Rewrite weak bullets, close keyword gaps, and sharpen positioning.",
-  },
-  {
-    icon: MessageSquareText,
-    title: "Practice Interviews",
-    description: "Prepare for technical, behavioral, OA, and project deep dives.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Get Hired",
-    description: "Apply with a stronger resume, clearer story, and more confidence.",
-  },
-];
-
-const trustItems: TrustItem[] = [
-  {
-    icon: Sparkles,
-    title: "AI-powered analysis",
-    description: "Resume, JD, and interview feedback built for modern hiring workflows.",
-  },
-  {
-    icon: SearchCheck,
-    title: "Recruiter-focused insights",
-    description: "Guidance is framed around clarity, proof, relevance, and scannability.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "ATS optimization",
-    description: "Keyword coverage, formatting risks, and role fit are surfaced quickly.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Industry best practices",
-    description: "Recommendations prioritize measurable impact and concise positioning.",
-  },
-  {
-    icon: LockKeyhole,
-    title: "Secure authentication",
-    description: "Protected app routes keep career data behind authenticated sessions.",
-  },
-  {
-    icon: FileText,
-    title: "Privacy-first approach",
-    description: "Your documents stay tied to your account and your career workflow.",
-  },
-];
-
 const trustedBrands = ["Google", "Microsoft", "Amazon", "Adobe", "Infosys", "TCS", "Deloitte"];
 
 export default function Home() {
@@ -323,9 +244,6 @@ export default function Home() {
             <NavLink href="#how-it-works">Resources</NavLink>
             <a href="#pricing" className="transition hover:text-cyan-50">
               Pricing
-            </a>
-            <a href="#trust" className="transition hover:text-cyan-50">
-              Trust
             </a>
           </div>
 
@@ -511,53 +429,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="how-it-works"
-        className="border-y border-white/[0.06] bg-[#080D1D]/42"
-      >
-        <div className="mx-auto grid w-full max-w-[1360px] gap-10 px-5 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <SectionHeader
-              eyebrow="How TalentForge Works"
-              title="From resume upload to interview confidence."
-              description="A guided system for improving every signal recruiters and hiring systems evaluate."
-            />
-            <div className="mt-8 rounded-[1.75rem] border border-cyan-300/15 bg-[linear-gradient(135deg,rgba(0,229,255,0.12),rgba(255,255,255,0.04)_48%,rgba(139,92,246,0.12))] p-5 shadow-[0_0_40px_rgba(0,229,255,0.12),0_0_60px_rgba(106,92,255,0.12)] backdrop-blur-xl">
-              <p className="text-sm font-medium text-cyan-100">
-                Hiring readiness combines resume quality, JD fit, ATS coverage, and interview preparation into one focused workflow.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            {workflow.map((step, index) => (
-              <WorkflowCard
-                key={step.title}
-                step={step}
-                index={index + 1}
-                isLast={index === workflow.length - 1}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="trust"
-        className="mx-auto w-full max-w-[1360px] px-5 py-16 sm:px-6 lg:px-8"
-      >
-        <SectionHeader
-          eyebrow="Trust"
-          title="Built for serious candidates and modern hiring loops."
-          description="Premium analysis, protected access, and practical recommendations without turning your career workflow into noise."
-        />
-        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {trustItems.map((item) => (
-            <TrustCard key={item.title} item={item} />
-          ))}
-        </div>
-      </section>
-
       <section id="pricing" className="mx-auto w-full max-w-[1360px] px-5 pb-16 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.16),rgba(106,92,255,0.12)_50%,rgba(139,92,246,0.18))] p-6 shadow-[0_0_40px_rgba(0,229,255,0.14),0_0_70px_rgba(106,92,255,0.16)] backdrop-blur-2xl sm:p-8 lg:p-10">
           <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/20 blur-3xl" />
@@ -618,9 +489,6 @@ export default function Home() {
             </a>
             <a href="#how-it-works" className="transition hover:text-cyan-50">
               Workflow
-            </a>
-            <a href="#trust" className="transition hover:text-cyan-50">
-              Trust
             </a>
           </div>
         </div>
@@ -896,63 +764,6 @@ function FeatureCard({ feature }: { feature: Feature }) {
             Explore workflow
             <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-0.5" />
           </span>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function WorkflowCard({
-  step,
-  index,
-  isLast,
-}: {
-  step: WorkflowStep;
-  index: number;
-  isLast: boolean;
-}) {
-  const Icon = step.icon;
-
-  return (
-    <article className="group relative grid gap-4 rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_36px_rgba(0,229,255,0.08)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/25 hover:bg-white/[0.055] md:grid-cols-[64px_1fr]">
-      {!isLast ? (
-        <div
-          className="absolute left-8 top-[72px] hidden h-[calc(100%_-_44px)] w-px bg-gradient-to-b from-[#00E5FF]/50 to-transparent md:block"
-          aria-hidden="true"
-        />
-      ) : null}
-      <span className="relative z-10 grid h-14 w-14 place-items-center rounded-2xl border border-[#00E5FF]/20 bg-[#00E5FF]/10 text-cyan-100 shadow-[0_0_24px_rgba(0,229,255,0.14)]">
-        <Icon className="h-5 w-5" />
-      </span>
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Step {String(index).padStart(2, "0")}
-        </p>
-        <h3 className="mt-2 text-xl font-semibold tracking-tight text-white">
-          {step.title}
-        </h3>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
-          {step.description}
-        </p>
-      </div>
-    </article>
-  );
-}
-
-function TrustCard({ item }: { item: TrustItem }) {
-  const Icon = item.icon;
-
-  return (
-    <article className="rounded-[1.5rem] border border-[rgba(255,255,255,0.08)] bg-[#101827]/60 p-5 shadow-[0_0_32px_rgba(0,229,255,0.07)] transition duration-300 hover:-translate-y-0.5 hover:border-[#00E5FF]/25 hover:bg-white/[0.045]">
-      <div className="flex items-start gap-4">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-purple-300/20 bg-[#8B5CF6]/10 text-purple-100 shadow-[0_0_24px_rgba(139,92,246,0.12)]">
-          <Icon className="h-5 w-5" />
-        </span>
-        <div>
-          <h3 className="font-semibold tracking-tight text-white">{item.title}</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            {item.description}
-          </p>
         </div>
       </div>
     </article>
