@@ -1380,11 +1380,6 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
   const metrics = useMemo(() => (result ? metricCards(result) : []), [result]);
   const preAnalysisMetrics = [
     {
-      label: "Resume Skills",
-      value: String(resumeContext.skills.length),
-      tone: "cyan" as const,
-    },
-    {
       label: "Resume Context",
       value: resumeContext.title ? "Connected" : "Not linked",
       tone: resumeContext.title ? ("emerald" as const) : ("amber" as const),
@@ -1396,13 +1391,11 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
     },
   ];
   const preAnalysisDetails = [
-    resumeContext.title ? `Resume context: ${resumeContext.title}` : null,
-    resumeContext.skills.length
-      ? `${resumeContext.skills.length} resume skills ready for GitHub alignment`
-      : "Upload a resume to compare GitHub evidence against resume skills",
-    "Analysis uses public repositories, README files, language data, deployment links, and recent activity",
-    "Results appear here after you enter a GitHub username",
-  ].filter((item): item is string => Boolean(item));
+    "Evidence-Based Analysis|Inspects real repositories, commits, and documentation",
+    "Recruiter-Focused Signals|Highlights what matters for hiring decisions",
+    "Resume Alignment|Maps your experience to real project evidence",
+    "Privacy Safe|We only analyze public information",
+  ];
 
   async function runAnalysis() {
     setError(null);
@@ -1439,7 +1432,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
         metrics={result ? heroMetrics(result) : preAnalysisMetrics}
         summary={result?.hero.recruiterSummary}
       >
-        <form onSubmit={handleAnalyze} className="mt-6 grid gap-3 lg:grid-cols-[1fr_1fr_auto]">
+        <form onSubmit={handleAnalyze} className="mt-5 grid gap-3 sm:grid-cols-[minmax(0,180px)_minmax(0,220px)] lg:grid-cols-[180px_220px_140px]">
           <label className="sr-only" htmlFor="github-username">
             GitHub username
           </label>
@@ -1455,7 +1448,7 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
               autoCapitalize="none"
               autoComplete="username"
               spellCheck={false}
-              className={`h-12 w-full pl-11 ${forge.input}`}
+              className={`h-10 w-full pl-10 text-xs ${forge.input}`}
             />
           </div>
           <label className="sr-only" htmlFor="portfolio-url">
@@ -1472,10 +1465,10 @@ export function GitHubAnalyzerClient({ resumeContext }: { resumeContext: ResumeC
               autoCapitalize="none"
               autoComplete="url"
               spellCheck={false}
-              className={`h-12 w-full pl-11 ${forge.input}`}
+              className={`h-10 w-full pl-10 text-xs ${forge.input}`}
             />
           </div>
-          <Button type="submit" disabled={isLoading} className={`h-12 ${forge.primaryButton}`}>
+          <Button type="submit" disabled={isLoading} className={`h-10 px-4 text-xs ${forge.primaryButton}`}>
             {isLoading ? "Analyzing..." : "Analyze Profile"}
           </Button>
         </form>

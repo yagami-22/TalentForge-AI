@@ -1,91 +1,78 @@
 # TalentForge AI
 
-AI-powered career intelligence platform for resumes, ATS optimization, job matching, GitHub analysis, recruiter mode, and interview preparation.
+TalentForge AI is a production-ready career intelligence platform for resume analysis, ATS optimization, job matching, GitHub portfolio review, recruiter workflows, interview preparation, and career coaching.
 
 ## Live Demo
 
-Live Demo: add deployed URL here
-
-## Screenshots
-
-Add screenshots before publishing:
-
-- Landing Page: add screenshot here
-- Dashboard: add screenshot here
-- Resume Analyzer: add screenshot here
-- ATS Optimizer: add screenshot here
-- JD Match: add screenshot here
-- Resume Rewriter: add screenshot here
-- GitHub Analyzer: add screenshot here
-- AI Recruiter Mode: add screenshot here
-- Mock Interview: add screenshot here
-
-## Features
-
-- **Resume Intelligence**: Upload text-based PDF resumes, parse content, detect evidence, score resume quality, and surface actionable improvements.
-- **ATS Optimization**: Compare a resume against a target job description and identify keyword, formatting, and relevance gaps.
-- **JD Match**: Analyze job description fit with skill overlap, missing requirements, and match evidence.
-- **Resume Rewriter**: Generate recruiter-ready resume sections tailored to a selected job description and export rewritten content as PDF.
-- **Resume Version History**: Track resume changes, compare versions, review ATS/JD score trends, and restore saved versions.
-- **GitHub Profile Analyzer**: Inspect public GitHub repositories for project quality, modern stack evidence, documentation, deployment, and recruiter visibility.
-- **AI Recruiter Mode**: Review candidate batches against a job description, rank applicants, and generate evidence-based recruiter reports.
-- **Mock Interviews**: Run company-style technical, DSA, frontend, backend, system design, project deep dive, behavioral, and mixed interview sessions.
-- **Career Coach**: Combine resume, ATS, JD match, interview, project, skill, and GitHub signals into personalized readiness and roadmap guidance.
-- **Premium Dashboard**: Unified dark SaaS workspace with analytics, quick actions, module navigation, and consistent product UI.
+Live Demo: _Coming soon - add the Vercel URL here after deployment._
 
 ## Tech Stack
 
-- Next.js
-- React
+- Next.js 16 App Router
+- React 19
 - TypeScript
-- Tailwind CSS
-- Shadcn UI
-- Clerk
-- Prisma
+- Tailwind CSS 4
+- Clerk authentication
+- Prisma 7
 - Neon PostgreSQL
 - GitHub API
-- PDF parsing/export
+- Recharts
+- PDF parsing and PDF export
 - Vercel
 
-## Architecture Overview
+## Features
 
-TalentForge AI is a modular Next.js application organized around authenticated dashboard workflows.
+- Resume Hub for text-based PDF upload, parsing, scoring, and improvement suggestions.
+- ATS Optimizer for job-description-specific resume gaps and keyword coverage.
+- JD Matcher for role fit, missing requirements, and evidence-based match scoring.
+- AI Rewriter for recruiter-ready resume section rewrites and PDF export.
+- GitHub Analyzer for public repository quality, stack evidence, deployment signals, and recruiter visibility.
+- Interview Prep and OA Practice for mock interviews, DSA practice, scoring, and reports.
+- AI Recruiter Mode for candidate ranking and recruiter-facing evidence reports.
+- Career Coach and Analytics for readiness signals, progress summaries, and career roadmap guidance.
+- Resume History for saved versions, comparisons, score trends, and restoration.
 
-- **Frontend**: App Router pages and client components live under `src/app`, with shared UI in `src/components` and design tokens in `src/lib/talentforge-design.ts`.
-- **Auth**: Clerk handles sign-in, sign-up, sessions, and protected dashboard access.
-- **Database**: Prisma models persist users, resumes, analysis outputs, and version history in Neon PostgreSQL.
-- **AI analysis layer**: Domain logic in `src/lib` scores resumes, JD matches, ATS evidence, recruiter reports, interview answers, and career readiness.
-- **Resume parsing**: Text-based PDFs are validated and parsed server-side before analysis and storage.
-- **GitHub API integration**: Public repository data is fetched through a server-side API proxy with optional `GITHUB_TOKEN` support.
-- **Recruiter intelligence**: Candidate evidence is ranked against job descriptions with seniority, skills, project quality, portfolio, and recommendation signals.
-- **Dashboard modules**: Resume, ATS, JD Match, Rewriter, History, GitHub, Recruiter, Interview, Career Coach, Analytics, and Settings are separate route modules sharing the same visual system.
+## Local Setup
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for more detail.
+1. Install dependencies:
 
-## Folder Structure
+```bash
+npm install
+```
 
-```text
-src/app/                         Next.js App Router routes and route modules
-src/app/api/github/fetch/        Server-side GitHub API proxy
-src/app/dashboard/               Authenticated dashboard shell and modules
-src/app/dashboard/resume/        Resume intelligence, ATS, JD match, rewrite, history
-src/app/dashboard/github/        GitHub Profile Analyzer
-src/app/dashboard/recruiter/     AI Recruiter Mode workspace
-src/app/dashboard/interview/     Interview and OA simulator flows
-src/app/dashboard/coach/         AI Career Coach
-src/components/                  Shared application components
-src/components/ui/               Shadcn-style UI primitives
-src/components/dashboard/        Dashboard-specific shared components
-src/lib/                         Domain logic, analyzers, API clients, utilities
-src/data/question-bank/          Interview and OA question data
-prisma/                          Prisma schema and database scripts
-public/uploads/resumes/          Local uploaded resume storage in development
-docs/                            Product, setup, architecture, and feature docs
+2. Create `.env.local` in the project root and add the required variables listed below.
+
+3. Sync the database schema when using a fresh Neon database:
+
+```bash
+npx prisma db push
+```
+
+4. Start the development server:
+
+```bash
+npm run dev
+```
+
+5. Verify production readiness locally:
+
+```bash
+npm run lint
+npm run build
 ```
 
 ## Environment Variables
 
-Create `.env.local` and provide the values needed for your environment. Do not commit real secrets.
+Do not commit real secret values. `.env.local` is ignored by this repository.
+
+| Variable | Required | Where it is used |
+| --- | --- | --- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Yes | Clerk browser authentication |
+| `CLERK_SECRET_KEY` | Yes | Clerk server authentication |
+| `DATABASE_URL` | Yes | Prisma + Neon PostgreSQL |
+| `GITHUB_TOKEN` | Optional | Server-side GitHub API requests with higher rate limits |
+
+Example shape only:
 
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
@@ -94,66 +81,44 @@ DATABASE_URL=
 GITHUB_TOKEN=
 ```
 
-`GITHUB_TOKEN` is optional but recommended for higher GitHub API limits. It is read only on the server and must never be exposed to the browser.
+## Vercel Deployment
 
-## Local Setup
+TalentForge AI is ready to deploy on Vercel with the default Next.js framework preset.
 
-```bash
-npm install
-npm run dev
-npm run lint
-npm run build
-```
+- Framework preset: `Next.js`
+- Install command: `npm install`
+- Build command: `npm run build`
+- Output directory: Vercel default for Next.js
+- Development command: `npm run dev`
 
-Open the local development URL printed by Next.js, usually `http://localhost:3000`.
-
-For full setup details, see [docs/SETUP.md](docs/SETUP.md).
-
-## Deployment Guide
-
-TalentForge AI is designed to deploy on Vercel.
+Deployment steps:
 
 1. Push the repository to GitHub.
-2. Import the project in Vercel.
-3. Add required environment variables in Vercel Project Settings.
-4. Connect the Neon PostgreSQL database using `DATABASE_URL`.
-5. Configure Clerk production keys and allowed redirect URLs.
-6. Add `GITHUB_TOKEN` as a server-side environment variable if using GitHub analysis at production scale.
-7. Deploy with the default Next.js build command: `npm run build`.
+2. Import the GitHub repository into Vercel.
+3. Add the required environment variables in Vercel Project Settings.
+4. Create or connect a Neon PostgreSQL database and set `DATABASE_URL`.
+5. Configure Clerk production keys and allowed redirect URLs for the Vercel domain.
+6. Run `npx prisma db push` against the production database before first use.
+7. Deploy the project.
+8. After deployment, add the live Vercel URL to the GitHub repository About section.
 
-## Security Notes
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the full production checklist.
 
-- Store secrets only in environment variables.
-- Keep `.env.local` out of version control.
-- The GitHub token is server-side only and is not sent to client bundles.
-- Clerk handles authentication and session state.
-- Resume uploads should be treated as sensitive user data.
-- Public GitHub analysis should only request public repository data unless the product explicitly adds private repository support later.
+## Production Notes
 
-## Performance Notes
+- Uploaded resume PDFs are persisted to `public/uploads/resumes` only in local development.
+- In production, TalentForge AI stores extracted resume text, analysis output, and version history in the database. Add Vercel Blob, S3, or another object store later if persistent original-PDF storage is required.
+- `GITHUB_TOKEN` is server-side only and must not be exposed to client code.
+- Prisma Client is generated during install through the `postinstall` script for fresh Vercel builds.
 
-- Dashboard modules are route-isolated to keep workflows focused.
-- Heavy GitHub API calls are proxied server-side and cached briefly.
-- PDF parsing and analysis run server-side where possible.
-- UI motion respects `prefers-reduced-motion`.
-- Static and dynamic routes are validated through `npm run build`.
+## GitHub Repository Presentation
 
-## Accessibility Notes
+After deployment, update the repository About section:
 
-- Dashboard routes include visible focus states and keyboard-accessible controls.
-- Forms use labels or ARIA labels with live feedback for errors and status updates.
-- Charts include screen-reader summaries where visual-only graphics are used.
-- Interactive cards are implemented as links or buttons.
-- Motion is reduced when users enable reduced-motion preferences.
-
-## Future Improvements
-
-- Add production screenshots and a deployed demo URL.
-- Add automated accessibility testing to CI.
-- Add deeper recruiter pipeline persistence.
-- Add optional cloud file storage for uploaded resumes.
-- Add richer observability for API failures and analysis latency.
+- Description: `AI-powered career intelligence platform for resumes, ATS optimization, GitHub analysis, recruiter workflows, interviews, and career coaching.`
+- Website: add the live Vercel URL.
+- Suggested topics: `nextjs`, `typescript`, `career`, `ai`, `resume`, `ats`, `clerk`, `prisma`, `neon`, `vercel`.
 
 ## License
 
-MIT or placeholder.
+MIT or project-specific license.

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 
 import { AnalyticsDashboardClient } from "@/app/dashboard/analytics/analytics-client";
@@ -14,6 +15,33 @@ import { forge } from "@/lib/talentforge-design";
 
 export const runtime = "nodejs";
 
+const analyticsResumeSelect = {
+  id: true,
+  title: true,
+  extractedText: true,
+  atsScore: true,
+  matchScore: true,
+  createdAt: true,
+  updatedAt: true,
+  versions: {
+    orderBy: { versionNumber: "asc" },
+    select: {
+      id: true,
+      versionNumber: true,
+      sourceType: true,
+      atsScore: true,
+      jobMatchScore: true,
+      addedKeywords: true,
+      removedKeywords: true,
+      createdAt: true,
+    },
+  },
+} satisfies Prisma.ResumeSelect;
+
+type AnalyticsResume = Prisma.ResumeGetPayload<{
+  select: typeof analyticsResumeSelect;
+}>;
+
 export default async function AnalyticsPage() {
   const user = await getCurrentDbUser();
 
@@ -21,32 +49,11 @@ export default async function AnalyticsPage() {
     redirect("/onboarding");
   }
 
-  const resumes = await withRetry(() =>
+  const resumes = await withRetry<AnalyticsResume[]>(() =>
     prisma.resume.findMany({
       where: { userId: user.id },
       orderBy: { updatedAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        extractedText: true,
-        atsScore: true,
-        matchScore: true,
-        createdAt: true,
-        updatedAt: true,
-        versions: {
-          orderBy: { versionNumber: "asc" },
-          select: {
-            id: true,
-            versionNumber: true,
-            sourceType: true,
-            atsScore: true,
-            jobMatchScore: true,
-            addedKeywords: true,
-            removedKeywords: true,
-            createdAt: true,
-          },
-        },
-      },
+      select: analyticsResumeSelect,
     })
   );
   const latestResume = resumes[0] ?? null;

@@ -159,6 +159,7 @@ export async function uploadResume(
   const storedFileName = `${randomUUID()}-${safeName}.pdf`;
   const storedPath = path.join(userUploadDir, storedFileName);
   const fileUrl = `/uploads/resumes/${user.id}/${storedFileName}`;
+  const storedFileUrl = isDevelopment ? fileUrl : null;
   const buffer = Buffer.from(await file.arrayBuffer());
   const fileHash = hashBuffer(buffer);
   let extractedText = "";
@@ -207,13 +208,15 @@ export async function uploadResume(
 
   const atsAnalysis = analyzeResume(extractedText);
 
-  await mkdir(userUploadDir, { recursive: true });
-  await writeFile(storedPath, buffer);
+  if (isDevelopment) {
+    await mkdir(userUploadDir, { recursive: true });
+    await writeFile(storedPath, buffer);
+  }
 
   const createdResume = await prisma.resume.create({
     data: {
       title,
-      fileUrl,
+      fileUrl: storedFileUrl,
       extractedText,
       extractionSource,
       fileHash,

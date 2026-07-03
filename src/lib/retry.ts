@@ -23,7 +23,7 @@ export async function withRetry<T>(
     delayMs = 150,
     shouldRetry = isTransientError,
   }: RetryOptions = {}
-) {
+): Promise<T> {
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {

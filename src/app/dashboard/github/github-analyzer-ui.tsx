@@ -3,12 +3,15 @@
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  BarChart3,
   BookOpen,
   Code2,
   ExternalLink,
   GitBranch,
   GitFork,
   RadioTower,
+  SearchCheck,
+  ShieldCheck,
   Star,
   Target,
 } from "lucide-react";
@@ -73,21 +76,30 @@ export function GitHubHero({
   summary?: string;
 }) {
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-white/[0.07] bg-[linear-gradient(135deg,rgba(0,229,255,0.085),rgba(106,92,255,0.065)_48%,rgba(139,92,246,0.085))] p-5 shadow-[0_0_20px_rgba(0,229,255,0.045),0_0_30px_rgba(106,92,255,0.04)] backdrop-blur-2xl sm:p-6">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/8 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 left-20 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
-      <div className="relative grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.05fr)] xl:items-center">
+    <section className="relative overflow-hidden rounded-[1.1rem] border border-cyan-300/20 bg-[radial-gradient(circle_at_8%_0%,rgba(0,229,255,0.16),transparent_30%),radial-gradient(circle_at_88%_0%,rgba(151,71,255,0.22),transparent_33%),radial-gradient(circle_at_46%_108%,rgba(0,135,255,0.08),transparent_34%),linear-gradient(135deg,#050916_0%,#060817_48%,#12051f_100%)] p-4 shadow-[0_0_24px_rgba(0,229,255,0.08),inset_0_0_42px_rgba(139,92,246,0.035)] backdrop-blur-2xl sm:p-5">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-45"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(120,210,255,0.18) 0 1px, transparent 1.6px)",
+          backgroundSize: "26px 26px",
+        }}
+      />
+      <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-cyan-300/70 via-blue-400/35 to-purple-400/70" />
+      <div className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full bg-[#8B5CF6]/14 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 left-10 h-64 w-64 rounded-full bg-[#00E5FF]/13 blur-3xl" />
+      <div className="relative grid gap-5 xl:grid-cols-[minmax(0,0.92fr)_minmax(420px,0.82fr)] xl:items-center">
         <div>
           <p className={forge.badge}>GitHub Profile Analyzer</p>
-          <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-3 max-w-2xl text-2xl font-semibold tracking-tight text-white sm:text-[2rem] sm:leading-[1.12]">
             Repository intelligence for serious hiring signal.
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-300">
+          <p className="mt-2 max-w-2xl text-xs leading-5 text-zinc-300 sm:text-sm">
             Inspect public code, README depth, stack evidence, deployment, architecture, and resume alignment the way a technical recruiter would.
           </p>
           {children}
         </div>
-        <div className="rounded-[1.7rem] border border-white/[0.08] bg-[#070B16]/55 p-4 shadow-[inset_0_0_38px_rgba(0,229,255,0.06)]">
+        <div className="rounded-[1rem] border border-white/[0.065] bg-[#060915]/60 p-3 shadow-[inset_0_0_30px_rgba(0,229,255,0.04),0_18px_45px_rgba(0,0,0,0.18)]">
           <div className="grid gap-3 sm:grid-cols-3">
             {(metrics.length
               ? metrics
@@ -101,13 +113,13 @@ export function GitHubHero({
                 ]).map((metric) => (
               <div
                 key={metric.label}
-                className="rounded-2xl border border-white/[0.08] bg-white/[0.045] p-3"
+                className="rounded-xl border border-white/[0.08] bg-[linear-gradient(135deg,rgba(255,255,255,0.045),rgba(139,92,246,0.035))] px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]"
               >
                 <p className="text-[0.66rem] font-semibold uppercase tracking-wide text-zinc-500">
                   {metric.label}
                 </p>
                 <p
-                  className={`mt-1 text-xl font-semibold ${
+                  className={`mt-1 text-lg font-semibold ${
                     metric.tone === "emerald"
                       ? "text-emerald-100"
                       : metric.tone === "purple"
@@ -122,12 +134,12 @@ export function GitHubHero({
               </div>
             ))}
           </div>
-          <div className="mt-3 rounded-2xl border border-cyan-300/14 bg-[#00E5FF]/8 p-3">
+          <div className="mt-3 rounded-xl border border-cyan-300/22 bg-[linear-gradient(135deg,rgba(0,229,255,0.1),rgba(59,130,246,0.06)_52%,rgba(139,92,246,0.08))] px-3 py-2.5 shadow-[0_0_22px_rgba(0,229,255,0.055)]">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-cyan-100">
               <SparklineIcon />
               AI recruiter summary
             </div>
-            <p className="mt-2 text-sm leading-6 text-zinc-300">
+            <p className="mt-2 text-xs leading-5 text-zinc-300 sm:text-sm">
               {summary ?? "Run an analysis to generate a compact recruiter-facing summary from public repository evidence."}
             </p>
           </div>
@@ -310,6 +322,19 @@ function SignalBadge({ active, label }: { active: boolean; label: string }) {
 
 function SparklineIcon() {
   return <RadioTower className="h-3.5 w-3.5" />;
+}
+
+function GitHubMark({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M12 2C6.48 2 2 6.59 2 12.26c0 4.51 2.87 8.34 6.84 9.69.5.1.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.38-3.37-1.38-.45-1.18-1.1-1.5-1.1-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.36 9.36 0 0 1 12 6.93c.85 0 1.7.12 2.5.35 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.07.36.32.68.95.68 1.92 0 1.38-.01 2.49-.01 2.83 0 .27.18.59.69.49A10.12 10.12 0 0 0 22 12.26C22 6.59 17.52 2 12 2Z" />
+    </svg>
+  );
 }
 
 export function LanguageChart({
@@ -646,27 +671,73 @@ export function AnalyzerEmptyState({
   action?: ReactNode;
   statusRole?: "status" | "alert";
 }) {
+  const featureIcons = [ShieldCheck, Target, BarChart3, SearchCheck];
+
   return (
     <div
       role={statusRole}
       aria-live={statusRole ? "polite" : undefined}
-      className="rounded-[1.5rem] border border-white/[0.08] bg-[#101827]/58 p-6 text-center"
+      className="relative overflow-hidden rounded-[1.1rem] border border-cyan-300/22 bg-[radial-gradient(circle_at_50%_22%,rgba(0,148,255,0.34),transparent_23%),radial-gradient(circle_at_44%_29%,rgba(163,73,255,0.32),transparent_28%),radial-gradient(circle_at_6%_0%,rgba(0,229,255,0.16),transparent_35%),radial-gradient(circle_at_92%_5%,rgba(117,35,255,0.28),transparent_40%),linear-gradient(135deg,#030613_0%,#050716_42%,#100021_100%)] px-5 py-7 text-center shadow-[0_0_30px_rgba(0,229,255,0.08),inset_0_0_58px_rgba(139,92,246,0.06)] sm:px-8"
     >
-      <BookOpen className="mx-auto h-8 w-8 text-cyan-100" />
-      <h3 className="mt-4 text-lg font-semibold text-white">{title}</h3>
-      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-400">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-35"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(135,217,255,0.28) 0 1px, transparent 1.7px)",
+          backgroundSize: "30px 30px",
+        }}
+      />
+      <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-cyan-300/75 via-blue-400/35 to-purple-400/75" />
+      <div className="pointer-events-none absolute left-1/2 top-10 h-60 w-[44rem] -translate-x-1/2 rounded-full bg-[#00E5FF]/18 blur-3xl" />
+      <div className="pointer-events-none absolute left-[42%] top-12 h-60 w-[34rem] -translate-x-1/2 rounded-full bg-[#8B5CF6]/18 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 right-8 h-80 w-80 rounded-full bg-[#8B5CF6]/16 blur-3xl" />
+      <div className="relative mx-auto h-[20rem] max-w-4xl [perspective:900px]">
+        <div className="absolute left-1/2 top-[8.7rem] h-28 w-[34rem] -translate-x-1/2 rounded-full border border-cyan-300/24 bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.34),rgba(139,92,246,0.22)_42%,transparent_72%)] shadow-[0_0_52px_rgba(0,229,255,0.28)]" />
+        <div className="absolute left-[47%] top-[9.1rem] h-20 w-[28rem] -translate-x-1/2 rounded-full border border-purple-400/35 shadow-[0_0_22px_rgba(139,92,246,0.32)] [transform:rotateX(64deg)]" />
+        <div className="absolute left-[54%] top-[9.75rem] h-14 w-[23rem] -translate-x-1/2 rounded-full border border-cyan-300/32 shadow-[0_0_22px_rgba(0,229,255,0.26)] [transform:rotateX(64deg)]" />
+        <div className="absolute left-1/2 top-[3.75rem] h-36 w-56 -translate-x-[58%] rounded-[1.35rem] border border-cyan-200/38 bg-[linear-gradient(135deg,rgba(255,255,255,0.22),rgba(94,153,255,0.13)_45%,rgba(139,92,246,0.18))] shadow-[0_0_44px_rgba(139,92,246,0.32),inset_0_1px_0_rgba(255,255,255,0.22)] backdrop-blur-md [transform:rotateX(8deg)_rotateY(-19deg)_rotateZ(-2deg)]" />
+        <div className="absolute left-1/2 top-[4.85rem] grid h-36 w-64 -translate-x-1/2 place-items-center rounded-[1.35rem] border border-cyan-100/48 bg-[linear-gradient(135deg,rgba(255,255,255,0.22),rgba(26,50,91,0.66)_40%,rgba(0,153,255,0.15))] shadow-[0_0_46px_rgba(0,229,255,0.28),inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-22px_38px_rgba(139,92,246,0.14)] backdrop-blur-md [transform:rotateX(8deg)_rotateY(-12deg)_rotateZ(1deg)]">
+          <span className="absolute left-5 top-5 h-1.5 w-1.5 rounded-full bg-white/85 shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+          <span className="absolute left-9 top-6 h-1 w-1 rounded-full bg-white/65" />
+          <span className="grid h-20 w-20 place-items-center rounded-full bg-[linear-gradient(180deg,#ffffff,#d7e6ff)] text-[#101827] shadow-[0_0_28px_rgba(255,255,255,0.2)]">
+            <GitHubMark className="h-14 w-14" />
+          </span>
+        </div>
+        <div className="absolute left-[18%] top-[5.7rem] grid h-20 w-20 place-items-center rounded-[1.35rem] border border-emerald-300/28 bg-emerald-300/14 text-emerald-100 shadow-[0_0_30px_rgba(52,211,153,0.28)] backdrop-blur-md">
+          <SearchCheck className="h-9 w-9" />
+        </div>
+        <div className="absolute right-[18%] top-[5.9rem] grid h-20 w-20 place-items-center rounded-[1.35rem] border border-cyan-300/30 bg-cyan-300/14 text-cyan-100 shadow-[0_0_30px_rgba(0,229,255,0.28)] backdrop-blur-md">
+          <Code2 className="h-9 w-9" />
+        </div>
+        <div className="absolute left-[19%] top-[13.2rem] grid h-16 w-16 place-items-center rounded-[1.2rem] border border-purple-300/30 bg-purple-300/16 text-purple-100 shadow-[0_0_30px_rgba(139,92,246,0.3)] backdrop-blur-md">
+          <BarChart3 className="h-8 w-8" />
+        </div>
+      </div>
+      <h3 className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent drop-shadow-[0_0_22px_rgba(59,130,246,0.28)]">{title}</h3>
+      <p className="mx-auto mt-3 max-w-3xl text-base leading-7 text-zinc-300">
         {description}
       </p>
       {details?.length ? (
-        <div className="mx-auto mt-5 grid max-w-2xl gap-2 text-left sm:grid-cols-2">
-          {details.map((detail) => (
-            <span
-              key={detail}
-              className="rounded-2xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs leading-5 text-zinc-300"
-            >
-              {detail}
-            </span>
-          ))}
+        <div className="mx-auto mt-6 grid max-w-5xl gap-3 text-left sm:grid-cols-2 xl:grid-cols-4">
+          {details.map((detail, index) => {
+            const Icon = featureIcons[index % featureIcons.length] ?? BookOpen;
+            const [detailTitle, detailBody] = detail.split("|");
+
+            return (
+              <span
+                key={detail}
+                className="flex min-h-[4.4rem] items-center gap-3 rounded-xl border border-cyan-300/16 bg-[linear-gradient(135deg,rgba(8,14,31,0.82),rgba(17,12,37,0.72))] px-4 py-3 text-xs leading-5 text-zinc-300 shadow-[0_0_18px_rgba(0,229,255,0.045)]"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-cyan-300/18 bg-cyan-300/10 text-cyan-100 shadow-[0_0_14px_rgba(0,229,255,0.12)]">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span>
+                  <span className="block font-semibold text-zinc-100">{detailTitle}</span>
+                  {detailBody ? <span className="mt-1 block text-zinc-400">{detailBody}</span> : null}
+                </span>
+              </span>
+            );
+          })}
         </div>
       ) : null}
       {action ? (
