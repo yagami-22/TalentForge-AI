@@ -3,13 +3,13 @@ import {
   ArrowRight,
   Bot,
   CheckCircle2,
+  ChevronDown,
   CirclePlay,
   Code2,
   Compass,
   FileSearch,
   GitBranch,
   MessageSquareText,
-  PenLine,
   ShieldCheck,
   Sparkles,
   Star,
@@ -111,7 +111,7 @@ const trustedBrands = ["Google", "Microsoft", "Amazon", "Adobe", "Infosys", "TCS
 
 export default function Home() {
   return (
-    <PremiumBackground contentClassName="mx-auto min-h-screen w-full max-w-[1560px] overflow-x-hidden">
+    <PremiumBackground contentClassName="mx-auto min-h-screen w-full overflow-x-hidden">
       <style>
         {`
           @keyframes landing-float {
@@ -144,9 +144,9 @@ export default function Home() {
 
       <nav
         aria-label="Main navigation"
-        className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#050914]/82 backdrop-blur-2xl"
+        className="sticky top-0 z-40 border-b border-white/[0.07] bg-[#030713]/88 backdrop-blur-2xl"
       >
-        <div className="mx-auto flex w-full max-w-[1360px] items-center justify-between gap-4 px-5 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[1410px] items-center justify-between gap-5 px-5 py-3 sm:px-7 lg:px-8">
           <Link href="/" className="flex min-w-0 items-center gap-3 rounded-2xl">
             <TFMark size="md" />
             <span className="min-w-0">
@@ -160,8 +160,14 @@ export default function Home() {
           </Link>
 
           <div className="hidden items-center gap-8 text-sm font-medium text-slate-300 lg:flex">
-            <a href="#pricing" className="transition hover:text-cyan-50">
+            <NavLink href="#features">Platform</NavLink>
+            <NavLink href="#features">Solutions</NavLink>
+            <NavLink href="#features">Resources</NavLink>
+            <a href="#features" className="transition hover:text-cyan-50">
               Pricing
+            </a>
+            <a href="#features" className="transition hover:text-cyan-50">
+              Trust
             </a>
           </div>
 
@@ -171,7 +177,7 @@ export default function Home() {
               variant="outline"
               className="hidden h-10 rounded-xl border-white/[0.08] bg-[#080D1D]/70 px-4 text-sm font-semibold text-white shadow-[0_0_22px_rgba(139,92,246,0.1)] md:inline-flex"
             >
-              <a href="#pricing">
+              <a href="#features">
                 <Bot className="h-4 w-4 text-amber-300" />
                 AI Assistant
               </a>
@@ -201,24 +207,24 @@ export default function Home() {
       </nav>
 
       <section className="relative isolate overflow-hidden border-b border-white/[0.06]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,229,255,0.14),transparent_24%),radial-gradient(circle_at_74%_34%,rgba(139,92,246,0.18),transparent_30%),linear-gradient(180deg,rgba(5,9,20,0.12),rgba(5,9,20,0.86))]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_15%,rgba(0,229,255,0.13),transparent_25%),radial-gradient(circle_at_70%_30%,rgba(139,92,246,0.2),transparent_32%),linear-gradient(180deg,rgba(5,9,20,0.08),rgba(5,9,20,0.92))]" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
         <div className="pointer-events-none absolute left-[12%] top-24 h-80 w-80 rounded-full bg-[#00E5FF]/8 blur-3xl" />
         <div className="pointer-events-none absolute right-[16%] top-20 h-96 w-96 rounded-full bg-[#8B5CF6]/10 blur-3xl" />
 
-        <div className="relative mx-auto grid min-w-0 w-full max-w-[1360px] gap-10 px-5 pb-12 pt-10 sm:px-6 lg:grid-cols-[minmax(0,0.88fr)_minmax(560px,1.12fr)] lg:px-8 lg:pb-14 lg:pt-12">
+        <div className="relative mx-auto grid min-w-0 w-full max-w-[1410px] gap-8 px-5 pb-8 pt-10 sm:px-7 lg:grid-cols-[minmax(0,0.86fr)_minmax(580px,1.14fr)] lg:px-8 lg:pb-8 lg:pt-10">
           <div className="relative flex min-w-0 flex-col justify-center">
             <p className="inline-flex max-w-full rounded-full border border-purple-300/24 bg-purple-300/10 px-3 py-1.5 text-center text-[0.64rem] font-semibold uppercase tracking-[0.18em] text-purple-100 shadow-[0_0_24px_rgba(139,92,246,0.18)] sm:w-fit sm:px-4 sm:text-xs sm:tracking-[0.35em]">
               AI-Powered Career Intelligence
             </p>
-            <h1 className="mt-6 max-w-[620px] text-[3.1rem] font-semibold leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-[4.7rem]">
+            <h1 className="mt-5 max-w-[640px] text-[3.5rem] font-semibold leading-[0.92] tracking-tight text-white sm:text-7xl lg:text-[5.05rem]">
               Your career.
               <span className="block bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#FF3DFE] bg-clip-text text-transparent">
                 Upgraded
                 <span className="block text-white sm:inline"> by AI.</span>
               </span>
             </h1>
-            <p className="mt-6 max-w-[560px] text-base leading-8 text-slate-300 sm:text-lg">
+            <p className="mt-5 max-w-[560px] text-base leading-8 text-slate-300 sm:text-lg">
               From resume analysis to interview mastery, TalentForge AI gives you everything you need to stand out and get hired faster.
             </p>
 
@@ -271,7 +277,7 @@ export default function Home() {
                 variant="outline"
                 className="h-12 w-full max-w-sm rounded-[1.15rem] border-white/[0.08] bg-[#080D1D]/66 px-7 text-base text-white shadow-[0_0_24px_rgba(0,0,0,0.22)] sm:w-auto"
               >
-                <a href="#pricing">
+                <a href="#features">
                   <CirclePlay className="h-4 w-4" />
                   See How It Works
                 </a>
@@ -294,37 +300,34 @@ export default function Home() {
 
       <section
         id="features"
-        className="relative mx-auto w-full max-w-[1360px] px-5 py-12 sm:px-6 lg:px-8"
+        className="relative mx-auto w-full max-w-[1410px] px-5 py-5 sm:px-7 lg:px-8"
       >
-        <div className="pointer-events-none absolute left-1/2 top-10 h-56 w-56 -translate-x-1/2 rounded-full bg-[#00E5FF]/8 blur-3xl" />
-        <div className="pointer-events-none absolute right-[12%] top-20 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
+        <div className="pointer-events-none absolute left-1/2 top-4 h-56 w-56 -translate-x-1/2 rounded-full bg-[#00E5FF]/8 blur-3xl" />
+        <div className="pointer-events-none absolute right-[12%] top-8 h-64 w-64 rounded-full bg-[#8B5CF6]/8 blur-3xl" />
 
         <div className="relative mx-auto max-w-3xl text-center">
           <p className="mx-auto inline-flex rounded-full border border-cyan-300/18 bg-cyan-300/8 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-cyan-200 shadow-[0_0_24px_rgba(0,229,255,0.12)]">
             All-In-One Career Intelligence Suite
           </p>
           <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
-            Everything you need.
-            <span className="block">
-              In one{" "}
-              <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] bg-clip-text text-transparent">
-                intelligent
-              </span>{" "}
-              platform.
-            </span>
+            Everything you need. In one{" "}
+            <span className="bg-gradient-to-r from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] bg-clip-text text-transparent">
+              intelligent
+            </span>{" "}
+            platform.
           </h2>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
+          <p className="mt-2 text-sm leading-6 text-slate-400">
             Powerful AI tools to analyze, optimize, and accelerate your career growth.
           </p>
         </div>
 
-        <div className="relative mt-8 grid grid-cols-1 gap-4 min-[460px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
+        <div className="relative mt-6 grid grid-cols-1 gap-4 min-[460px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
           {moduleCards.map((module) => (
             <ModuleCardView key={module.title} module={module} />
           ))}
         </div>
 
-        <div className="relative mt-9 text-center">
+        <div className="relative mt-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.36em] text-slate-600 sm:tracking-[0.5em]">
             Trusted by aspiring professionals from
           </p>
@@ -335,66 +338,16 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <section id="pricing" className="mx-auto w-full max-w-[1360px] px-5 py-12 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[2rem] border border-[rgba(255,255,255,0.08)] bg-[linear-gradient(135deg,rgba(0,229,255,0.16),rgba(106,92,255,0.12)_50%,rgba(139,92,246,0.18))] p-6 shadow-[0_0_40px_rgba(0,229,255,0.14),0_0_70px_rgba(106,92,255,0.16)] backdrop-blur-2xl sm:p-8 lg:p-10">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#00E5FF]/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-[#8B5CF6]/18 blur-3xl" />
-          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-100">
-                Ready when you are
-              </p>
-              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Build the proof, practice the pitch, and apply with confidence.
-              </h2>
-            </div>
-            <Show when="signed-out">
-              <SignUpButton fallbackRedirectUrl="/dashboard">
-                <Button
-                  size="lg"
-                  className="h-12 rounded-2xl px-6 text-base font-semibold shadow-[0_0_44px_rgba(0,229,255,0.34)]"
-                >
-                  Start Your Free Journey
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 rounded-2xl px-6 text-base font-semibold shadow-[0_0_44px_rgba(0,229,255,0.34)]"
-              >
-                <Link href="/dashboard" prefetch={false}>
-                  Go to Dashboard
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </Show>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-white/[0.06] px-5 py-8 text-sm text-slate-500 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-6 rounded-[1.75rem] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] p-5 shadow-[0_0_40px_rgba(0,229,255,0.08),0_0_60px_rgba(106,92,255,0.08)] backdrop-blur-xl md:flex-row md:items-center md:justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <TFMark size="sm" />
-            <span>
-              <span className="block font-semibold tracking-tight text-white">
-                TalentForge AI
-              </span>
-              <span className="text-xs text-slate-500">Career Intelligence Platform</span>
-            </span>
-          </Link>
-          <div className="flex flex-wrap gap-4">
-            <a href="#pricing" className="transition hover:text-cyan-50">
-              Get Started
-            </a>
-          </div>
-        </div>
-      </footer>
     </PremiumBackground>
+  );
+}
+
+function NavLink({ href, children }: { href: string; children: string }) {
+  return (
+    <a href={href} className="inline-flex items-center gap-1 transition hover:text-cyan-50">
+      {children}
+      <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+    </a>
   );
 }
 
@@ -417,52 +370,53 @@ function TFMark({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 
 function CareerIntelligenceVisual() {
   return (
-    <div className="relative hidden min-h-[560px] lg:block" aria-label="TalentForge AI career intelligence preview">
-      <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.12),transparent_60%)] blur-2xl" />
-      <div className="landing-float absolute left-[20%] top-[8%] z-30">
+    <div className="relative hidden min-h-[520px] lg:block" aria-label="TalentForge AI career intelligence preview">
+      <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_48%_42%,rgba(0,229,255,0.18),transparent_58%)] blur-2xl" />
+      <div className="landing-float absolute left-[10%] top-[4%] z-30">
         <FloatingMetric title="Resume Analysis" label="ATS Score" value="86%" delta="+18%" accent="cyan" />
       </div>
-      <div className="landing-float-slow absolute left-[12%] top-[42%] z-30">
+      <div className="landing-float-slow absolute left-[2%] top-[34%] z-30">
         <FloatingMetric title="JD Match" label="Match Score" value="92%" delta="+21%" accent="emerald" />
       </div>
-      <div className="landing-float absolute right-[3%] top-[10%] z-30">
+      <div className="landing-float absolute right-[4%] top-[6%] z-30">
         <FloatingMetric title="Interview Prep" label="Mock Interviews" value="31K+" delta="Completed" accent="purple" />
       </div>
-      <div className="landing-float-slow absolute right-[-2%] top-[36%] z-30">
+      <div className="landing-float-slow absolute right-[2%] top-[33%] z-30">
         <FloatingStars />
       </div>
-      <div className="landing-float absolute bottom-[8%] left-[40%] z-30">
+      <div className="landing-float absolute bottom-[8%] left-[18%] z-30">
         <FloatingChecklist />
       </div>
-      <div className="landing-float-slow absolute bottom-[8%] right-[6%] z-30">
+      <div className="landing-float-slow absolute bottom-[8%] right-[8%] z-30">
         <FloatingChart />
       </div>
 
-      <div className="absolute left-1/2 top-[45%] h-[360px] w-[520px] -translate-x-1/2 -translate-y-1/2">
-        <div className="landing-orbit absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/16" />
-        <div className="absolute left-1/2 top-1/2 h-[270px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-purple-300/18" />
-        <div className="absolute left-1/2 top-1/2 h-[220px] w-[430px] -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-[50%] border border-cyan-300/16" />
-        <div className="absolute left-1/2 top-1/2 h-[220px] w-[430px] -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-[50%] border border-[#FF3DFE]/14" />
-        <div className="absolute left-1/2 top-[54%] h-40 w-[360px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.22),rgba(139,92,246,0.22)_48%,transparent_74%)] blur-sm" />
+      <div className="absolute left-1/2 top-[43%] h-[430px] w-[580px] -translate-x-1/2 -translate-y-1/2">
+        <div className="landing-orbit absolute left-1/2 top-[43%] h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/20 shadow-[0_0_36px_rgba(0,229,255,0.18)]" />
+        <div className="absolute left-1/2 top-[43%] h-[255px] w-[455px] -translate-x-1/2 -translate-y-1/2 rotate-12 rounded-[50%] border border-cyan-300/24" />
+        <div className="absolute left-1/2 top-[43%] h-[255px] w-[455px] -translate-x-1/2 -translate-y-1/2 -rotate-12 rounded-[50%] border border-purple-300/22" />
+        <div className="absolute left-1/2 top-[43%] h-[330px] w-[330px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.16),transparent_63%)] blur-xl" />
 
-        {[0, 1, 2, 3, 4, 5].map((item) => (
+        {[0, 1, 2, 3, 4, 5, 6].map((item) => (
           <span
             key={item}
-            className="landing-pulse absolute h-2 w-2 rounded-full bg-cyan-100 shadow-[0_0_14px_rgba(0,229,255,0.95)]"
+            className="landing-pulse absolute h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(0,229,255,1)]"
             style={{
-              left: `${14 + item * 14}%`,
-              top: `${26 + ((item * 23) % 42)}%`,
+              left: `${20 + item * 10}%`,
+              top: `${18 + ((item * 29) % 46)}%`,
               animationDelay: `${item * 0.28}s`,
             }}
           />
         ))}
 
-        <div className="absolute left-1/2 top-[49%] z-10 h-[185px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-[2.2rem] border border-cyan-200/22 bg-[linear-gradient(145deg,rgba(14,30,62,0.62),rgba(58,54,150,0.4),rgba(0,229,255,0.18))] shadow-[0_0_44px_rgba(0,229,255,0.34),0_0_70px_rgba(139,92,246,0.3),inset_0_1px_0_rgba(255,255,255,0.18)] [transform:perspective(900px)_rotateX(58deg)_rotateZ(45deg)]" />
-        <div className="absolute left-1/2 top-[54%] z-10 h-[185px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-[2.2rem] border border-purple-200/22 bg-[linear-gradient(145deg,rgba(20,25,66,0.62),rgba(106,92,255,0.34),rgba(255,61,254,0.15))] shadow-[0_0_40px_rgba(139,92,246,0.35)] [transform:perspective(900px)_rotateX(58deg)_rotateZ(45deg)]" />
-        <div className="absolute left-1/2 top-[59%] z-10 h-[185px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-[2.2rem] border border-purple-300/18 bg-[linear-gradient(145deg,rgba(7,12,32,0.7),rgba(75,51,164,0.34),rgba(0,229,255,0.1))] shadow-[0_0_46px_rgba(106,92,255,0.35)] [transform:perspective(900px)_rotateX(58deg)_rotateZ(45deg)]" />
+        <div className="absolute left-1/2 top-[63%] h-28 w-[330px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,229,255,0.44),rgba(106,92,255,0.34)_42%,transparent_72%)] blur-md" />
+        <div className="absolute left-1/2 top-[63%] z-10 h-16 w-[280px] -translate-x-1/2 rounded-[50%] border border-cyan-300/28 bg-[linear-gradient(90deg,rgba(0,229,255,0.28),rgba(139,92,246,0.35),rgba(255,61,254,0.22))] shadow-[0_0_36px_rgba(0,229,255,0.34),0_0_60px_rgba(139,92,246,0.32)]" />
+        <div className="absolute left-1/2 top-[68%] z-0 h-16 w-[350px] -translate-x-1/2 rounded-[50%] border border-purple-300/22 bg-[linear-gradient(90deg,rgba(9,16,42,0.82),rgba(65,51,154,0.72),rgba(7,12,32,0.84))] shadow-[0_0_36px_rgba(106,92,255,0.42)]" />
+        <div className="absolute left-1/2 top-[73%] z-0 h-16 w-[300px] -translate-x-1/2 rounded-[50%] border border-cyan-300/16 bg-[linear-gradient(90deg,rgba(5,10,27,0.86),rgba(0,229,255,0.18),rgba(139,92,246,0.24))]" />
 
-        <div className="landing-shimmer absolute left-[52%] top-[35%] z-20 grid h-52 w-52 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-cyan-200/32 bg-[radial-gradient(circle_at_38%_28%,rgba(255,255,255,0.5),rgba(59,168,255,0.36)_24%,rgba(106,92,255,0.42)_56%,rgba(7,11,28,0.94))] shadow-[0_0_48px_rgba(0,229,255,0.62),0_0_92px_rgba(139,92,246,0.5),inset_0_0_46px_rgba(255,255,255,0.18)]">
-          <span className="absolute inset-5 rounded-full border border-cyan-100/12" />
+        <div className="landing-shimmer absolute left-1/2 top-[42%] z-20 grid h-56 w-56 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-cyan-100/36 bg-[radial-gradient(circle_at_32%_24%,rgba(255,255,255,0.68),rgba(74,184,255,0.42)_18%,rgba(55,116,255,0.42)_42%,rgba(139,92,246,0.45)_62%,rgba(5,9,26,0.94)_86%)] shadow-[0_0_54px_rgba(0,229,255,0.78),0_0_110px_rgba(139,92,246,0.58),inset_0_0_36px_rgba(255,255,255,0.18)]">
+          <span className="absolute inset-4 rounded-full border border-cyan-100/16" />
+          <span className="absolute left-8 top-8 h-12 w-24 rounded-full bg-white/20 blur-xl" />
           <TFMark size="lg" />
         </div>
       </div>
