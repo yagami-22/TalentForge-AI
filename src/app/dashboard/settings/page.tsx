@@ -16,7 +16,6 @@ import type { LucideIcon } from "lucide-react";
 
 import {
   BillingAction,
-  ClerkProfileAction,
   DangerActionButton,
   PreferenceSelect,
   SettingToggle,
@@ -121,8 +120,12 @@ export default async function DashboardSettingsPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <ClerkProfileAction>Edit Profile</ClerkProfileAction>
-              <ClerkProfileAction>Manage Account</ClerkProfileAction>
+              <Button asChild variant="outline" size="sm" className={forge.secondaryButton}>
+                <Link href="/dashboard/settings/account#/account">Edit Profile</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className={forge.secondaryButton}>
+                <Link href="/dashboard/settings/account#/security">Manage Account</Link>
+              </Button>
             </div>
           </div>
         </Section>
@@ -135,10 +138,15 @@ export default async function DashboardSettingsPage() {
               <SimpleRow label="Active Sessions" value="Current device" />
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
-              <ClerkProfileAction icon={<KeyRound className="h-3.5 w-3.5" />}>
-                Change Password
-              </ClerkProfileAction>
-              <ClerkProfileAction>Manage Sessions</ClerkProfileAction>
+              <Button asChild variant="outline" size="sm" className={forge.secondaryButton}>
+                <Link href="/dashboard/settings/account#/security">
+                  <KeyRound className="h-3.5 w-3.5" />
+                  Change Password
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className={forge.secondaryButton}>
+                <Link href="/dashboard/settings/account#/security">Manage Sessions</Link>
+              </Button>
             </div>
           </Section>
 

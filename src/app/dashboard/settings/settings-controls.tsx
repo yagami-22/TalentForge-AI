@@ -85,27 +85,6 @@ export function SettingToggle({
   );
 }
 
-type ClerkProfileActionProps = {
-  children: ReactNode;
-  icon?: ReactNode;
-};
-
-export function ClerkProfileAction({ children, icon }: ClerkProfileActionProps) {
-  const clerk = useClerk();
-
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      onClick={() => clerk.openUserProfile()}
-    >
-      {icon}
-      {children}
-    </Button>
-  );
-}
-
 export function SignOutAction() {
   const clerk = useClerk();
   const [isSigningOut, setIsSigningOut] = useState(false);

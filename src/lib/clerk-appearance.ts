@@ -260,6 +260,212 @@ export const clerkAuthAppearance = {
   },
 } as const;
 
+export const clerkUserProfileAppearance = {
+  variables: {
+    colorPrimary: "#00E5FF",
+    colorBackground: "#071024",
+    colorInputBackground: "#0B1224",
+    colorInputText: "#F8FAFC",
+    colorText: "#F8FAFC",
+    colorTextSecondary: "#CBD5E1",
+    colorNeutral: "#94A3B8",
+    colorDanger: "#FB7185",
+    borderRadius: "1rem",
+    fontFamily: "var(--font-geist-sans)",
+  },
+  elements: {
+    rootBox: {
+      width: "100%",
+      maxWidth: "100%",
+    },
+    cardBox: {
+      width: "100%",
+      maxWidth: "1120px",
+      borderRadius: "28px",
+      background:
+        "linear-gradient(145deg, rgba(7,16,36,0.98), rgba(15,23,42,0.96) 52%, rgba(29,19,58,0.94))",
+      border: "1px solid rgba(103,232,249,0.16)",
+      boxShadow:
+        "0 28px 100px rgba(0,0,0,0.42), 0 0 64px rgba(0,229,255,0.08), inset 0 1px 0 rgba(255,255,255,0.07)",
+      backdropFilter: "blur(20px)",
+      overflow: "hidden",
+    },
+    card: {
+      width: "100%",
+      minHeight: "680px",
+      borderRadius: "28px",
+      background:
+        "radial-gradient(circle at 10% 0%, rgba(0,229,255,0.09), transparent 26%), radial-gradient(circle at 85% 8%, rgba(139,92,246,0.12), transparent 30%), rgba(7,16,36,0.96)",
+      color: "#F8FAFC",
+      boxShadow: "none",
+      border: "0",
+      padding: "0",
+    },
+    navbar: {
+      background: "rgba(3,7,18,0.54)",
+      borderRight: "1px solid rgba(255,255,255,0.08)",
+      color: "#CBD5E1",
+      padding: "1rem",
+    },
+    navbarButton: {
+      borderRadius: "14px",
+      color: "#CBD5E1",
+      fontWeight: "650",
+      transition: "background 180ms ease, color 180ms ease",
+    },
+    navbarButton__active: {
+      background: "rgba(0,229,255,0.12)",
+      color: "#FFFFFF",
+      boxShadow: "inset 0 0 0 1px rgba(103,232,249,0.2)",
+    },
+    navbarButton__hover: {
+      background: "rgba(255,255,255,0.06)",
+      color: "#FFFFFF",
+    },
+    navbarButtonIcon: {
+      color: "#67E8F9",
+    },
+    pageScrollBox: {
+      background: "transparent",
+      color: "#F8FAFC",
+      padding: "1.5rem",
+    },
+    page: {
+      background: "transparent",
+      color: "#F8FAFC",
+    },
+    headerTitle: {
+      color: "#FFFFFF",
+      fontSize: "1.65rem",
+      fontWeight: "700",
+      letterSpacing: "-0.02em",
+    },
+    headerSubtitle: {
+      color: "#CBD5E1",
+      lineHeight: "1.6",
+    },
+    profileSectionTitleText: {
+      color: "#FFFFFF",
+      fontSize: "1rem",
+      fontWeight: "700",
+    },
+    profileSectionPrimaryButton: {
+      borderRadius: "14px",
+      background: "linear-gradient(90deg, #00E5FF, #6A5CFF, #8B5CF6)",
+      color: "#FFFFFF",
+      fontWeight: "700",
+      boxShadow: "0 0 20px rgba(0,229,255,0.18)",
+    },
+    profileSectionPrimaryButton__hover: {
+      boxShadow: "0 0 28px rgba(0,229,255,0.24)",
+    },
+    profileSectionItem: {
+      borderColor: "rgba(255,255,255,0.09)",
+      color: "#F8FAFC",
+    },
+    profileSectionItemList: {
+      background: "rgba(15,23,42,0.34)",
+      borderRadius: "20px",
+      border: "1px solid rgba(255,255,255,0.07)",
+      overflow: "hidden",
+    },
+    profileSectionItemTitle: {
+      color: "#FFFFFF",
+      fontWeight: "650",
+    },
+    profileSectionItemSubtitle: {
+      color: "#CBD5E1",
+    },
+    accordionTriggerButton: {
+      color: "#FFFFFF",
+      borderRadius: "16px",
+      background: "rgba(255,255,255,0.035)",
+      border: "1px solid rgba(255,255,255,0.07)",
+    },
+    accordionContent: {
+      color: "#CBD5E1",
+    },
+    formFieldLabel: {
+      color: "#F8FAFC",
+      fontWeight: "650",
+    },
+    formFieldInput: {
+      height: "2.875rem",
+      borderRadius: "14px",
+      border: "1px solid rgba(148,163,184,0.24)",
+      background: "rgba(3,7,18,0.72)",
+      color: "#F8FAFC",
+      caretColor: "#00E5FF",
+      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+    },
+    formFieldInput__focus: {
+      borderColor: "rgba(0,229,255,0.7)",
+      boxShadow: "0 0 0 3px rgba(0,229,255,0.18)",
+    },
+    formButtonPrimary: {
+      borderRadius: "14px",
+      background: "linear-gradient(90deg, #00E5FF, #6A5CFF, #8B5CF6)",
+      color: "#FFFFFF",
+      fontWeight: "700",
+      boxShadow: "0 0 20px rgba(0,229,255,0.18)",
+    },
+    formButtonPrimary__hover: {
+      boxShadow: "0 0 28px rgba(0,229,255,0.24)",
+    },
+    formButtonReset: {
+      color: "#CBD5E1",
+      fontWeight: "650",
+    },
+    formFieldAction: {
+      color: "#67E8F9",
+      fontWeight: "700",
+    },
+    formFieldErrorText: {
+      color: "#FDA4AF",
+    },
+    badge: {
+      color: "#CFFAFE",
+      background: "rgba(0,229,255,0.1)",
+      border: "1px solid rgba(0,229,255,0.2)",
+    },
+    avatarBox: {
+      boxShadow: "0 0 0 2px rgba(0,229,255,0.2), 0 0 30px rgba(0,229,255,0.14)",
+    },
+    userPreviewMainIdentifier: {
+      color: "#FFFFFF",
+      fontWeight: "700",
+    },
+    userPreviewSecondaryIdentifier: {
+      color: "#CBD5E1",
+    },
+    footer: {
+      background: "rgba(3,7,18,0.6)",
+      borderTop: "1px solid rgba(255,255,255,0.08)",
+    },
+    footerActionText: {
+      color: "#CBD5E1",
+    },
+    footerActionLink: {
+      color: "#67E8F9",
+      fontWeight: "700",
+    },
+    modalBackdrop: {
+      background: "rgba(2,4,11,0.82)",
+      backdropFilter: "blur(10px)",
+    },
+    modalContent: {
+      background:
+        "linear-gradient(145deg, rgba(7,16,36,0.98), rgba(15,23,42,0.96) 52%, rgba(29,19,58,0.94))",
+      border: "1px solid rgba(103,232,249,0.16)",
+      color: "#F8FAFC",
+    },
+  },
+  layout: {
+    applicationName: "TalentForge AI",
+    logoPlacement: "none",
+  },
+} as const;
+
 export const clerkLocalization = {
   signIn: {
     start: {
