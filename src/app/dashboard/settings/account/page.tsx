@@ -1,20 +1,21 @@
 import Link from "next/link";
 import { UserProfile } from "@clerk/nextjs";
-import { ArrowLeft, Settings } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { clerkUserProfileAppearance } from "@/lib/clerk-appearance";
 import { forge } from "@/lib/talentforge-design";
 
+import styles from "./account-profile.module.css";
+
 export default function SettingsAccountPage() {
   return (
     <main className={forge.page}>
-      <div className="relative mx-auto flex min-h-screen w-full max-w-[1180px] flex-col gap-6 py-4">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative mx-auto w-full max-w-[820px] space-y-6 py-2">
+        <header className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-slate-500">TalentForge AI</p>
-            <h1 className="mt-1 flex items-center gap-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              <Settings className="h-7 w-7 text-cyan-100" />
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               Account
             </h1>
           </div>
@@ -26,7 +27,7 @@ export default function SettingsAccountPage() {
           </Button>
         </header>
 
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-cyan-200/12 bg-[radial-gradient(circle_at_12%_0%,rgba(0,229,255,0.12),transparent_30%),radial-gradient(circle_at_86%_8%,rgba(139,92,246,0.16),transparent_34%),linear-gradient(145deg,rgba(7,16,36,0.78),rgba(5,10,22,0.88))] p-3 shadow-[0_26px_100px_rgba(0,0,0,0.34),0_0_48px_rgba(0,229,255,0.06)] backdrop-blur-2xl sm:p-5">
+        <section className={`${styles.accountShell} relative overflow-hidden rounded-[1.65rem] border border-white/[0.08] bg-[linear-gradient(145deg,rgba(7,16,36,0.84),rgba(13,20,38,0.62)_56%,rgba(5,10,22,0.8))] shadow-[0_22px_80px_rgba(0,0,0,0.26),0_0_32px_rgba(0,229,255,0.035),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-2xl`}>
           <UserProfile
             routing="hash"
             appearance={clerkUserProfileAppearance}

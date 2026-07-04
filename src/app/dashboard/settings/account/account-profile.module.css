@@ -1,0 +1,310 @@
+.accountShell {
+  position: relative;
+  isolation: isolate;
+}
+
+.accountShell::before {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(0, 229, 255, 0.06), transparent 18rem),
+    radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.07), transparent 20rem);
+  content: "";
+}
+
+.accountShell::after {
+  pointer-events: none;
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.08), transparent) top / 100% 1px no-repeat;
+  content: "";
+}
+
+.accountShell :global(.cl-rootBox) {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.accountShell :global(.cl-cardBox) {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+  min-height: 0 !important;
+}
+
+.accountShell :global(.cl-card) {
+  min-height: 0 !important;
+  height: auto !important;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: #f8fafc;
+  box-shadow: none;
+}
+
+.accountShell :global(.cl-navbar),
+.accountShell :global(.cl-footer) {
+  display: none;
+}
+
+.accountShell :global(.cl-pageScrollBox) {
+  max-height: none;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: visible;
+  background: transparent;
+  color: #f8fafc;
+  padding: 0;
+}
+
+.accountShell :global(.cl-page) {
+  width: 100%;
+  max-width: 100%;
+  color: #f8fafc;
+}
+
+.accountShell :global(.cl-header) {
+  display: none;
+}
+
+.accountShell :global(.cl-profilePage),
+.accountShell :global(.cl-securityPage) {
+  padding: 0;
+}
+
+.accountShell :global(.cl-profileSection),
+.accountShell :global(.cl-activeDevicesSection),
+.accountShell :global(.cl-deleteAccountSection) {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.32fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  padding: 1.25rem 1.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.accountShell :global(.cl-profileSection:last-child),
+.accountShell :global(.cl-activeDevicesSection:last-child),
+.accountShell :global(.cl-deleteAccountSection:last-child) {
+  border-bottom: 0;
+}
+
+.accountShell :global(.cl-profileSectionTitle),
+.accountShell :global(.cl-activeDevicesSectionTitle),
+.accountShell :global(.cl-deleteAccountSectionTitle) {
+  margin: 0;
+  order: -1;
+  padding-top: 0.45rem;
+}
+
+.accountShell :global(.cl-profileSectionTitleText),
+.accountShell :global(.cl-profileSectionTitle),
+.accountShell :global(.cl-activeDevicesSectionTitle),
+.accountShell :global(.cl-deleteAccountSectionTitle) {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+}
+
+.accountShell :global(.cl-profileSectionContent),
+.accountShell :global(.cl-activeDevicesSectionContent),
+.accountShell :global(.cl-deleteAccountSectionContent) {
+  width: 100%;
+  min-width: 0;
+  order: 1;
+}
+
+.accountShell :global(.cl-profileSectionItemList),
+.accountShell :global(.cl-activeDeviceList) {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0, 229, 255, 0.045), transparent 12rem),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.36), rgba(15, 23, 42, 0.18)),
+    rgba(2, 6, 23, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+.accountShell :global(.cl-profileSectionItem),
+.accountShell :global(.cl-activeDevice) {
+  min-height: 3.4rem;
+  border-color: rgba(255, 255, 255, 0.07);
+  background: transparent;
+  color: #f8fafc;
+  padding: 0.85rem 1rem;
+}
+
+.accountShell :global(.cl-profileSectionItem:hover),
+.accountShell :global(.cl-activeDevice:hover) {
+  background: rgba(0, 229, 255, 0.035);
+}
+
+.accountShell :global(.cl-profileSectionItemTitle),
+.accountShell :global(.cl-profileSectionItemPrimaryText),
+.accountShell :global(.cl-userPreviewMainIdentifier),
+.accountShell :global(.cl-menuButton),
+.accountShell :global(.cl-accordionTriggerButton),
+.accountShell :global(.cl-activeDeviceInfo),
+.accountShell :global(.cl-activeDeviceBrowser),
+.accountShell :global(.cl-activeDeviceOs) {
+  color: #f8fafc;
+}
+
+.accountShell :global(.cl-profileSectionItemSubtitle),
+.accountShell :global(.cl-profileSectionItemSecondaryText),
+.accountShell :global(.cl-userPreviewSecondaryIdentifier),
+.accountShell :global(.cl-activeDeviceLocation),
+.accountShell :global(.cl-activeDeviceActivity),
+.accountShell :global(.cl-formFieldHintText),
+.accountShell :global(.cl-formFieldWarningText) {
+  color: rgba(148, 163, 184, 0.92);
+}
+
+.accountShell :global(.cl-profileSectionItem [class*="Text"]),
+.accountShell :global(.cl-activeDevice [class*="Text"]) {
+  color: rgba(226, 232, 240, 0.94);
+}
+
+.accountShell :global(.cl-badge) {
+  border: 1px solid rgba(103, 232, 249, 0.2);
+  background: rgba(0, 229, 255, 0.09);
+  color: #cffafe;
+  font-weight: 700;
+}
+
+.accountShell :global(.cl-avatarBox) {
+  border-radius: 0.95rem;
+  box-shadow:
+    0 0 0 1px rgba(0, 229, 255, 0.22),
+    0 0 24px rgba(0, 229, 255, 0.12);
+}
+
+.accountShell :global(.cl-formFieldLabel) {
+  color: #f8fafc;
+  font-weight: 680;
+}
+
+.accountShell :global(.cl-formFieldInput) {
+  min-height: 2.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.95rem;
+  background: rgba(2, 6, 23, 0.54);
+  color: #f8fafc;
+  caret-color: #00e5ff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.accountShell :global(.cl-formFieldInput:focus) {
+  border-color: rgba(0, 229, 255, 0.58);
+  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.14);
+}
+
+.accountShell :global(.cl-formButtonPrimary),
+.accountShell :global(.cl-profileSectionPrimaryButton),
+.accountShell :global(.cl-deleteAccountButton) {
+  min-height: 2.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00e5ff, #6a5cff, #8b5cf6);
+  color: #ffffff;
+  font-weight: 760;
+  box-shadow:
+    0 0 18px rgba(0, 229, 255, 0.16),
+    0 0 24px rgba(139, 92, 246, 0.1);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.accountShell :global(.cl-profileSectionPrimaryButton) {
+  justify-self: end;
+}
+
+.accountShell :global(.cl-profileSection__profile),
+.accountShell :global(.cl-profileSection__emailAddresses),
+.accountShell :global(.cl-profileSection__connectedAccounts) {
+  min-height: 0;
+}
+
+.accountShell :global(.cl-profileSection__profile .cl-profileSectionContent) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.accountShell :global(.cl-profileSection__emailAddresses .cl-profileSectionContent),
+.accountShell :global(.cl-profileSection__connectedAccounts .cl-profileSectionContent) {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.accountShell :global(.cl-deleteAccountButton) {
+  background: linear-gradient(90deg, #fb7185, #8b5cf6);
+}
+
+.accountShell :global(.cl-formButtonPrimary:hover),
+.accountShell :global(.cl-profileSectionPrimaryButton:hover),
+.accountShell :global(.cl-deleteAccountButton:hover) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 24px rgba(0, 229, 255, 0.22),
+    0 0 34px rgba(139, 92, 246, 0.14);
+}
+
+.accountShell :global(.cl-formButtonReset),
+.accountShell :global(.cl-formFieldAction) {
+  color: #67e8f9;
+  font-weight: 720;
+}
+
+.accountShell :global(.cl-menuButton) {
+  border-radius: 999px;
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.accountShell :global(.cl-menuButton:hover) {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.accountShell :global(.cl-modalBackdrop) {
+  background: rgba(2, 4, 11, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.accountShell :global(.cl-modalContent) {
+  border: 1px solid rgba(103, 232, 249, 0.14);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(0, 229, 255, 0.08), transparent 16rem),
+    linear-gradient(145deg, rgba(7, 16, 36, 0.98), rgba(15, 23, 42, 0.96) 52%, rgba(29, 19, 58, 0.94));
+  color: #f8fafc;
+}
+
+@media (max-width: 760px) {
+  .accountShell :global(.cl-profileSection),
+  .accountShell :global(.cl-activeDevicesSection),
+  .accountShell :global(.cl-deleteAccountSection) {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    padding: 1.2rem;
+  }
+
+  .accountShell :global(.cl-profileSectionItem),
+  .accountShell :global(.cl-activeDevice) {
+    min-height: 3.4rem;
+  }
+}

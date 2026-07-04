@@ -280,22 +280,19 @@ export const clerkUserProfileAppearance = {
     },
     cardBox: {
       width: "100%",
-      maxWidth: "1120px",
-      borderRadius: "28px",
-      background:
-        "linear-gradient(145deg, rgba(7,16,36,0.98), rgba(15,23,42,0.96) 52%, rgba(29,19,58,0.94))",
-      border: "1px solid rgba(103,232,249,0.16)",
-      boxShadow:
-        "0 28px 100px rgba(0,0,0,0.42), 0 0 64px rgba(0,229,255,0.08), inset 0 1px 0 rgba(255,255,255,0.07)",
-      backdropFilter: "blur(20px)",
+      maxWidth: "100%",
+      borderRadius: "26px",
+      background: "transparent",
+      border: "0",
+      boxShadow: "none",
+      backdropFilter: "none",
       overflow: "hidden",
     },
     card: {
       width: "100%",
-      minHeight: "680px",
-      borderRadius: "28px",
-      background:
-        "radial-gradient(circle at 10% 0%, rgba(0,229,255,0.09), transparent 26%), radial-gradient(circle at 85% 8%, rgba(139,92,246,0.12), transparent 30%), rgba(7,16,36,0.96)",
+      minHeight: "0",
+      borderRadius: "26px",
+      background: "transparent",
       color: "#F8FAFC",
       boxShadow: "none",
       border: "0",
@@ -328,7 +325,7 @@ export const clerkUserProfileAppearance = {
     pageScrollBox: {
       background: "transparent",
       color: "#F8FAFC",
-      padding: "1.5rem",
+      padding: "0",
     },
     page: {
       background: "transparent",
@@ -364,7 +361,7 @@ export const clerkUserProfileAppearance = {
       color: "#F8FAFC",
     },
     profileSectionItemList: {
-      background: "rgba(15,23,42,0.34)",
+      background: "rgba(15,23,42,0.28)",
       borderRadius: "20px",
       border: "1px solid rgba(255,255,255,0.07)",
       overflow: "hidden",
