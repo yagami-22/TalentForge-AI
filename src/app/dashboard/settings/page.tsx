@@ -14,7 +14,14 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { ConfirmActionButton, SettingToggle } from "@/app/dashboard/settings/settings-controls";
+import {
+  BillingAction,
+  ClerkProfileAction,
+  DangerActionButton,
+  PreferenceSelect,
+  SettingToggle,
+  SignOutAction,
+} from "@/app/dashboard/settings/settings-controls";
 import { Button } from "@/components/ui/button";
 import { getCurrentDbUser } from "@/lib/current-user";
 import { forge } from "@/lib/talentforge-design";
@@ -22,17 +29,50 @@ import { forge } from "@/lib/talentforge-design";
 export const runtime = "nodejs";
 
 const notifications = [
-  { label: "Interview reminders", defaultChecked: true },
-  { label: "Job alerts", defaultChecked: false },
-  { label: "Weekly insights", defaultChecked: true },
-  { label: "Product updates", defaultChecked: false },
+  {
+    label: "Interview reminders",
+    storageKey: "talentforge.settings.notifications.interview-reminders",
+    defaultChecked: true,
+  },
+  {
+    label: "Job alerts",
+    storageKey: "talentforge.settings.notifications.job-alerts",
+    defaultChecked: false,
+  },
+  {
+    label: "Weekly insights",
+    storageKey: "talentforge.settings.notifications.weekly-insights",
+    defaultChecked: true,
+  },
+  {
+    label: "Product updates",
+    storageKey: "talentforge.settings.notifications.product-updates",
+    defaultChecked: false,
+  },
 ];
 
 const appearance = [
-  { label: "Theme", defaultChecked: true, disabled: true },
-  { label: "Animations", defaultChecked: true },
-  { label: "Reduced Motion", defaultChecked: false },
-  { label: "Compact Mode", defaultChecked: false },
+  {
+    label: "Theme",
+    storageKey: "talentforge.settings.theme",
+    defaultChecked: true,
+    disabled: true,
+  },
+  {
+    label: "Animations",
+    storageKey: "talentforge.settings.animations",
+    defaultChecked: true,
+  },
+  {
+    label: "Reduced Motion",
+    storageKey: "talentforge.settings.reduced-motion",
+    defaultChecked: false,
+  },
+  {
+    label: "Compact Mode",
+    storageKey: "talentforge.settings.compact-mode",
+    defaultChecked: false,
+  },
 ];
 
 export default async function DashboardSettingsPage() {
@@ -59,12 +99,15 @@ export default async function DashboardSettingsPage() {
               Settings
             </h1>
           </div>
-          <Button asChild variant="outline" size="sm" className={forge.secondaryButton}>
-            <Link href="/dashboard">
-              <LayoutDashboard className="h-3.5 w-3.5" />
-              Dashboard
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Button asChild variant="outline" size="sm" className={forge.secondaryButton}>
+              <Link href="/dashboard">
+                <LayoutDashboard className="h-3.5 w-3.5" />
+                Dashboard
+              </Link>
+            </Button>
+            <SignOutAction />
+          </div>
         </header>
 
         <Section title="Profile" icon={UserRound}>
@@ -78,12 +121,8 @@ export default async function DashboardSettingsPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className={forge.secondaryButton}>
-                Edit Profile
-              </Button>
-              <Button variant="outline" size="sm" className={forge.secondaryButton}>
-                Manage Account
-              </Button>
+              <ClerkProfileAction>Edit Profile</ClerkProfileAction>
+              <ClerkProfileAction>Manage Account</ClerkProfileAction>
             </div>
           </div>
         </Section>
@@ -96,13 +135,10 @@ export default async function DashboardSettingsPage() {
               <SimpleRow label="Active Sessions" value="Current device" />
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className={forge.secondaryButton}>
-                <KeyRound className="h-3.5 w-3.5" />
+              <ClerkProfileAction icon={<KeyRound className="h-3.5 w-3.5" />}>
                 Change Password
-              </Button>
-              <Button variant="outline" size="sm" className={forge.secondaryButton}>
-                Manage Sessions
-              </Button>
+              </ClerkProfileAction>
+              <ClerkProfileAction>Manage Sessions</ClerkProfileAction>
             </div>
           </Section>
 
@@ -124,9 +160,31 @@ export default async function DashboardSettingsPage() {
 
           <Section title="AI Preferences" icon={Bot}>
             <div className="divide-y divide-white/[0.07]">
-              <SimpleRow label="Resume Style" value="Impact-focused" />
-              <SimpleRow label="Interview Difficulty" value="Adaptive" />
-              <SettingToggle label="Auto ATS Suggestions" defaultChecked />
+              <PreferenceSelect
+                label="Resume Style"
+                storageKey="talentforge.settings.ai.resume-style"
+                defaultValue="impact-focused"
+                options={[
+                  { label: "Impact-focused", value: "impact-focused" },
+                  { label: "Concise", value: "concise" },
+                  { label: "Technical", value: "technical" },
+                ]}
+              />
+              <PreferenceSelect
+                label="Interview Difficulty"
+                storageKey="talentforge.settings.ai.interview-difficulty"
+                defaultValue="adaptive"
+                options={[
+                  { label: "Adaptive", value: "adaptive" },
+                  { label: "Beginner", value: "beginner" },
+                  { label: "Advanced", value: "advanced" },
+                ]}
+              />
+              <SettingToggle
+                label="Auto ATS Suggestions"
+                storageKey="talentforge.settings.ai.auto-ats-suggestions"
+                defaultChecked
+              />
             </div>
           </Section>
         </div>
@@ -139,10 +197,10 @@ export default async function DashboardSettingsPage() {
                 <p className="mt-1 text-xl font-semibold text-white">{profile.plan}</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button size="sm">Upgrade</Button>
-                <Button variant="outline" size="sm" className={forge.secondaryButton}>
-                  Manage Billing
-                </Button>
+                <BillingAction plan={profile.plan} variant="default">
+                  Upgrade
+                </BillingAction>
+                <BillingAction plan={profile.plan}>Manage Billing</BillingAction>
               </div>
             </div>
           </Section>
@@ -157,11 +215,21 @@ export default async function DashboardSettingsPage() {
             <div className="space-y-3">
               <DangerRow
                 label="Delete Account"
+                title="Delete account"
                 confirmation="Delete your account? This action cannot be undone once account deletion is enabled."
+                resultMessage="Account deletion requires a connected backend deletion flow. No account data was deleted."
               />
               <DangerRow
                 label="Delete Uploaded Resumes"
+                title="Delete uploaded resumes"
                 confirmation="Delete uploaded resumes? This action cannot be undone once resume deletion is enabled."
+                resultMessage="Resume deletion requires a connected backend deletion flow. No resume data was deleted."
+              />
+              <DangerRow
+                label="Reset AI History"
+                title="Reset AI history"
+                confirmation="Reset your AI history? This action cannot be undone once history reset is enabled."
+                resultMessage="AI history reset requires a connected backend deletion flow. No AI history was changed."
               />
             </div>
           </section>
@@ -204,15 +272,24 @@ function SimpleRow({ label, value }: { label: string; value: string }) {
 
 function DangerRow({
   label,
+  title,
   confirmation,
+  resultMessage,
 }: {
   label: string;
+  title: string;
   confirmation: string;
+  resultMessage: string;
 }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-[1rem] px-1 py-2 transition duration-300 hover:bg-red-400/[0.045] sm:px-2">
       <p className="text-sm font-semibold text-white">{label}</p>
-      <ConfirmActionButton label="Delete" confirmation={confirmation} tone="danger" />
+      <DangerActionButton
+        label={label === "Reset AI History" ? "Reset" : "Delete"}
+        title={title}
+        confirmation={confirmation}
+        resultMessage={resultMessage}
+      />
     </div>
   );
 }
