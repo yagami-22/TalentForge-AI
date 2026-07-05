@@ -31,6 +31,8 @@ import {
   DashboardMotionItem,
   DashboardMotionSection,
 } from "@/components/dashboard/dashboard-motion";
+import { AccountDropdown } from "@/app/dashboard/account-dropdown";
+import type { AccountDropdownProfile } from "@/app/dashboard/account-dropdown";
 import { DashboardErrorFallback } from "@/app/dashboard/dashboard-production";
 import { PremiumBackground } from "@/components/premium-background";
 import { Button } from "@/components/ui/button";
@@ -90,8 +92,11 @@ type LatestResume = {
 
 type UserProfile = {
   email: string;
+  imageUrl: string | null;
   role: string;
   initial: string;
+  name: string | null;
+  plan: string;
 };
 
 type NavGroup = {
@@ -419,8 +424,11 @@ export default async function DashboardPage() {
 
   const profile: UserProfile = {
     email: user.email,
+    imageUrl: user.imageUrl,
     role: user.role,
-    initial: user.email?.[0]?.toUpperCase() ?? "U",
+    initial: (user.name || user.email)?.[0]?.toUpperCase() ?? "U",
+    name: user.name,
+    plan: "Starter",
   };
   const resumeResult = await loadLatestResume(user.id);
 
@@ -629,7 +637,14 @@ function SidebarLink({
 }
 
 function DashboardHeader({ profile }: { profile: UserProfile }) {
-  const name = getDisplayName(profile.email);
+  const name = profile.name || getDisplayName(profile.email);
+  const accountProfile: AccountDropdownProfile = {
+    email: profile.email,
+    imageUrl: profile.imageUrl,
+    initial: profile.initial,
+    name: profile.name,
+    plan: profile.plan,
+  };
 
   return (
     <header className="relative flex flex-col gap-3 py-1 lg:flex-row lg:items-start lg:justify-between">
@@ -663,11 +678,7 @@ function DashboardHeader({ profile }: { profile: UserProfile }) {
           <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#8B5CF6] shadow-[0_0_12px_rgba(139,92,246,0.9)]" />
           <Bell className="h-4 w-4" />
         </button>
-        <div className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-[#39C8FF] via-[#6A5CFF] to-[#8B5CF6] p-px shadow-[0_0_26px_rgba(59,168,255,0.26)]">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-[#3BA8FF] to-[#6A5CFF] text-sm font-bold text-white">
-            {profile.initial}
-          </span>
-        </div>
+        <AccountDropdown profile={accountProfile} />
       </div>
     </header>
   );
